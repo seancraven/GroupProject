@@ -1,0 +1,7 @@
+/images
+/models
+/wandb
+**/__pycache__
+*.png
+/.history
+.mypy_cache
