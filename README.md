@@ -8,7 +8,7 @@ If you use the terminal in vscode, and you are logged in through github you won'
 1)  Git clone the repo:
     - in a terminal run
     ```console
-    git clone https://github.com/flxclxc/COMP0197_Group_Project.git
+    git clone https://github.com/seancraven/GroupProject.git
     ```
 2) Install anaconda or miniconda, follow the instrunctions here:
 https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html#installing-conda-on-a-system-that-has-other-python-installations-or-packages
