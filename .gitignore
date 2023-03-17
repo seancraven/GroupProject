@@ -5,3 +5,5 @@
 *.png
 /.history
 .mypy_cache
+**/test_data/
+**/train_data/
