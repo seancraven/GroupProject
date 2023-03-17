@@ -47,7 +47,7 @@ class Pets(Dataset):
         root: str,
         split: str = "all_train",
         labeled_fraction: Union[float, None] = None,
-        binary_labels: bool = False,
+        binary_labels: bool = True,
     ):
         # Check arguments are valid.
         assert split in [
