@@ -1,0 +1,13 @@
+name: apdl-cw
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - matplotlib
+  - pre-commit
+  - pylint
+  - python=3.10
+  - pytorch
+  - torchvision
+  - wandb
+prefix: /home/sean/miniconda3/envs/apdl-cw
