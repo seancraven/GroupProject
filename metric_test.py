@@ -16,8 +16,9 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # model = LoadedModel("./models/u_net_supervised/Mean Squared Error_20.pt")
     model = LSD()
-    testdataset = Pets("./pet_3", "all_train", binary_labels=True)
+    testdataset = Pets("./src/pet_3", "test", binary_labels=True)
     model_metrics = ModelMetrics(model, testdataset)
-    print('', model_metrics.test_accuracy)
-    print(model_metrics.test_iou)
+    print('LSD accuracy: {:.5f}'.format(model_metrics.test_accuracy), )
+    print('LSD loss: {:.5f}'.format(model_metrics.test_loss),)
+    print('LSD IOU: {:.5f}'.format(model_metrics.test_iou))
 
