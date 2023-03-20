@@ -5,8 +5,10 @@ import torch
 import numpy as np
 from torch import nn
 from typing import Callable
-from pet_3.data import Pets
+
 from torch.utils.data import DataLoader
+from src.pet_3.data import Pets
+
 
 
 class LoadedModel:
@@ -24,10 +26,50 @@ class ModelMetrics:
         """ Add model metric to class here """
         self.model = loadedmodel
         self.test_dataset = test_dataset
-        self.metric1 = None
-        self.metric2 = None
-        self.metric3 = None
-        # ...
+        self.test_accuracy = self._accuracy()
+        self.test_iou = self._intersection_over_union()
+    
+
+    def _accuracy(self):
+        """ Calculate accuracy metric """
+        # move model to device ??
+        self.model.eval()
+        # self.model.to(device) # ???
+        test_loader = DataLoader(self.test_dataset, batch_size=1, num_workers=8)
+
+        with torch.no_grad():
+            correct_pixels = 0
+            total_pixels = 0
+            for _, (data, target) in enumerate(test_loader):
+                data, target = data, target
+                output = self.model.forward(data)
+                pred = (output > .5).int()
+                correct_pixels += (pred == target).sum().item()
+                total_pixels += (target.shape[2] * target.shape[3]) * target.shape[0]
+
+        return correct_pixels / total_pixels
+    
+    
+    def _intersection_over_union(self):
+        """ Calculate IoU metric """
+         # move model to device ?
+        self.model.eval()
+        # self.model.to(device) # ???
+        test_loader = DataLoader(self.test_dataset, batch_size=1, shuffle=True)
+
+        with torch.no_grad():
+            intersection_sum = 0.0
+            union_sum = 0.0
+            for _, (data, target) in enumerate(test_loader):
+                output = self.model.forward(data)
+                pred = (output > .5).int()
+                intersection = (pred * target).sum().item()
+                union = (pred + target).sum().item() - intersection
+                intersection_sum += intersection
+                union_sum += union
+        
+        iou = intersection_sum / union_sum
+        return iou / len(test_loader)
 
 
 def model_metric(
@@ -46,7 +88,6 @@ def model_metric(
 
     with torch.no_grad():
         eval_metric = 0.0
-
         for X, y in test_loader:
             X, y = X.to(device), y.to(device)
             y_pred = model(X)
@@ -55,7 +96,3 @@ def model_metric(
     with open(output_path, "w") as f:
         pass
 
-
-if __name__ == "__main__":
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    LoadedModel("./models/u_net_supervised/Mean Squared Error_20.pt")
