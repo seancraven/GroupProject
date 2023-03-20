@@ -5,7 +5,7 @@ import torch
 import numpy as np
 from torch import nn
 from typing import Callable
-from data import Pets
+from pet_3.data import Pets
 from torch.data.utils import DataLoader
 
 

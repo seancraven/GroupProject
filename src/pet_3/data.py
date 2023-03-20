@@ -3,12 +3,15 @@ Torch datasets for the pet dataset.
 """
 from __future__ import annotations
 import os
-from typing import Tuple, Union
+import random
+import torch
 
+from functools import cache
 from PIL import Image
-from torch import Tensor
 from torch.utils.data import Dataset
 from torchvision.transforms.transforms import Resize, ToTensor
+from typing import Tuple, Union, Optional
+
 from .download_utils import (
     _populate_data,
     _move_files_according_to_file,
@@ -47,7 +50,7 @@ class Pets(Dataset):
         root: str,
         split: str = "all_train",
         labeled_fraction: Union[float, None] = None,
-        binary_labels: bool = False,
+        binary_labels: bool = True,
     ):
         # Check arguments are valid.
         assert split in [
@@ -105,7 +108,7 @@ class Pets(Dataset):
     def __len__(self) -> int:
         return len(self.images)
 
-    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         img = ToTensor()(
             Image.open(os.path.join(self.image_folder, self.images[idx])).convert("RGB")
         )
@@ -116,8 +119,8 @@ class Pets(Dataset):
             label[label < 0.0075] = 1  # Only Edge
             label[label > 0.009] = 1  # Only foreground
             label[(0.0075 <= label) & (label <= 0.009)] = 0
-
-        label = Resize((256, 256))(label)
+            label = Resize((256, 256))(label).round().long()
+            label = label.flatten(1,-1)
         return img, label
 
     @property
@@ -132,7 +135,7 @@ class Pets(Dataset):
 class PetsUnlabeled(Dataset):
     """Class to manage unlabeled data for pet dataset."""
 
-    def __init__(self, root: str, labeled_fraction: float):
+    def __init__(self, root: str, labeled_fraction: float, shuffle: bool=True):
         move_files = os.path.join(root, f"unlabeled_train_{labeled_fraction}.txt")
         self.labeled_fraction = labeled_fraction
         self.train_dir = os.path.join(root, "train_data")
@@ -145,11 +148,13 @@ class PetsUnlabeled(Dataset):
         self.images = os.listdir(self.unlabeled_dir)
         self.images = [img for img in self.images if _valid_images(img)]
         self.images.sort()
+        if shuffle:
+            random.shuffle(self.images)
 
     def __len__(self) -> int:
         return len(self.images)
 
-    def __getitem__(self, idx: int) -> Tensor:
+    def __getitem__(self, idx: int) -> torch.Tensor:
         img = Image.open(os.path.join(self.unlabeled_dir, self.images[idx])).convert(
             "RGB"
         )
@@ -183,3 +188,40 @@ def _valid_images(f_name: str) -> bool:
     if f_name in bad_names or f_name[-3:] != "jpg":
         return False
     return True
+
+
+class Oracle:
+    """
+    An oracle which can evaluate the accuracy of pseudolabel given the image,
+    the pseudolabel, and the pseudolabel mask.
+    """
+    def __init__(self):
+        # Build a cache of the dataset, and then delete the dataset object
+        # so we don't mess up the files being moved around.
+        # The cache will stay in memory, which might be problematic depending
+        # on amounts of ram... I haven't tested this yet.
+        # I'm not remotely proud of this.
+        dataset = Pets("data", "all_train")
+        for img, _ in Pets("data", "all_train"):
+            self.__image_label(img)
+        del dataset
+
+    @cache
+    @staticmethod
+    def __image_label(self, image: torch.Tensor) -> torch.Tensor:
+        """Returns the label of the image."""
+        for img, label in self.dataset:
+            if torch.equal(img, image):
+                return label
+            
+    def __batch_labels(self, batch: torch.Tensor) -> torch.Tensor:
+        """Returns the labels of the batch."""
+        return torch.stack([self.__image_label(img) for img in batch])
+
+    def __call__(self, batch: torch.Tensor, pseudolabels: torch.Tensor, masks: torch.Tensor) -> float:
+        """Returns the accuracy of the pseudolabels given the batch."""
+        labels = self.__batch_labels(batch)
+        pseudolabels = pseudolabels * masks
+        labels = labels * masks
+        # TODO: Implement this function.
+        pass
