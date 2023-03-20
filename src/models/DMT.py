@@ -75,7 +75,7 @@ class DMT(nn.Module):
         if use_validation:
             labeled_dataset = labeled_loader.dataset
             validation_dataset, training_dataset = map(
-                lambda x: Subset(labeled_dataset, range(int(len(labeled_dataset)) * x)),
+                lambda x: Subset(labeled_dataset, range(int(len(labeled_dataset) * x))),
                 [0.05, 0.95]
             )
             self.labeled_loader = DataLoader(training_dataset, batch_size=labeled_loader.batch_size)
@@ -465,16 +465,16 @@ class DMT(nn.Module):
                         self.baseline_optimizer.step()
 
                     # Epoch bookkeeping
-                    epoch_dynamic_loss += dynamic_loss
-                    epoch_standard_loss += standard_loss
+                    epoch_dynamic_loss += dynamic_loss * unlabeled.shape[0]
+                    epoch_standard_loss += standard_loss * labeled.shape[0]
                     # There's no guarantee the last batch will be of size batch_size
                     # (this stuff might get used if we implement an Oracle)
                     seen_unlabeled += unlabeled.shape[0]
                     seen_labeled += labeled.shape[0]
 
                 toc = time.time()
-                epoch_dynamic_loss /= i
-                epoch_standard_loss /= i
+                epoch_dynamic_loss /= seen_unlabeled
+                epoch_standard_loss /= seen_labeled
 
                 debug_msg = 'Epoch {}/{} completed in {:.2f} secs.\n\tDynamic loss: {:.4f}. Standard loss: {:.4f}.'
                 debug_msg_args = [epoch + 1, num_epochs, toc-tic, epoch_dynamic_loss, epoch_standard_loss]
