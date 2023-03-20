@@ -351,7 +351,8 @@ class DMT(nn.Module):
                 torch.save(self.baseline_model.state_dict(), 'DMT_baseline.pt')
 
         if self.test_loader:
-            self.debug(f'Baseline accuracy before training: {self.evaluate(self.baseline_model, self.test_loader):.4f}')
+            if self.baseline_model:
+                self.debug(f'Baseline accuracy before training: {self.evaluate(self.baseline_model, self.test_loader):.4f}')
             self.debug(f'Model A accuracy before training: {self.evaluate(self.model_a, self.test_loader):.4f}')
             self.debug(f'Model B before training: {self.evaluate(self.model_b, self.test_loader):.4f}')
 
@@ -407,8 +408,7 @@ class DMT(nn.Module):
                         student_predictions, labels
                     )
                     # Compute total loss and update
-                    # total_loss = dynamic_loss + standard_loss
-                    total_loss = dynamic_loss
+                    total_loss = dynamic_loss + standard_loss
                     total_loss.backward()
                     opt_student.step()
 
