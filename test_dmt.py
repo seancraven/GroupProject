@@ -18,6 +18,7 @@ baseline = get_unet()
 #     unet_b_state = torch.load("model_b.pt")
 #     unet_a.load_state_dict(unet_a_state)
 #     unet_b.load_state_dict(unet_b_state)
+#     baseline.load_state_dict(unet_a_state)
 #     print('Using pretrained models.')
 #     using_pretrained = True
 # except:
