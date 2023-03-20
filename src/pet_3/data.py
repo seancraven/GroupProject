@@ -28,13 +28,13 @@ class Pets(Dataset):
 
     Examples:
         Binary labeled dataset:
-        train = pet_3.Data.Pets("./pet_3", split = "all_train", binary_labels = True)
+        train = pet_3.Data.Pets("./src/pet_3", split = "all_train", binary_labels = True)
         train[i][0] # the ith image
         train[i][1] # the ith label binary mode
 
         Binary unlabeled dataset 60% labeled
         unlabeled, labeled = pet_3.Data.Pets(
-            "./pet_3",
+            "./src/pet_3",
             split = "labeled_unlabeled",
             labeled_fraction = 0.6,
             binary_labels=True,
@@ -47,7 +47,7 @@ class Pets(Dataset):
         root: str,
         split: str = "all_train",
         labeled_fraction: Union[float, None] = None,
-        binary_labels: bool = False,
+        binary_labels: bool = True,
     ):
         # Check arguments are valid.
         assert split in [
@@ -117,7 +117,8 @@ class Pets(Dataset):
             label[label > 0.009] = 1  # Only foreground
             label[(0.0075 <= label) & (label <= 0.009)] = 0
 
-        label = Resize((256, 256))(label)
+        label = Resize((256, 256))(label).round()
+
         return img, label
 
     @property
