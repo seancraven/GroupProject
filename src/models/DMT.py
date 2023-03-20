@@ -6,6 +6,7 @@ import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import wandb
 
 from torch.utils.data import DataLoader, Dataset, Subset
 from typing import Tuple, Iterable, Optional, Callable
@@ -93,6 +94,15 @@ class DMT(nn.Module):
 
         self.best_model = None
 
+
+    def wandb_log(self, *args, **kwargs) -> None:
+        """ Logs to wandb if it's available. """
+        # Wandb statement needs to be a dict, e.g.
+        # wandb.log({"loss": loss.item()})
+        try:
+            wandb.log(*args, **kwargs)
+        except:  # Blanket except is bad!
+            pass
 
     def debug(self, msg: str) -> None:
         """ Prints a debug message if verbosity is >= 2 """
@@ -322,16 +332,28 @@ class DMT(nn.Module):
     
     @staticmethod
     def compute_standard_loss(
-        student_predictions,
-        labels
+        student_predictions: torch.Tensor,
+        labels: torch.Tensor
     ):  
+        """
+        Computes the standard cross entropy loss.
+
+        Args:
+            student_predictions (torch.Tensor): Tensor of shape (B, W*H, C) containing
+                the predictions of the student model.
+            labels (torch.Tensor): Tensor of shape (B, W*H) containing the labels for
+                each pixel in each image in the batch.
+        """
         criterion = nn.CrossEntropyLoss(reduction='none')
         logits = torch.log(student_predictions).permute(0,2,1)
         ce = criterion(logits, labels.flatten(1))
         loss = ce.mean()
         return loss
     
-    def evaluate(self, net: nn.Module, data: DataLoader) -> float:
+    def evaluate_IoU(self, net: nn.Module, data: DataLoader) -> float:
+        """
+        Evaluates the IoU score of the model on the given data.
+        """
         net.eval()
         score = 0
         seen_images = 0
@@ -352,9 +374,19 @@ class DMT(nn.Module):
         percentiles: Iterable[float],
         num_epochs: int,
         batch_size: int,
-        skip_unlabeled: bool=False,
+        label_ratio: float,  # Just used for logging to wandb
         skip_pretrain: bool=False
     ) -> None:
+        """
+        TODO docstring
+        """
+        wandb.init(project='DMT model', config={
+            "Percentiles": percentiles,
+            "Number of epochs": num_epochs,
+            "Batch size": batch_size,
+            "Label ratio": label_ratio,
+        })
+
         if not skip_pretrain:
             self.pretrain(num_epochs=10, batch_size=batch_size, proportion=0.7)
             torch.save(self.model_a.state_dict(), 'DMT_model_a.pt')
@@ -364,11 +396,11 @@ class DMT(nn.Module):
 
         if self.validation_loader:
             if self.baseline_model:
-                self.debug(f'Baseline accuracy before training: {self.evaluate(self.baseline_model, self.validation_loader):.4f}')
-            self.debug(f'Model A accuracy before training: {self.evaluate(self.model_a, self.validation_loader):.4f}')
-            self.debug(f'Model B before training: {self.evaluate(self.model_b, self.validation_loader):.4f}')
+                self.debug(f'Baseline accuracy before training: {self.evaluate_IoU(self.baseline_model, self.validation_loader):.4f}')
+            self.debug(f'Model A accuracy before training: {self.evaluate_IoU(self.model_a, self.validation_loader):.4f}')
+            self.debug(f'Model B accuracy before training: {self.evaluate_IoU(self.model_b, self.validation_loader):.4f}')
 
-        def _train_from_teacher(teacher, student, opt_student, alpha, train_baseline=False):
+        def _train_from_teacher(teacher, student, opt_student, alpha, student_name='Student', train_baseline=False):
             # If train_baseline is true, we train the baseline as well just on the labeled data.
             # This is so the baseline 'sees' the labeled data as much as a student does,
             # so we can see if DMT is actually helping.
@@ -377,12 +409,11 @@ class DMT(nn.Module):
 
             self.debug(f'Beginning dynamic mutual training on percentile {alpha}')
             if self.validation_loader:
-                self.debug(f'Student accuracy before training: {self.evaluate(student, self.validation_loader):.4f}')
+                self.debug(f'Student accuracy before training: {self.evaluate_IoU(student, self.validation_loader):.4f}')
             
             for epoch in range(num_epochs):
                 epoch_dynamic_loss = 0.
                 epoch_standard_loss = 0.
-                pseudolabel_accuracy = 0.
                 seen_unlabeled = 0
                 seen_labeled = 0
                 tic = time.time()
@@ -392,29 +423,27 @@ class DMT(nn.Module):
                     labels = labels.to(self.device)
 
                     opt_student.zero_grad()
-                    if not skip_unlabeled:
-                        teacher_confidences = teacher(unlabeled)
-                        pseudolabels, mask = self.compute_pseudolabels(teacher_confidences, alpha)
-                        if self.oracle:
-                            pl_accuracy = self.oracle(unlabeled, pseudolabels, mask)
-                            pseudolabel_accuracy += unlabeled.shape[0] * pl_accuracy
-                        student_confidences = student(unlabeled)
-                        with torch.no_grad():
-                            # This needs to be no_grad, because otherwise
-                            # the model learns to disagree with the teacher with high
-                            # confidence to get low weights
-                            weights = self.compute_weights(
-                                pseudolabels, mask, student_confidences, teacher_confidences,
-                                # TODO see if we're meant to decrease gamma over time?
-                                gamma_1=self.gamma_1_max,
-                                gamma_2=self.gamma_2_max
-                            )
-                        student_labels = torch.argmax(student_confidences, dim=-1)
-                        DMT.sanity_check(unlabeled, pseudolabels, student_labels, mask, weights, 0, 'test1.png')
-                        DMT.sanity_check(unlabeled, pseudolabels, student_labels, mask, weights, 1, 'test2.png')
-                        dynamic_loss = self.compute_dynamic_loss(
-                            student_confidences, teacher_confidences, weights
+                    # Compute the dynamic loss
+                    teacher_confidences = teacher(unlabeled)
+                    pseudolabels, mask = self.compute_pseudolabels(teacher_confidences, alpha)
+                    student_confidences = student(unlabeled)
+                    with torch.no_grad():
+                        # This needs to be no_grad, because otherwise
+                        # the model learns to disagree with the teacher with high
+                        # confidence to get low weights
+                        weights = self.compute_weights(
+                            pseudolabels, mask, student_confidences, teacher_confidences,
+                            # TODO see if we're meant to decrease gamma over time?
+                            gamma_1=self.gamma_1_max,
+                            gamma_2=self.gamma_2_max
                         )
+                    student_labels = torch.argmax(student_confidences, dim=-1)
+                    # The below lines output some images for sanity checks
+                    # DMT.sanity_check(unlabeled, pseudolabels, student_labels, mask, weights, 0, 'test1.png')
+                    # DMT.sanity_check(unlabeled, pseudolabels, student_labels, mask, weights, 1, 'test2.png')
+                    dynamic_loss = self.compute_dynamic_loss(
+                        student_confidences, teacher_confidences, weights
+                    )
                     # Compute the standard loss
                     student_predictions = student(labeled)
                     standard_loss = self.compute_standard_loss(
@@ -444,21 +473,35 @@ class DMT(nn.Module):
                     seen_labeled += labeled.shape[0]
 
                 toc = time.time()
-                pseudolabel_accuracy /= seen_unlabeled
                 epoch_dynamic_loss /= i
                 epoch_standard_loss /= i
 
                 debug_msg = 'Epoch {}/{} completed in {:.2f} secs.\n\tDynamic loss: {:.4f}. Standard loss: {:.4f}.'
                 debug_msg_args = [epoch + 1, num_epochs, toc-tic, epoch_dynamic_loss, epoch_standard_loss]
-                if self.oracle:
-                    debug_msg += ' Pseudolabel accuracy: {:.4f}.'
-                    debug_msg_args.append(pseudolabel_accuracy)
+
+                student_train_accuracy = self.evaluate_IoU(student, self.labeled_loader)
+                self.wandb_log({
+                    "Epoch time": toc-tic,
+                    "Epoch mean dynamic loss": epoch_dynamic_loss,
+                    "Epoch mean standard loss": epoch_standard_loss,  
+                    f"{student_name} train accuracy": student_train_accuracy, 
+                })
                 if self.validation_loader:
                     debug_msg += '\n\tStudent validation accuracy: {:.4f}.'
-                    debug_msg_args.append(self.evaluate(student, self.validation_loader))
+                    student_validation_accuracy = self.evaluate_IoU(student, self.validation_loader)
+                    debug_msg_args.append(student_validation_accuracy)
+                    self.wandb_log({
+                        f"{student_name} validation accuracy": student_validation_accuracy,
+                    })
                     if self.baseline_model:
                         debug_msg += ' Baseline validation accuracy: {:.4f}.'
-                        debug_msg_args.append(self.evaluate(self.baseline_model, self.validation_loader))
+                        baseline_validation_accuracy = self.evaluate_IoU(self.baseline_model, self.validation_loader)
+                        debug_msg_args.append(baseline_validation_accuracy)
+                        if train_baseline:  # Only log the baseline accuracy if we trained it
+                            self.wandb_log({
+                                "Baseline validation accuracy": baseline_validation_accuracy,
+                            })
+
                 self.debug(debug_msg.format(*debug_msg_args))
 
 
@@ -470,6 +513,7 @@ class DMT(nn.Module):
                 student = self.model_b,
                 alpha = alpha,
                 opt_student = self.optimizer_b,
+                student_name='Model B',
                 train_baseline = True
             )
             _train_from_teacher(
@@ -477,18 +521,30 @@ class DMT(nn.Module):
                 student = self.model_a,
                 alpha = alpha,
                 opt_student = self.optimizer_a,
+                student_name='Model A',
                 train_baseline = False
             )
         
-        model_a_accuracy = self.evaluate(self.model_a, self.labeled_loader)
-        model_b_accuracy = self.evaluate(self.model_b, self.labeled_loader)
+        # Finally, the best model is the one with the highest IoU on the labeled set
+        model_a_accuracy = self.evaluate_IoU(self.model_a, self.labeled_loader)
+        model_b_accuracy = self.evaluate_IoU(self.model_b, self.labeled_loader)
         best_model = self.model_a if model_a_accuracy >= model_b_accuracy else self.model_b
-
         self.best_model = best_model
+
+        try:
+            wandb.finish()
+        except:
+            pass
     
     def save_best_model(self, filename: str) -> None:
         """ Save the best model to the filename specified """
         if self.best_model is None:
             raise ValueError('No best model found. Did you run train()?')
         torch.save(self.best_model.state_dict(), filename)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """ Forward pass through the best model """
+        if self.best_model is None:
+            raise ValueError('No best model found. Did you run train()?')
+        return self.best_model(x)
 

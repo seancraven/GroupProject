@@ -61,6 +61,7 @@ dmt.train(
     percentiles=[0.2,0.4,0.6,0.8,1.0],
     num_epochs=10,
     batch_size=TOTAL_BATCH_SIZE,
+    label_ratio=LABEL_PROPORTION,
     skip_pretrain=False
 )
 dmt.save_best_model('best_dmt.pt')
