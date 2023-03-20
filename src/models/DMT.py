@@ -78,7 +78,7 @@ class DMT(nn.Module):
         self.device = device
         self.verbosity = verbosity
         self.test_loader = test_dataloader
-        self.baseline_model = baseline_model
+        self.baseline_model = baseline_model.to(device)
         self.baseline_optimizer = baseline_optimizer
 
 
