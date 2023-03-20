@@ -62,6 +62,6 @@ dmt.train(
     num_epochs=10,
     batch_size=TOTAL_BATCH_SIZE,
     label_ratio=LABEL_PROPORTION,
-    skip_pretrain=True
+    skip_pretrain=False
 )
 dmt.save_best_model('best_dmt.pt')
