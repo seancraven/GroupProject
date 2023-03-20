@@ -414,8 +414,6 @@ class DMT(nn.Module):
             for epoch in range(num_epochs):
                 epoch_dynamic_loss = 0.
                 epoch_standard_loss = 0.
-                seen_unlabeled = 0
-                seen_labeled = 0
                 tic = time.time()
                 for i, (unlabeled, (labeled, labels)) in enumerate(zip(self.unlabeled_loader, self.labeled_loader)):
                     unlabeled = unlabeled.to(self.device)
@@ -465,16 +463,13 @@ class DMT(nn.Module):
                         self.baseline_optimizer.step()
 
                     # Epoch bookkeeping
-                    epoch_dynamic_loss += dynamic_loss * unlabeled.shape[0]
-                    epoch_standard_loss += standard_loss * labeled.shape[0]
-                    # There's no guarantee the last batch will be of size batch_size
-                    # (this stuff might get used if we implement an Oracle)
-                    seen_unlabeled += unlabeled.shape[0]
-                    seen_labeled += labeled.shape[0]
+                    epoch_dynamic_loss += dynamic_loss
+                    epoch_standard_loss += standard_loss
 
                 toc = time.time()
-                epoch_dynamic_loss /= seen_unlabeled
-                epoch_standard_loss /= seen_labeled
+                # i is the number of batches - 1
+                epoch_dynamic_loss /= {i+1}
+                epoch_standard_loss /= {i+1}
 
                 debug_msg = 'Epoch {}/{} completed in {:.2f} secs.\n\tDynamic loss: {:.4f}. Standard loss: {:.4f}.'
                 debug_msg_args = [epoch + 1, num_epochs, toc-tic, epoch_dynamic_loss, epoch_standard_loss]
