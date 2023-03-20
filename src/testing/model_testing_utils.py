@@ -5,8 +5,29 @@ import torch
 import numpy as np
 from torch import nn
 from typing import Callable
-from data import Pets
-from torch.data.utils import DataLoader
+from pet_3.data import Pets
+from torch.utils.data import DataLoader
+
+
+class LoadedModel:
+    def __init__(self, model_path: str):
+        self.model: nn.Module = torch.load(model_path)
+        directory: str = os.path.dirname(model_path)
+        file_name: str = os.path.basename(model_path)
+        loss, self.num_epoch = file_name.split("_")
+        num_epoch: int = int(self.num_epoch.split(".")[0])
+
+
+class ModelMetrics:
+    """ Model metric evaluation class """
+    def __init__(self, loadedmodel : LoadedModel, test_dataset : Pets):
+        """ Add model metric to class here """
+        self.model = loadedmodel
+        self.test_dataset = test_dataset
+        self.metric1 = None
+        self.metric2 = None
+        self.metric3 = None
+        # ...
 
 
 def model_metric(
@@ -33,15 +54,6 @@ def model_metric(
 
     with open(output_path, "w") as f:
         pass
-
-
-class LoadedModel:
-    def __init__(self, model_path: str):
-        self.model: nn.Module = torch.load(model_path)
-        directory: str = os.path.dirname(model_path)
-        file_name: str = os.path.basename(model_path)
-        loss, self.num_epoch = file_name.split("_")
-        num_epoch: int = int(self.num_epoch.split(".")[0])
 
 
 if __name__ == "__main__":
