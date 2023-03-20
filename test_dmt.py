@@ -13,16 +13,17 @@ using_pretrained = False
 unet_a = get_unet()
 unet_b = get_unet()
 baseline = get_unet()
-# try:
-#     unet_a_state = torch.load("model_a.pt")
-#     unet_b_state = torch.load("model_b.pt")
-#     unet_a.load_state_dict(unet_a_state)
-#     unet_b.load_state_dict(unet_b_state)
-#     baseline.load_state_dict(unet_a_state)
-#     print('Using pretrained models.')
-#     using_pretrained = True
-# except:
-#     print('No pretrained models found. Training from scratch.')
+try:
+    unet_a_state = torch.load("DMT_model_a.pt")
+    unet_b_state = torch.load("DMT_model_b.pt")
+    baseline_state = torch.load("DMT_baseline.pt")
+    unet_a.load_state_dict(unet_a_state)
+    unet_b.load_state_dict(unet_b_state)
+    baseline.load_state_dict(unet_a_state)
+    print('Using pretrained models.')
+    using_pretrained = True
+except:
+    print('No pretrained models found. Training from scratch.')
 
 
 optimizer_a = torch.optim.Adam(unet_a.parameters(), lr=1e-3)

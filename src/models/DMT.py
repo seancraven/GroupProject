@@ -343,8 +343,10 @@ class DMT(nn.Module):
     ) -> None:
         if not skip_pretrain:
             self.pretrain(num_epochs=10, batch_size=batch_size, proportion=0.7)
-            torch.save(self.model_a.state_dict(), 'model_a.pt')
-            torch.save(self.model_b.state_dict(), 'model_b.pt')
+            torch.save(self.model_a.state_dict(), 'DMT_model_a.pt')
+            torch.save(self.model_b.state_dict(), 'DMT_model_b.pt')
+            if self.baseline_model:
+                torch.save(self.baseline_model.state_dict(), 'DMT_baseline.pt')
 
         def _train_from_teacher(teacher, student, opt_student, alpha, train_baseline=False):
             # If train_baseline is true, we train the baseline as well just on the labeled data.
