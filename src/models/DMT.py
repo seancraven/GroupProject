@@ -27,7 +27,7 @@ class DMT(nn.Module):
         unlabeled_loader: DataLoader,
         gamma_1: float,
         gamma_2: float,
-        use_validation: bool = False,
+        use_validation: bool = True,
         pseudolabel_accuracy_oracle: Optional[Oracle] = None,
         device: str = 'cuda' if torch.cuda.is_available() else 'cpu',
         verbosity: int = 2,
