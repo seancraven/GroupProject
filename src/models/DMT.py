@@ -325,8 +325,8 @@ class DMT(nn.Module):
             images = images.to(self.device)
             labels = labels.to(self.device).flatten(1)
             predictions = net(images).argmax(dim=-1)
-            intersection = (predictions == 1 and labels == 1).sum()
-            union = (predictions == 1 or labels == 1).sum()
+            intersection = (torch.logical_and(predictions == 1, labels == 1)).sum()
+            union = (torch.logical_or(predictions == 1, labels == 1)).sum()
             IoU = intersection / union  # Got this propoortion correct on this batch
             score += IoU * images.shape[0]  # Needs to be a weighted sum bc the last batch might be smaller
             seen_images += images.shape[0]
@@ -347,6 +347,11 @@ class DMT(nn.Module):
             torch.save(self.model_b.state_dict(), 'DMT_model_b.pt')
             if self.baseline_model:
                 torch.save(self.baseline_model.state_dict(), 'DMT_baseline.pt')
+
+        if self.test_loader:
+            self.debug(f'Baseline accuracy before training: {self.evaluate(self.baseline_model, self.test_loader):.4f}')
+            self.debug(f'Model A accuracy before training: {self.evaluate(self.model_a, self.test_loader):.4f}')
+            self.debug(f'Model B before training: {self.evaluate(self.model_b, self.test_loader):.4f}')
 
         def _train_from_teacher(teacher, student, opt_student, alpha, train_baseline=False):
             # If train_baseline is true, we train the baseline as well just on the labeled data.
