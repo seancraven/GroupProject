@@ -74,10 +74,9 @@ class DMT(nn.Module):
         self.validation_loader = None
         if use_validation:
             labeled_dataset = labeled_loader.dataset
-            validation_dataset, training_dataset = map(
-                lambda x: Subset(labeled_dataset, range(int(len(labeled_dataset) * x))),
-                [0.05, 0.95]
-            )
+            validation_upper_bound = int(0.05 * len(labeled_dataset))
+            validation_dataset = Subset(labeled_dataset, range(validation_upper_bound))
+            training_dataset = Subset(labeled_dataset, range(validation_upper_bound, len(labeled_dataset)))
             self.labeled_loader = DataLoader(training_dataset, batch_size=labeled_loader.batch_size)
             self.validation_loader = DataLoader(validation_dataset, batch_size=labeled_loader.batch_size)
         else:
