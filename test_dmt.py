@@ -51,8 +51,8 @@ dmt = DMT(
     optimizer_b,
     labeled_loader,
     unlabeled_loader,
-    gamma_1=5,
-    gamma_2=5,
+    gamma_1=1,
+    gamma_2=1,
     verbosity=2,
     test_dataloader=test_loader,
     baseline_model=baseline,
@@ -61,5 +61,6 @@ dmt = DMT(
 dmt.train(
     percentiles=[0.2,0.4,0.6,0.8,1.0],
     num_epochs=10,
-    batch_size=TOTAL_BATCH_SIZE
+    batch_size=TOTAL_BATCH_SIZE,
+    skip_pretrain=using_pretrained
 )
