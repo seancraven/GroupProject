@@ -536,6 +536,12 @@ class DMT(nn.Module):
             raise ValueError('No best model found. Did you run train()?')
         torch.save(self.best_model.state_dict(), filename)
 
+    def save_baseline(self, filename: str) -> None:
+        """ Save the baseline model to the filename specified """
+        if not self.baseline_model:
+            raise ValueError('No baseline model was trained!')
+        torch.save(self.baseline_model.state_dict(), filename)
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """ Forward pass through the best model """
         if self.best_model is None:

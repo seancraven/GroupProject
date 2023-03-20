@@ -65,3 +65,4 @@ dmt.train(
     skip_pretrain=False
 )
 dmt.save_best_model('best_dmt.pt')
+dmt.save_baseline('baseline.pt')
