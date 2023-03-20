@@ -72,3 +72,7 @@ baseline_test_accuracy = dmt.evaluate_IoU(test_loader, dmt.baseline_model)
 print('=== Done ===')
 print('Best model test accuracy: ', best_model_test_accuracy)
 print('Baseline test accuracy: ', baseline_test_accuracy)
+dmt.wandb_log({
+    "Baseline test accuracy": baseline_test_accuracy,
+    "Best model test accuracy": best_model_test_accuracy
+    })
