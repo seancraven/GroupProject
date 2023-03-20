@@ -19,7 +19,7 @@ try:
     baseline_state = torch.load("DMT_baseline.pt")
     unet_a.load_state_dict(unet_a_state)
     unet_b.load_state_dict(unet_b_state)
-    baseline.load_state_dict(unet_a_state)
+    baseline.load_state_dict(baseline_state)
     print('Using pretrained models.')
     using_pretrained = True
 except:
@@ -29,7 +29,7 @@ except:
 optimizer_a = torch.optim.Adam(unet_a.parameters(), lr=1e-3)
 optimizer_b = torch.optim.Adam(unet_b.parameters(), lr=1e-3)
 baseline_optimizer = torch.optim.Adam(baseline.parameters(), lr=1e-3)
-train_dataset = Pets("src/pet_3", "labeled_unlabeled", labeled_fraction=LABEL_PROPORTION)
+train_dataset = Pets("src/pet_3", "labeled_unlabeled", labeled_fraction=LABEL_PROPORTION, shuffle=True)
 train_unlabeled, train_labeled = train_dataset.get_datasets()
 unlabeled_loader = DataLoader(
     train_unlabeled,
@@ -62,5 +62,5 @@ dmt.train(
     percentiles=[0.2,0.4,0.6,0.8,1.0],
     num_epochs=10,
     batch_size=TOTAL_BATCH_SIZE,
-    skip_pretrain=using_pretrained
+    skip_pretrain=not using_pretrained
 )

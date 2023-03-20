@@ -108,6 +108,8 @@ class DMT(nn.Module):
         """
         subset_1 = Subset(dataset, range(int(len(dataset) * proportion)))
         subset_2 = Subset(dataset, range(int((1 - proportion) * len(dataset)), len(dataset)))
+        print(len(subset_1))
+        print(len(subset_2))
         
         return subset_1, subset_2
 

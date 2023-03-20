@@ -51,6 +51,7 @@ class Pets(Dataset):
         split: str = "all_train",
         labeled_fraction: Union[float, None] = None,
         binary_labels: bool = True,
+        shuffle: bool = False
     ):
         # Check arguments are valid.
         assert split in [
@@ -69,6 +70,7 @@ class Pets(Dataset):
 
         self.root = root
         self.labeled_fraction = labeled_fraction
+        self.shuffle = shuffle
 
         if split == "test":
             self.parent_data_folder = os.path.join(root, "test_data")
@@ -85,6 +87,8 @@ class Pets(Dataset):
             self.images = os.listdir(self.image_folder)
             self.images = [img for img in self.images if _valid_images(img)]
             self.images.sort()
+            if self.shuffle:
+                random.shuffle(self.images)
             #  self.labels = os.listdir(self.label_folder)
 
         if split == "labeled_unlabeled":
@@ -102,6 +106,7 @@ class Pets(Dataset):
                 "all_train",
                 self.labeled_fraction,
                 binary_labels=self.binary_labels,
+                shuffle=self.shuffle
             )
         raise ValueError("labeled_fraction must be a float for a dataset split")
 
