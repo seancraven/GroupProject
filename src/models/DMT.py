@@ -26,10 +26,10 @@ class DMT(nn.Module):
         unlabeled_loader: DataLoader,
         gamma_1: float,
         gamma_2: float,
+        use_validation: bool = False,
         pseudolabel_accuracy_oracle: Optional[Oracle] = None,
         device: str = 'cuda' if torch.cuda.is_available() else 'cpu',
         verbosity: int = 2,
-        test_dataloader: Optional[DataLoader] = None,
         baseline_model: Optional[nn.Module] = None,
         baseline_optimizer: Optional[optim.Optimizer] = None,
     ):
@@ -63,23 +63,35 @@ class DMT(nn.Module):
             device (str): Device to train on. Defaults to cuda if available.
             verbosity (int): Verbosity level. 0: no logging, 1: information, 2: debug.
                 Currently just prints to stdout, but could be changed to use a logger.
-            test_dataloader (Optional[DataLoader]): Dataloader for sneaky test data to see if anything is working.
         """
         super().__init__()
         self.model_a = model_a.to(device)
         self.model_b = model_b.to(device)
         self.optimizer_a = optimizer_a
-        self.optimizer_b = optimizer_b
-        self.labeled_loader = labeled_loader
+        self.optimizer_b = optimizer_b        
+        
+        self.validation_loader = None
+        if use_validation:
+            labeled_dataset = labeled_loader.dataset
+            validation_dataset, training_dataset = map(
+                lambda x: Subset(labeled_dataset, range(int(len(labeled_dataset)) * x)),
+                [0.05, 0.95]
+            )
+            self.labeled_loader = DataLoader(training_dataset, batch_size=labeled_loader.batch_size)
+            self.validation_loader = DataLoader(validation_dataset, batch_size=labeled_loader.batch_size)
+        else:
+            self.labeled_loader = labeled_loader
+
         self.unlabeled_loader = unlabeled_loader
         self.gamma_1_max = gamma_1
         self.gamma_2_max = gamma_2
         self.oracle = pseudolabel_accuracy_oracle
         self.device = device
         self.verbosity = verbosity
-        self.test_loader = test_dataloader
         self.baseline_model = baseline_model.to(device)
         self.baseline_optimizer = baseline_optimizer
+
+        self.best_model = None
 
 
     def debug(self, msg: str) -> None:
@@ -350,11 +362,11 @@ class DMT(nn.Module):
             if self.baseline_model:
                 torch.save(self.baseline_model.state_dict(), 'DMT_baseline.pt')
 
-        if self.test_loader:
+        if self.validation_loader:
             if self.baseline_model:
-                self.debug(f'Baseline accuracy before training: {self.evaluate(self.baseline_model, self.test_loader):.4f}')
-            self.debug(f'Model A accuracy before training: {self.evaluate(self.model_a, self.test_loader):.4f}')
-            self.debug(f'Model B before training: {self.evaluate(self.model_b, self.test_loader):.4f}')
+                self.debug(f'Baseline accuracy before training: {self.evaluate(self.baseline_model, self.validation_loader):.4f}')
+            self.debug(f'Model A accuracy before training: {self.evaluate(self.model_a, self.validation_loader):.4f}')
+            self.debug(f'Model B before training: {self.evaluate(self.model_b, self.validation_loader):.4f}')
 
         def _train_from_teacher(teacher, student, opt_student, alpha, train_baseline=False):
             # If train_baseline is true, we train the baseline as well just on the labeled data.
@@ -364,7 +376,8 @@ class DMT(nn.Module):
             student.train()
 
             self.debug(f'Beginning dynamic mutual training on percentile {alpha}')
-            self.debug(f'Student accuracy before training: {self.evaluate(student, self.test_loader):.4f}')
+            if self.validation_loader:
+                self.debug(f'Student accuracy before training: {self.evaluate(student, self.validation_loader):.4f}')
             
             for epoch in range(num_epochs):
                 epoch_dynamic_loss = 0.
@@ -440,12 +453,12 @@ class DMT(nn.Module):
                 if self.oracle:
                     debug_msg += ' Pseudolabel accuracy: {:.4f}.'
                     debug_msg_args.append(pseudolabel_accuracy)
-                if self.test_loader:
-                    debug_msg += '\n\tStudent accuracy: {:.4f}.'
-                    debug_msg_args.append(self.evaluate(student, self.test_loader))
+                if self.validation_loader:
+                    debug_msg += '\n\tStudent validation accuracy: {:.4f}.'
+                    debug_msg_args.append(self.evaluate(student, self.validation_loader))
                     if self.baseline_model:
-                        debug_msg += ' Baseline accuracy: {:.4f}.'
-                        debug_msg_args.append(self.evaluate(self.baseline_model, self.test_loader))
+                        debug_msg += ' Baseline validation accuracy: {:.4f}.'
+                        debug_msg_args.append(self.evaluate(self.baseline_model, self.validation_loader))
                 self.debug(debug_msg.format(*debug_msg_args))
 
 
@@ -466,6 +479,16 @@ class DMT(nn.Module):
                 opt_student = self.optimizer_a,
                 train_baseline = False
             )
+        
+        model_a_accuracy = self.evaluate(self.model_a, self.labeled_loader)
+        model_b_accuracy = self.evaluate(self.model_b, self.labeled_loader)
+        best_model = self.model_a if model_a_accuracy >= model_b_accuracy else self.model_b
 
-
+        self.best_model = best_model
+    
+    def save_best_model(self, filename: str) -> None:
+        """ Save the best model to the filename specified """
+        if self.best_model is None:
+            raise ValueError('No best model found. Did you run train()?')
+        torch.save(self.best_model.state_dict(), filename)
 

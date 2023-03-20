@@ -54,7 +54,6 @@ dmt = DMT(
     gamma_1=1,
     gamma_2=1,
     verbosity=2,
-    test_dataloader=test_loader,
     baseline_model=baseline,
     baseline_optimizer=baseline_optimizer,
 )
@@ -64,3 +63,4 @@ dmt.train(
     batch_size=TOTAL_BATCH_SIZE,
     skip_pretrain=False
 )
+dmt.save_best_model('best_dmt.pt')
