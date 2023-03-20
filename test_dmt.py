@@ -7,7 +7,7 @@ from src.models.DMT import DMT
 from src.pet_3.data import Pets
 
 TOTAL_BATCH_SIZE = 8
-LABEL_PROPORTION = 0.5
+LABEL_PROPORTION = 0.2
 
 using_pretrained = False
 unet_a = get_unet()
@@ -66,3 +66,9 @@ dmt.train(
 )
 dmt.save_best_model('best_dmt.pt')
 dmt.save_baseline('baseline.pt')
+best_model_test_accuracy = dmt.evaluate_IoU(test_loader, dmt.best_model)
+baseline_test_accuracy = dmt.evaluate_IoU(test_loader, dmt.baseline_model)
+
+print('=== Done ===')
+print('Best model test accuracy: ', best_model_test_accuracy)
+print('Baseline test accuracy: ', baseline_test_accuracy)

@@ -129,8 +129,6 @@ class DMT(nn.Module):
         """
         subset_1 = Subset(dataset, range(int(len(dataset) * proportion)))
         subset_2 = Subset(dataset, range(int((1 - proportion) * len(dataset)), len(dataset)))
-        print(len(subset_1))
-        print(len(subset_2))
         
         return subset_1, subset_2
 
@@ -384,6 +382,8 @@ class DMT(nn.Module):
             "Number of epochs": num_epochs,
             "Batch size": batch_size,
             "Label ratio": label_ratio,
+            "Gamma 1": self.gamma_1_max,
+            "Gamma 2": self.gamma_2_max,
         })
 
         if not skip_pretrain:
