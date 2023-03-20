@@ -415,7 +415,7 @@ class DMT(nn.Module):
                     if train_baseline and self.baseline_model:
                         # Train the baseline only if we're told do and we have a baseline model
                         self.baseline_optimizer.zero_grad()
-                        baseline_predictions = self.baseline(labeled)
+                        baseline_predictions = self.baseline_model(labeled)
                         baseline_loss = self.compute_standard_loss(
                             baseline_predictions, labels
                         )
