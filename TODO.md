@@ -10,6 +10,16 @@ DMT: Michael
 
 Pet Dataset:
  - [ ] Add validation split function, Tristan, Jannette, Charlie 
+
+```python
+class Pets(Dataset):
+    def __init__(self, ........):
+    some shit.
+    
+    def validation_split(self, split_fraction: float) -> Tuple[Pets, Pets]:
+        return 
+
+```
  - [ ] create more finegrain dataset splits. [0.005, ..., 0.15]
 
 Plotting from wandb:
