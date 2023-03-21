@@ -2,7 +2,7 @@ import torch
 
 from torch.utils.data import DataLoader
 
-from src.models.UNet import get_unet
+from src.models.UNet import UNet
 from src.models.DMT import DMT
 from src.pet_3.data import Pets
 
@@ -10,9 +10,9 @@ TOTAL_BATCH_SIZE = 8
 LABEL_PROPORTION = 0.2
 
 using_pretrained = False
-unet_a = get_unet()
-unet_b = get_unet()
-baseline = get_unet()
+unet_a = UNet()
+unet_b = UNet()
+baseline = UNet()
 # try:
 #     unet_a_state = torch.load("DMT_model_a.pt")
 #     unet_b_state = torch.load("DMT_model_b.pt")
