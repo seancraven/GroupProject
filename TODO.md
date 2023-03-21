@@ -6,6 +6,7 @@ DMT: Michael
  - [ ] Per teacher student DMT paper figure 6. 
  - [ ] Baseline validation, save model.
  - [ ] Code Review: Daniel , Alexi, Eirik 
+ - [ ] Model saving protocol to tell Max. 
 
 Pet Dataset:
  - [ ] Add validation split function, Tristan, Jannette, Charlie 
@@ -33,4 +34,3 @@ Bossman:
  
 Binman:
 - [ ] Sean, clean out repo of crap. 
-- [ ] Sean, add single model, and models folder/ stucture.
