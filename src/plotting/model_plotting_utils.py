@@ -2,9 +2,12 @@ import torch
 import matplotlib.figure as fig
 import matplotlib.pyplot as plt
 
-from src.testing.model_testing_utils import ModelMetrics
+from src.testing.model_testing_utils import LoadedModel, ModelMetrics
+from src.pet_3.data import Pets
 
-from typing import Dict
+from typing import Dict, Callable
+
+import os
 
 
 def plot_bar(
@@ -231,3 +234,128 @@ def plot_img_label_grid(
         plt.ylabel(y_label)
 
     return fig
+
+
+def plot_img_label_pred(
+        title : str,
+        x_label : str,
+        y_label : str,
+        image : torch.Tensor,
+        label : torch.Tensor,
+        prediction : torch.Tensor,
+        ) -> fig.Figure :
+    """
+    Arguments:
+    ----------
+    title   : {String}
+                > Plot title.
+    x_label : {String}
+                > Plot x-axis label.
+    y_label : {String}
+                > Plot y-axis label.
+    img     : {Tensor}
+                > Image tensor to plot
+    label   : {Tensor} 
+                > Label tensor to plot
+    pred    : {Tensor}
+                > Prediction tensor to plot
+    
+    Returns:
+    ----------
+    fig     : {Figure}
+                > Matplotlib figure object
+    """
+
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 8))
+
+    # plot the image
+    img = image.squeeze().permute(1, 2, 0)
+    ax1.imshow(img)
+    ax1.set_title("Image")
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+
+    # plot the label
+    seg_label = label.squeeze()
+    ax2.imshow(seg_label)
+    ax2.set_title("Ground Truth Label")
+    ax2.set_xticks([])
+    ax2.set_yticks([])
+
+    # plot the prediction
+    seg_pred = prediction.squeeze()
+    ax3.imshow(seg_pred)
+    ax3.set_title("Prediction")
+    ax3.set_xticks([])
+    ax3.set_yticks([])
+
+    # Add plot title
+    plt.suptitle(title, fontsize=16, fontweight='bold')
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+
+    return fig
+
+
+def plot_model_figures(
+        model_path : str,
+        ) -> fig.Figure :
+    """
+    Plots all figures for a given model
+
+    Arguments:
+    ----------
+    model_path  : {String}
+                    > Path to model
+    
+    Returns:
+    ----------
+    fig         : {Figure}
+                    > Matplotlib figure object
+    """
+    # load model
+    model = LoadedModel(model_path)
+
+    # check if model has directory in figure folder
+    folder_path = "figures"
+    directory_name = model.file_name
+    directory_path = os.path.join(folder_path, directory_name)
+
+    # Check if the directory exists
+    if os.path.exists(directory_path):
+        pass
+    else:
+        os.mkdir(directory_path)
+
+    # get model metrics
+    testdataset = Pets("./src/pet_3", "test", binary_labels=True)
+    model_metrics = ModelMetrics(model, testdataset)
+
+    # plot model metrics bar plot
+    fig = plot_bar(
+        title = f"Model Metrics for {model.file_name}",
+        x_label = "Metric",
+        y_label = "Value",
+        accuracy = model_metrics.test_accuracy,
+        iou = model_metrics.test_iou,
+    )
+
+    # save figure
+    path = os.path.join(directory_path, f"{model.file_name}_metrics.png")
+    fig.savefig(path)
+
+    # plot model predictions
+    fig = plot_img_label_pred(
+        title = f"Model Predictions for {model.file_name}",
+        x_label = "",
+        y_label = "",
+        image = testdataset[0][0],
+        label = testdataset[0][1],
+        prediction = model.predict(testdataset[0][0]))
+    
+    # save figure
+    path = os.path.join(directory_path, f"{model.file_name}_img_label_pred.png")
+    fig.savefig(path)
+
+
+    
