@@ -27,4 +27,7 @@ Readmes
 
 
  - [ ] Label Proportioins Need to be decided [0.01, 0.02, 0.05, .1, .5, 0.1]: Sean 
+
+Bossman: 
+ - [ ] Alexei. 
  
