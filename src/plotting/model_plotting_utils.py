@@ -351,7 +351,7 @@ def plot_model_figures(
         y_label = "",
         image = testdataset[0][0],
         label = testdataset[0][1],
-        prediction = model.predict(testdataset[0][0]))
+        prediction = model.forwad(testdataset[0][0]))
     
     # save figure
     path = os.path.join(directory_path, f"{model.file_name}_img_label_pred.png")
