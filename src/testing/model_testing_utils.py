@@ -90,27 +90,27 @@ class ModelMetrics:
         return iou / len(test_loader)
 
 
-def model_metric(
-    loadmodel: LoadedModel, metric: Callable, test_dataset: Pets, output_path: str
-):
-    """
-    evaluates model with given metric exports data in ....
+# def model_metric(
+#     loadmodel: LoadedModel, metric: Callable, test_dataset: Pets, output_path: str
+# ):
+#     """
+#     evaluates model with given metric exports data in ....
 
-    :param metric: Metric with sum reduction and scalar output.
-    :param test_dataset: test dataset.
-    """
-    model = loadmodel.model
-    model.to(device)
+#     :param metric: Metric with sum reduction and scalar output.
+#     :param test_dataset: test dataset.
+#     """
+#     model = loadmodel.model
+#     model.to(device)
 
-    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=True)
+#     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=True)
 
-    with torch.no_grad():
-        eval_metric = 0.0
-        for X, y in test_loader:
-            X, y = X.to(device), y.to(device)
-            y_pred = model(X)
-            eval_metric += metric(y, y_pred).item()
+#     with torch.no_grad():
+#         eval_metric = 0.0
+#         for X, y in test_loader:
+#             X, y = X.to(device), y.to(device)
+#             y_pred = model(X)
+#             eval_metric += metric(y, y_pred).item()
 
-    with open(output_path, "w") as f:
-        pass
+#     with open(output_path, "w") as f:
+#         pass
 
