@@ -31,3 +31,5 @@ Readmes
 Bossman: 
  - [ ] Alexei. 
  
+Binman:
+- [ ] Sean, clean out repo of crap. 
