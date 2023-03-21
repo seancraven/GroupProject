@@ -16,3 +16,7 @@ class LSD(nn.Module):
         x = self.conv1(x)
         # output
         return torch.sigmoid(x)
+    
+    def predict(self, x):
+        activations = self.forward(x)
+        return (activations > .5).int()
