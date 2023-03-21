@@ -33,3 +33,4 @@ Bossman:
  
 Binman:
 - [ ] Sean, clean out repo of crap. 
+- [ ] Sean, add single model, and models folder/ stucture.
