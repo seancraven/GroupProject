@@ -149,16 +149,16 @@ class Pets(Dataset):
         assert img_names is not self.images
         random.shuffle(img_names)
         n_img = len(img_names)
-        val_img_names = img_names[: int(n_img * split_fraction)]
         train_img_names = img_names[int(n_img * split_fraction) :]
+        val_img_names = img_names[: int(n_img * split_fraction)]
         # Check that the two sets are disjoint
         assert len(set(val_img_names).intersection(set(train_img_names))) == 0
-
+        train_pets = deepcopy(self)
         val_pets = deepcopy(self)
+        train_pets.images = train_img_names
         val_pets.images = val_img_names
-        self.images = train_img_names
 
-        return val_pets, self
+        return train_pets, val_pets
 
 
 class PetsUnlabeled(Dataset):
