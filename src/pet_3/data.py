@@ -141,8 +141,7 @@ class Pets(Dataset):
         return "Pet 3"
 
     def validation_split(self, split_fraction: float) -> Tuple[Pets, Pets]:
-        """Split the training data into a training and validation set. Note we return the images names,
-        not the actual images."""
+        """Split the training data into a training and validation set."""
         # Load image names
         img_names = self.images.copy()
         # Make sure the two variables do not reference the same object in memory
