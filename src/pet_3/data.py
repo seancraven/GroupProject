@@ -65,9 +65,10 @@ class Pets(Dataset):
         """
 
         assert (
-            labeled_fraction in [i / 10 for i in range(9)] or labeled_fraction is None
+            labeled_fraction in [i / 10 for i in range(9)] + [0.01, 0.02, 0.05]
+            or labeled_fraction is None
         ), """
-        Invalid fraction must be one of[0.1, 0.2, 0.3, ... ,0.9]."""
+        Invalid fraction must be one of[0.01, 0.02, 0.05, 0.1, 0.2, 0.3, ... ,0.9]."""
 
         self.root = root
         self.labeled_fraction = labeled_fraction
