@@ -10,7 +10,8 @@ from functools import cache
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision.transforms.transforms import Resize, ToTensor
-from typing import Tuple, Union, Optional
+from typing import Tuple, Union
+from copy import deepcopy
 
 from .download_utils import (
     _populate_data,
@@ -51,7 +52,7 @@ class Pets(Dataset):
         split: str = "all_train",
         labeled_fraction: Union[float, None] = None,
         binary_labels: bool = True,
-        shuffle: bool = False
+        shuffle: bool = False,
     ):
         # Check arguments are valid.
         assert split in [
@@ -106,7 +107,7 @@ class Pets(Dataset):
                 "all_train",
                 self.labeled_fraction,
                 binary_labels=self.binary_labels,
-                shuffle=self.shuffle
+                shuffle=self.shuffle,
             )
         raise ValueError("labeled_fraction must be a float for a dataset split")
 
@@ -125,8 +126,8 @@ class Pets(Dataset):
             label[label > 0.009] = 1  # Only foreground
             label[(0.0075 <= label) & (label <= 0.009)] = 0
             label = Resize((256, 256))(label).round().long()
-            
-        label = label.flatten(1,-1)
+
+        label = label.flatten(1, -1)
 
         return img, label
 
@@ -137,28 +138,32 @@ class Pets(Dataset):
             return f"Pet 3 labeled fraction {self.labeled_fraction}"
 
         return "Pet 3"
-    
+
     def validation_split(self, split_fraction: float) -> Tuple[Pets, Pets]:
         """Split the training data into a training and validation set. Note we return the images names,
         not the actual images."""
-        # Load image names 
+        # Load image names
         img_names = self.images.copy()
         # Make sure the two variables do not reference the same object in memory
         assert img_names is not self.images
         random.shuffle(img_names)
         n_img = len(img_names)
-        val_img_names = img_names[:int(n_img*split_fraction)]
-        train_img_names = img_names[int(n_img*split_fraction):]
+        val_img_names = img_names[: int(n_img * split_fraction)]
+        train_img_names = img_names[int(n_img * split_fraction) :]
         # Check that the two sets are disjoint
         assert len(set(val_img_names).intersection(set(train_img_names))) == 0
 
-        return val_img_names, train_img_names
+        val_pets = deepcopy(self)
+        val_pets.images = val_img_names
+        self.images = train_img_names
+
+        return val_pets, self
 
 
 class PetsUnlabeled(Dataset):
     """Class to manage unlabeled data for pet dataset."""
 
-    def __init__(self, root: str, labeled_fraction: float, shuffle: bool=True):
+    def __init__(self, root: str, labeled_fraction: float, shuffle: bool = True):
         move_files = os.path.join(root, f"unlabeled_train_{labeled_fraction}.txt")
         self.labeled_fraction = labeled_fraction
         self.train_dir = os.path.join(root, "train_data")
@@ -218,6 +223,7 @@ class Oracle:
     An oracle which can evaluate the accuracy of pseudolabel given the image,
     the pseudolabel, and the pseudolabel mask.
     """
+
     def __init__(self):
         # Build a cache of the dataset, and then delete the dataset object
         # so we don't mess up the files being moved around.
@@ -236,15 +242,17 @@ class Oracle:
         for img, label in self.dataset:
             if torch.equal(img, image):
                 return label
-            
+
     def __batch_labels(self, batch: torch.Tensor) -> torch.Tensor:
         """Returns the labels of the batch."""
         return torch.stack([self.__image_label(img) for img in batch])
 
-    def __call__(self, batch: torch.Tensor, pseudolabels: torch.Tensor, masks: torch.Tensor) -> float:
-        """Returns the accuracy of the pseudolabels given the batch."""
-        labels = self.__batch_labels(batch)
-        pseudolabels = pseudolabels * masks
-        labels = labels * masks
-        # TODO: Implement this function.
-        pass
+    # def __call__(
+    #     self, batch: torch.Tensor, pseudolabels: torch.Tensor, masks: torch.Tensor
+    # ) -> float:
+    #     """Returns the accuracy of the pseudolabels given the batch."""
+    #     labels = self.__batch_labels(batch)
+    #     pseudolabels = pseudolabels * masks
+    #     labels = labels * masks
+    #     # TODO: Implement this function.
+    #     pass
