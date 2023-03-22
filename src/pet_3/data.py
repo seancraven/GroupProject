@@ -137,6 +137,22 @@ class Pets(Dataset):
             return f"Pet 3 labeled fraction {self.labeled_fraction}"
 
         return "Pet 3"
+    
+    def validation_split(self, split_fraction: float) -> Tuple[Pets, Pets]:
+        """Split the training data into a training and validation set. Note we return the images names,
+        not the actual images."""
+        # Load image names 
+        img_names = self.images.copy()
+        # Make sure the two variables do not reference the same object in memory
+        assert img_names is not self.images
+        random.shuffle(img_names)
+        n_img = len(img_names)
+        val_img_names = img_names[:int(n_img*split_fraction)]
+        train_img_names = img_names[int(n_img*split_fraction):]
+        # Check that the two sets are disjoint
+        assert len(set(val_img_names).intersection(set(train_img_names))) == 0
+
+        return val_img_names, train_img_names
 
 
 class PetsUnlabeled(Dataset):
