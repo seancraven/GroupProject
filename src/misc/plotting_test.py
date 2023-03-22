@@ -1,14 +1,8 @@
 # pylint: disable-all
-import os
-from dataclasses import dataclass
 import torch
-import numpy as np
-from torch import nn
-from typing import Callable
 
-from torch.utils.data import DataLoader
 from src.pet_3.data import Pets
-from src.testing.model_testing_utils import LoadedModel, ModelMetrics
+from src.testing.model_testing_utils import ModelMetrics
 from src.plotting.model_plotting_utils import (
     plot_bar,
     plot_img,
@@ -18,7 +12,7 @@ from src.plotting.model_plotting_utils import (
     plot_model_figures,
 )
 
-from LSD import LSD
+from src.models.LSD import LSD
 
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -109,5 +103,5 @@ if __name__ == "__main__":
 
     # PLOTTING MODEL FIGURES
     plot_model_figures(
-        model_path="./models/u_net_supervised/Mean Squared Error Loss_20.pt"
+        model_path="../../models/u_net_supervised/Mean Squared Error Loss_20.pt"
     )

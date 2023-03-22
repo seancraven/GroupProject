@@ -150,8 +150,7 @@ def multi_model_baseline():
             model, mean_square_error_loss, learning_rate, num_epoch, train_loader, ()
         )
 
-        file_name = os.path.join(
-            "models", "u_net_supervised", f"{loss_name}_{num_epoch}_{labeled.name}.pt"
+        file_name = os.path.join("../../models", "u_net_supervised", f"{loss_name}_{num_epoch}_{labeled.name}.pt"
         )
         torch.save(model.state_dict(), file_name)
 
@@ -177,8 +176,7 @@ def multi_model_baseline():
             model, binary_cross_entropy_loss, learning_rate, num_epoch, train_loader, ()
         )
 
-        file_name = os.path.join(
-            "models", "u_net_supervised", f"{loss_name}_{num_epoch}_{labeled.name}.pt"
+        file_name = os.path.join("../../models", "u_net_supervised", f"{loss_name}_{num_epoch}_{labeled.name}.pt"
         )
         torch.save(model.state_dict(), file_name)
 
