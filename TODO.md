@@ -3,21 +3,22 @@ DMT: Michael
  - [ ] Batch problem fix, currently we dont iterate through all of the unlabeled training examples.
  - [ ] Pretrain runs untill convergence on validation set
  - [ ] validation set refactor.
- - [ ] Per teacher student DMT paper figure 6. 
+ - [ ] Per teacher student DMT paper figure 6.
  - [ ] Baseline validation, save model.
- - [ ] Code Review: Daniel , Alexi, Eirik 
- - [ ] Model saving protocol to tell Max. 
+ - [ ] Code Review: Daniel , Alexi, Eirik
+ - [ ] Model saving protocol to tell Max.
 
 Pet Dataset:
- - [x] Add validation split function, Tristan, Jannette, Charlie 
+ - [x] Add validation split function, Tristan, Jannette, Charlie
+ - [ ] Test validation split function, Tristan, Jannette, Charlie
 
 ```python
 class Pets(Dataset):
     def __init__(self, ........):
     some shit.
-    
+
     def validation_split(self, split_fraction: float) -> Tuple[Pets, Pets]:
-        return 
+        return
 
 ```
  - [ ] create more finegrain dataset splits. [0.005, ..., 0.15]
@@ -29,18 +30,18 @@ Model testing utils
  - [ ] Currently doesn't work at all, get working.: Max
 
 Research Question:
- - [ ] Gamma sweep? Looking at gamma ranges to see where it fails? 
- - [ ] Ablation study fixed vs decay gamma. 
+ - [ ] Gamma sweep? Looking at gamma ranges to see where it fails?
+ - [ ] Ablation study fixed vs decay gamma.
 
 Readmes
 - [ ] Datasets: Jannette, Charlie, Tristan
 - [ ] DMT: Eirik, Alexei, Daniel
 
 
- - [ ] Label Proportioins Need to be decided [0.01, 0.02, 0.05, .1, .5, 0.1]: Sean 
+ - [ ] Label Proportioins Need to be decided [0.01, 0.02, 0.05, .1, .5, 0.1]: Sean
 
-Bossman: 
- - [ ] Alexei. 
- 
+Bossman:
+ - [ ] Alexei.
+
 Binman:
-- [ ] Sean, clean out repo of crap. 
+- [x] Sean, clean out repo of crap.
