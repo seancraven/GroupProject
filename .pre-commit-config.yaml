@@ -16,19 +16,3 @@ repos:
     hooks:
     -   id: mypy
         additional_dependencies: [types-all]
-- repo: local
-  hooks:
-    - id: pylint
-      name: pylint
-      entry: pylint
-      language: system
-      types: [python]
-      args:
-        [
-          "-rn", # Only display messages
-          "-sn", # Don't display the score
-        #   "--exit-zero",
-        #   "--fail-on=F,E",
-          "--disable=C0103",
-
-        ]
