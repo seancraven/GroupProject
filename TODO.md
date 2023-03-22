@@ -9,7 +9,7 @@ DMT: Michael
  - [ ] Model saving protocol to tell Max. 
 
 Pet Dataset:
- - [ ] Add validation split function, Tristan, Jannette, Charlie 
+ - [x] Add validation split function, Tristan, Jannette, Charlie 
 
 ```python
 class Pets(Dataset):
