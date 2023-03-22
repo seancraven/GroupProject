@@ -21,7 +21,7 @@ class Pets(Dataset):
         return
 
 ```
- - [ ] create more finegrain dataset splits. [0.005, ..., 0.15]
+ - [x] create more finegrain dataset splits. [0.005, ..., 0.15]
 
 Plotting from wandb:
  - [ ] Learning graphs.: Charlie
@@ -34,14 +34,14 @@ Research Question:
  - [ ] Ablation study fixed vs decay gamma.
 
 Readmes
-- [ ] Datasets: Jannette, Charlie, Tristan
-- [ ] DMT: Eirik, Alexei, Daniel
+ - [ ] Datasets: Jannette, Charlie, Tristan
+ - [ ] DMT: Eirik, Alexei, Daniel
 
 
- - [ ] Label Proportioins Need to be decided [0.01, 0.02, 0.05, .1, .5, 0.1]: Sean
+ - [x] Label Proportioins Need to be decided [0.01, 0.02, 0.05, .1, .5, 0.1]: Sean
 
 Bossman:
  - [ ] Alexei.
 
 Binman:
-- [x] Sean, clean out repo of crap.
+ - [x] Sean, clean out repo of crap.
