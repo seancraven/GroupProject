@@ -1,8 +1,8 @@
 DMT: Michael
  - [x] add load_state_dict() to UNET.py
- - [ ] Batch problem fix, currently we dont iterate through all of the unlabeled training examples.
- - [ ] Pretrain runs untill convergence on validation set
- - [ ] validation set refactor.
+ - [x] Batch problem fix, currently we dont iterate through all of the unlabeled training examples.
+ - [x] Pretrain runs untill convergence on validation set
+ - [x] validation set refactor.
  - [ ] Per teacher student DMT paper figure 6.
  - [ ] Baseline validation, save model.
  - [ ] Code Review: Daniel , Alexi, Eirik
