@@ -422,7 +422,7 @@ class DMT(nn.Module, ReporterMixin):
             idx (int): Index of the image to plot.
             filename (str): Filename to save the plot to.
         """
-        # return  # Comment me out to actually do stuff
+        return  # Comment me out to actually do stuff
         image = images[idx].cpu().detach().permute(1, 2, 0).numpy()
         image_shape = (image.shape[0], image.shape[1])
         # Make pseudolabel take values 0, 1, 2 instead of 0, 1
