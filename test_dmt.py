@@ -8,7 +8,9 @@ from src.pet_3.michael_data import PetsDataFetcher
 TOTAL_BATCH_SIZE = 6
 LABEL_PROPORTION = 0.02
 VALIDATION_PROPORTION = 0.1
+DIFFERENCE_MAXIMIZED_PROPORTION = 0.6
 PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
+NUM_DMT_EPOCHS = 10
 GAMMA_1 = 3
 GAMMA_2 = 3
 
@@ -62,19 +64,20 @@ dmt = DMT(
 )
 dmt.wandb_init(
     percentiles=PERCENTILES,
-    num_epochs=10,
+    num_epochs=NUM_DMT_EPOCHS,
     batch_size=TOTAL_BATCH_SIZE,
     label_ratio=LABEL_PROPORTION,
+    difference_maximized_proportion=DIFFERENCE_MAXIMIZED_PROPORTION,
     gamma_1=GAMMA_1,
     gamma_2=GAMMA_2
 )
 dmt.pretrain(
     max_epochs=10000,
-    proportion=0.6
+    proportion=DIFFERENCE_MAXIMIZED_PROPORTION
 )
 dmt.dynamic_train(
-    percentiles=[0.2,0.4,0.6,0.8,1.0],
-    num_epochs=10,
+    percentiles=PERCENTILES,
+    num_epochs=NUM_DMT_EPOCHS
 )
 dmt.save_best_model('best_dmt.pt')
 dmt.save_baseline('baseline.pt')

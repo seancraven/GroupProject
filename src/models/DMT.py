@@ -312,7 +312,7 @@ class DMT(nn.Module, ReporterMixin):
 
 
     @staticmethod
-    def wandb_init(percentiles, num_epochs, batch_size, label_ratio, gamma_1, gamma_2):
+    def wandb_init(percentiles, num_epochs, batch_size, label_ratio, difference_maximized_proportion, gamma_1, gamma_2):
         try:
             wandb.init(
                 project='DMT model',
@@ -321,6 +321,7 @@ class DMT(nn.Module, ReporterMixin):
                     "Number of epochs": num_epochs,
                     "Batch size": batch_size,
                     "Label ratio": label_ratio,
+                    "Difference maximized sampling proportion": difference_maximized_proportion,
                     "Gamma 1": gamma_1,
                     "Gamma 2": gamma_2
                 })
