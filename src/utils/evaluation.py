@@ -3,10 +3,11 @@ import torch.nn as nn
 
 from torch.utils.data import DataLoader
 
+
 def evaluate_IoU(
     model: nn.Module,
     data: DataLoader,
-    device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ) -> float:
     model = model.to(device)
     score = 0
@@ -20,5 +21,5 @@ def evaluate_IoU(
         IoU = intersection / union  # Got this proportion correct on this batch
         score += IoU * images.shape[0]
         seen_images += images.shape[0]
-    
-    return (score / seen_images).item()
+
+    return (score / seen_images).item()  # type: ignore
