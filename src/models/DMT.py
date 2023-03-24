@@ -1,3 +1,4 @@
+import copy
 import matplotlib.pyplot as plt
 import time
 import torch
@@ -47,8 +48,7 @@ class DMT(nn.Module, ReporterMixin):
             (labeled_dataset, unlabeled_dataset),
             (labeled_batch_size, unlabeled_batch_size)
         )
-        if validation_dataset is not None:
-            self.validation_loader = DataLoader(validation_dataset, max_batch_size, shuffle=True, num_workers=4)
+        self.validation_loader = DataLoader(validation_dataset, max_batch_size, shuffle=True, num_workers=4)
 
         self.max_batch_size = max_batch_size
         self.gamma_1_max = gamma_1
@@ -61,6 +61,10 @@ class DMT(nn.Module, ReporterMixin):
             lambda loader: partial(evaluate_IoU, data=loader, device=self.device),
             (self.labeled_loader, self.validation_loader)
         )
+        self.best_model_a_IoU = -torch.inf
+        self.best_model_b_IoU = -torch.inf
+        self.best_model_a_parameters = None
+        self.best_model_b_parameters = None
 
 
     def compute_pseudolabels(self, confidences: torch.Tensor, alpha: float) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -193,8 +197,6 @@ class DMT(nn.Module, ReporterMixin):
             fine_tuner = FT(student, num_epochs, self.labeled_loader, self.unlabeled_loader)
             opt, scheduler = fine_tuner.optimizer, fine_tuner.scheduler
 
-            best_student_val_iou = -torch.inf
-
             for epoch in range(num_epochs):
                 epoch_dynamic_loss = 0.0
                 epoch_standard_loss = 0.0
@@ -247,9 +249,15 @@ class DMT(nn.Module, ReporterMixin):
                 epoch_mean_standard_loss = epoch_standard_loss / (i+1)
                 student_train_accuracy = evaluate_IoU(student, self.labeled_loader, self.device)
                 student_val_accuracy = evaluate_IoU(student, self.validation_loader, self.device)
-
-                if student_val_accuracy >= best_student_val_iou:
-                    best_student_val_iou = student_val_accuracy
+                
+                if student is self.model_a:
+                    if student_val_accuracy >= self.best_model_a_IoU:
+                        self.best_model_a_IoU = student_val_accuracy
+                        self.best_model_a_parameters = copy.deepcopy(student.state_dict())
+                elif student is self.model_b:
+                    if student_val_accuracy >= self.best_model_b_IoU:
+                        self.best_model_b_IoU = student_val_accuracy
+                        self.best_model_b_parameters = copy.deepcopy(student.state_dict())
 
                 debug_msg = 'Epoch {}/{} of percentile {} completed in {:2f} secs.'
                 debug_msg_args = (epoch+1, num_epochs, alpha, toc-tic)
@@ -264,9 +272,19 @@ class DMT(nn.Module, ReporterMixin):
                 self.wandb_log_named({
                     "Train IoU": student_train_accuracy,
                     "Validation IoU": student_val_accuracy,
-                    "Best validation IoU": best_student_val_iou
                     },
-                    student_name
+                    student_name)
+                self.wandb_log_named(
+                    {"Best validation IoU" : self.best_model_a_IoU},
+                    "Model A"
+                )
+                self.wandb_log_named(
+                    {"Best validation IoU" : self.best_model_b_IoU},
+                    "Model B"
+                )
+                self.wandb_log_named(
+                    {"Best validation IoU" : self.best_baseline_IoU},
+                    "Baseline"
                 )
 
 
@@ -275,7 +293,15 @@ class DMT(nn.Module, ReporterMixin):
         # model A teaches model B first
         model_a_IoU, model_b_IoU = map(self.validation_IoU, (self.model_a, self.model_b))
         if model_b_IoU > model_a_IoU:
+            self.debug('Swapping models A and B')
             self.model_a, self.model_b = self.model_b, self.model_a
+            model_a_IoU, model_b_IoU = model_b_IoU, model_a_IoU
+        self.best_model_a_IoU = model_a_IoU
+        self.best_model_b_IoU = model_b_IoU
+        self.best_model_a_parameters = copy.deepcopy(self.model_a.state_dict())
+        self.best_model_b_parameters = copy.deepcopy(self.model_b.state_dict())
+    
+        self.baseline_IoU = self.validation_IoU(self.baseline) if self.baseline is not None else None
 
         for alpha in percentiles:
             self._train_from_teacher(
@@ -292,14 +318,16 @@ class DMT(nn.Module, ReporterMixin):
                 student = self.model_a,
                 student_name = 'Model A'
             )
-        
-        # Finally, the best model is the one with the highest IoU on all the data
-        # we can get our hands on
+
+        # Load best parameters each model found on the validation set
+        self.model_a.load(self.best_model_a_parameters)
+        self.model_b.load(self.best_model_b_parameters)
         loader = DataLoader(
             ConcatDataset([self.labeled_loader.dataset, self.validation_loader.dataset]),
             batch_size=self.max_batch_size,
             shuffle=True
         )
+
         self.best_model = max(
             (self.model_a, self.model_b),
             key = lambda model: evaluate_IoU(model, loader, self.device)

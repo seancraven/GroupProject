@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, Subset
 from src.models.UNet import UNet
 from src.models.DMT import DMT
 from src.pet_3.michael_data import PetsDataFetcher
+from src.utils.evaluation import evaluate_IoU
 
 TOTAL_BATCH_SIZE = 6
 LABEL_PROPORTION = 0.02
@@ -36,6 +37,7 @@ labeled, validation, unlabeled = fetcher.get_train_data(
     LABEL_PROPORTION, VALIDATION_PROPORTION,
     seed = 0
 )
+unlabeled = Subset(unlabeled, range(100))
 print(f'Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}')
 
 
@@ -79,5 +81,13 @@ dmt.dynamic_train(
     percentiles=PERCENTILES,
     num_epochs=NUM_DMT_EPOCHS
 )
+test_data = fetcher.get_test_data()
+test_loader = DataLoader(test_data, batch_size=TOTAL_BATCH_SIZE)
+baseline_test_IoU = evaluate_IoU(dmt.baseline, test_loader)
+best_model_test_IoU = evaluate_IoU(dmt.best_model, test_loader)
+
+print("Baseline test IoU: ", baseline_test_IoU)
+print("Best model test IoU: ", best_model_test_IoU)
+
 dmt.save_best_model('best_dmt.pt')
 dmt.save_baseline('baseline.pt')
