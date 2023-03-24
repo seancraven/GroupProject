@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import wandb
 from torch.utils.data import DataLoader, Subset
 
 from src.models.UNet import UNet
@@ -7,7 +8,7 @@ from src.pet_3.michael_data import PetsDataFetcher
 from src.utils.evaluation import evaluate_IoU
 
 TOTAL_BATCH_SIZE = 4
-LABEL_PROPORTION = 0.005
+LABEL_PROPORTION = 0.01
 VALIDATION_PROPORTION = 0.1
 DIFFERENCE_MAXIMIZED_PROPORTION = 0.6
 PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
@@ -37,7 +38,6 @@ labeled, validation, unlabeled = fetcher.get_train_data(
     LABEL_PROPORTION, VALIDATION_PROPORTION,
     seed = 0
 )
-unlabeled = Subset(unlabeled, range(100))
 print(f'Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}')
 
 
@@ -95,3 +95,5 @@ dmt.wandb_log({
 
 dmt.save_best_model('best_dmt.pt')
 dmt.save_baseline('baseline.pt')
+
+wandb.finish()
