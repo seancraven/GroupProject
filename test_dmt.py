@@ -1,13 +1,20 @@
-import torch
-
-from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
+import wandb
+from torch.utils.data import DataLoader, Subset
 
 from src.models.UNet import UNet
 from src.models.DMT import DMT
-from src.pet_3.data import Pets
+from src.pet_3.michael_data import PetsDataFetcher
+from src.utils.evaluation import evaluate_IoU
 
-TOTAL_BATCH_SIZE = 8
-LABEL_PROPORTION = 0.2
+TOTAL_BATCH_SIZE = 4
+LABEL_PROPORTION = 0.01
+VALIDATION_PROPORTION = 0.1
+DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
+PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
+NUM_DMT_EPOCHS = 10
+GAMMA_1 = 3
+GAMMA_2 = 3
 
 using_pretrained = False
 unet_a = UNet()
@@ -26,53 +33,54 @@ baseline = UNet()
 #     print('No pretrained models found. Training from scratch.')
 
 
-optimizer_a = torch.optim.Adam(unet_a.parameters(), lr=1e-3)
-optimizer_b = torch.optim.Adam(unet_b.parameters(), lr=1e-3)
-baseline_optimizer = torch.optim.Adam(baseline.parameters(), lr=1e-3)
-train_dataset = Pets("src/pet_3", "labeled_unlabeled", labeled_fraction=LABEL_PROPORTION, shuffle=True)
-train_unlabeled, train_labeled = train_dataset.get_datasets()
-unlabeled_loader = DataLoader(
-    train_unlabeled,
-    batch_size = int((1-LABEL_PROPORTION) * TOTAL_BATCH_SIZE),
-    num_workers=8
+fetcher = PetsDataFetcher(root='src/pet_3')
+labeled, validation, unlabeled = fetcher.get_train_data(
+    LABEL_PROPORTION, VALIDATION_PROPORTION,
+    seed = 1
 )
-labeled_loader = DataLoader(
-    train_labeled,
-    batch_size=int(LABEL_PROPORTION * TOTAL_BATCH_SIZE),
-    num_workers=8
-)
-test_dataset = Pets("src/pet_3", "test")
-test_loader = DataLoader(test_dataset, batch_size=TOTAL_BATCH_SIZE, num_workers=8)
+print(f'Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}')
 
 dmt = DMT(
     unet_a,
     unet_b,
-    optimizer_a,
-    optimizer_b,
-    labeled_loader,
-    unlabeled_loader,
-    gamma_1=1,
-    gamma_2=1,
-    verbosity=2,
-    baseline_model=baseline,
-    baseline_optimizer=baseline_optimizer,
+    labeled,
+    unlabeled,
+    validation,
+    max_batch_size=TOTAL_BATCH_SIZE,
+    gamma_1=GAMMA_1,
+    gamma_2=GAMMA_2,
+    baseline=baseline
 )
-dmt.train(
-    percentiles=[0.2,0.4,0.6,0.8,1.0],
-    num_epochs=10,
+dmt.wandb_init(
+    percentiles=PERCENTILES,
+    num_epochs=NUM_DMT_EPOCHS,
     batch_size=TOTAL_BATCH_SIZE,
     label_ratio=LABEL_PROPORTION,
-    skip_pretrain=False
+    difference_maximized_proportion=DIFFERENCE_MAXIMIZED_PROPORTION,
+    gamma_1=GAMMA_1,
+    gamma_2=GAMMA_2
 )
+dmt.pretrain(
+    max_epochs=10000,
+    proportion=DIFFERENCE_MAXIMIZED_PROPORTION
+)
+dmt.dynamic_train(
+    percentiles=PERCENTILES,
+    num_epochs=NUM_DMT_EPOCHS
+)
+test_data = fetcher.get_test_data()
+test_loader = DataLoader(test_data, batch_size=TOTAL_BATCH_SIZE)
+baseline_test_IoU = evaluate_IoU(dmt.baseline, test_loader)
+best_model_test_IoU = evaluate_IoU(dmt.best_model, test_loader)
+
+print("Baseline test IoU: ", baseline_test_IoU)
+print("Best model test IoU: ", best_model_test_IoU)
+dmt.wandb_log({
+    "Baseline test IoU": baseline_test_IoU,
+    "Best model test IoU": best_model_test_IoU,
+})
+
 dmt.save_best_model('best_dmt.pt')
 dmt.save_baseline('baseline.pt')
-best_model_test_accuracy = dmt.evaluate_IoU(test_loader, dmt.best_model)
-baseline_test_accuracy = dmt.evaluate_IoU(test_loader, dmt.baseline_model)
 
-print('=== Done ===')
-print('Best model test accuracy: ', best_model_test_accuracy)
-print('Baseline test accuracy: ', baseline_test_accuracy)
-dmt.wandb_log({
-    "Baseline test accuracy": baseline_test_accuracy,
-    "Best model test accuracy": best_model_test_accuracy
-    })
+wandb.finish()
