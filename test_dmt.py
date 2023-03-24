@@ -69,7 +69,7 @@ dmt.wandb_init(
     gamma_2=GAMMA_2
 )
 dmt.pretrain(
-    max_epochs=20,
+    max_epochs=10000,
     proportion=0.6
 )
 dmt.dynamic_train(
