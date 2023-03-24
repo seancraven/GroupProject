@@ -1,4 +1,5 @@
 import copy
+import math
 import matplotlib.pyplot as plt
 import time
 import torch
@@ -199,12 +200,18 @@ class DMT(nn.Module, ReporterMixin):
         fine_tuner = FT(student, num_epochs, self.labeled_loader, self.unlabeled_loader)
         opt, scheduler = fine_tuner.optimizer, fine_tuner.scheduler
 
+
+        total_batches = min(len(self.labeled_loader), len(self.unlabeled_loader))
+        def _dynamic_gamma(gamma: float, t: int) -> float:
+            total_train_steps = num_epochs * total_batches
+            return gamma * math.exp(5*(1 - (t / total_train_steps))**2)
+
         for epoch in range(num_epochs):
             epoch_dynamic_loss = 0.0
             epoch_standard_loss = 0.0
 
             tic = time.time()
-            for i, (unlabeled, (labeled, labels)) in enumerate(
+            for t, (unlabeled, (labeled, labels)) in enumerate(
                 zip(self.unlabeled_loader, self.labeled_loader)
             ):
                 unlabeled, labeled, labels = map(
@@ -227,8 +234,14 @@ class DMT(nn.Module, ReporterMixin):
                         mask,
                         teacher_confidences,
                         student_confidences,
-                        gamma_1=self.gamma_1_max,
-                        gamma_2=self.gamma_2_max,
+                        gamma_1=_dynamic_gamma(
+                            self.gamma_1_max,
+                            epoch * total_batches + t
+                        ),
+                        gamma_2=_dynamic_gamma(
+                            self.gamma_2_max,
+                            epoch * total_batches + t
+                        )
                     )
                 # These lines do a sanity check
                 student_labels = torch.argmax(student_confidences, dim=-1)
@@ -268,8 +281,8 @@ class DMT(nn.Module, ReporterMixin):
             toc = time.time()
 
             # Bookkeeping
-            epoch_mean_dynamic_loss = epoch_dynamic_loss / (i + 1)
-            epoch_mean_standard_loss = epoch_standard_loss / (i + 1)
+            epoch_mean_dynamic_loss = epoch_dynamic_loss / (t + 1)
+            epoch_mean_standard_loss = epoch_standard_loss / (t + 1)
             student_train_accuracy = evaluate_IoU(
                 student, self.labeled_loader, self.device
             )
@@ -286,11 +299,10 @@ class DMT(nn.Module, ReporterMixin):
                     self.best_model_b_IoU = student_val_accuracy
                     self.best_model_b_parameters = copy.deepcopy(student.state_dict())
 
+            # Everything below here is just logging
             debug_msg = "Epoch {}/{} of percentile {} completed in {:2f} secs."
             debug_msg_args = (epoch + 1, num_epochs, alpha, toc - tic)
-
             self.debug(debug_msg.format(*debug_msg_args))
-
             self.wandb_log(
                 {
                     "Epoch time": toc - tic,
