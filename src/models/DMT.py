@@ -362,9 +362,7 @@ class DMT(nn.Module, ReporterMixin):
                 student_name="Model A",
             )
 
-        # Load best parameters each model found on the validation set
-        self.model_a.load_state_dict(self.best_model_a_parameters)
-        self.model_b.load_state_dict(self.best_model_b_parameters)
+        # TODO: maybe Load best parameters each model found on the validation set?
         loader = DataLoader(
             ConcatDataset(
                 [self.labeled_loader.dataset, self.validation_loader.dataset]
