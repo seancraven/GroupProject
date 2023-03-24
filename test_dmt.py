@@ -40,19 +40,6 @@ labeled, validation, unlabeled = fetcher.get_train_data(
 )
 print(f'Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}')
 
-
-def save_fig(tensor, index, filename, reshape=True):
-    image = tensor[index].cpu().detach()
-    if reshape:
-        image = image.permute(1,2,0)
-    image = image.numpy()
-    if image.shape[-1] == 65536:
-        image = image.reshape((256,256))
-    plt.imshow(image)
-    plt.savefig(filename)
-
-loader = DataLoader(validation, batch_size=10)
-
 dmt = DMT(
     unet_a,
     unet_b,
