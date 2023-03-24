@@ -122,11 +122,15 @@ class PetsDataFetcher:
         num_labeled = int(len(all_filenames) * label_proportion)
         num_validation = int(num_labeled * validation_proportion)
 
-        validation_fnames = all_filenames[:num_validation]
+        validation_filenames = all_filenames[:num_validation]
         train_filenames = all_filenames[num_validation:num_labeled]
         unlabeled_filenames = all_filenames[num_labeled:]
 
-        if validation_proportion > 0 and len(validation_fnames) == 0:
+        assert len(set(train_filenames).intersection(set(validation_filenames))) == 0
+        assert len(set(train_filenames).intersection(set(unlabeled_filenames))) == 0
+        assert len(set(validation_filenames).intersection(set(unlabeled_filenames))) == 0
+
+        if validation_proportion > 0 and len(validation_filenames) == 0:
             raise ValueError("Validation proportion is too small.")
         
         train, validate = map(
@@ -136,7 +140,7 @@ class PetsDataFetcher:
                 image_folder = os.path.join(self.train_path, 'images'),
                 label_folder = os.path.join(self.train_path, 'labels')
             ),
-            (train_filenames, validation_fnames)
+            (train_filenames, validation_filenames)
         )
         unlabeled = PetsUnlabeled(
             unlabeled_filenames,

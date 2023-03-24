@@ -312,7 +312,7 @@ class DMT(nn.Module, ReporterMixin):
                 {"Best validation IoU": self.best_model_b_IoU}, "Model B"
             )
             self.wandb_log_named(
-                {"Best validation IoU": self.best_baseline_IoU}, "Baseline"
+                {"Best validation IoU": self.baseline_IoU}, "Baseline"
             )
 
     def dynamic_train(self, percentiles: Iterable[float], num_epochs: int) -> None:
@@ -351,8 +351,8 @@ class DMT(nn.Module, ReporterMixin):
             )
 
         # Load best parameters each model found on the validation set
-        self.model_a.load(self.best_model_a_parameters)
-        self.model_b.load(self.best_model_b_parameters)
+        self.model_a.load_state_dict(self.best_model_a_parameters)
+        self.model_b.load_state_dict(self.best_model_b_parameters)
         loader = DataLoader(
             ConcatDataset(
                 [self.labeled_loader.dataset, self.validation_loader.dataset]

@@ -6,14 +6,14 @@ from src.models.DMT import DMT
 from src.pet_3.michael_data import PetsDataFetcher
 from src.utils.evaluation import evaluate_IoU
 
-TOTAL_BATCH_SIZE = 6
-LABEL_PROPORTION = 0.02
+TOTAL_BATCH_SIZE = 4
+LABEL_PROPORTION = 0.005
 VALIDATION_PROPORTION = 0.1
 DIFFERENCE_MAXIMIZED_PROPORTION = 0.6
 PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
 NUM_DMT_EPOCHS = 10
-GAMMA_1 = 3
-GAMMA_2 = 3
+GAMMA_1 = 1
+GAMMA_2 = 1
 
 using_pretrained = False
 unet_a = UNet()
@@ -88,6 +88,10 @@ best_model_test_IoU = evaluate_IoU(dmt.best_model, test_loader)
 
 print("Baseline test IoU: ", baseline_test_IoU)
 print("Best model test IoU: ", best_model_test_IoU)
+dmt.wandb_log({
+    "Baseline test IoU": baseline_test_IoU,
+    "Best model test IoU": best_model_test_IoU,
+})
 
 dmt.save_best_model('best_dmt.pt')
 dmt.save_baseline('baseline.pt')
