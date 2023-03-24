@@ -184,7 +184,6 @@ def return_to_train(train_dir):
         os.replace(os.path.join(un_dir, file), os.path.join(img_dir, file))
     print("All files returned to train_data/images.")
 
-
 def _write_train_test_file(
     classed_files: Dict[str, List[str]], split_fraction: float, root: str
 ):

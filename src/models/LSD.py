@@ -14,7 +14,7 @@ class LSD(nn.Module):
     def forward(self, x):
         # convolutional layer
         x = self.conv1(x)
-        # output
+        # output        
         return torch.sigmoid(x)
     
     def predict(self, x):

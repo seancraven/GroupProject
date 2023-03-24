@@ -21,5 +21,5 @@ class UNet(torch.nn.Module):
     @classmethod
     def from_state_dict(cls, state_dict) -> "UNet":
         unet = cls()
-        unet.model.load_state_dict(state_dict)
+        unet.load_state_dict(state_dict)
         return unet
