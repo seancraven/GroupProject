@@ -36,7 +36,7 @@ baseline = UNet()
 fetcher = PetsDataFetcher(root='src/pet_3')
 labeled, validation, unlabeled = fetcher.get_train_data(
     LABEL_PROPORTION, VALIDATION_PROPORTION,
-    seed = 0
+    seed = 1
 )
 print(f'Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}')
 
