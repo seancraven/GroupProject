@@ -6,7 +6,7 @@ from src.models.DMT import DMT
 from src.pet_3.michael_data import PetsDataFetcher
 
 TOTAL_BATCH_SIZE = 6
-LABEL_PROPORTION = 0.01
+LABEL_PROPORTION = 0.02
 VALIDATION_PROPORTION = 0.1
 PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
 GAMMA_1 = 3
@@ -34,7 +34,6 @@ labeled, validation, unlabeled = fetcher.get_train_data(
     LABEL_PROPORTION, VALIDATION_PROPORTION,
     seed = 0
 )
-unlabeled = Subset(unlabeled, range(50))
 print(f'Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}')
 
 
