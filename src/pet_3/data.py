@@ -116,9 +116,17 @@ class PetsDataFetcher:
         validation_proportion: float = 0.0,
         seed: int = 0,
     ) -> Union[TrainPseudoSplit, TrainValidatePseudoSplit]:
-        """Returns the train data, generated randomly from the given seed"""
+        """Returns the train data, generated randomly from the given seed
+        Args:
+            label_proportion: The proportion of the data that is labeled.
+            validation_proportion: The proportion of the labeled data that is used for validation.
+            seed: The seed used to generate the random split.
+        Returns:
+            A tuple of the train and validation data, and unlabeled data.
+        """
         random.seed(seed)
         train_txt = os.path.join(self.root, "train.txt")
+        # Stop wierd behaviour across os.
         all_filenames = sorted(self._get_valid_files_from_txt(train_txt))
         random.shuffle(all_filenames)
 
@@ -162,9 +170,17 @@ class PetsDataFetcher:
         validation_proportion: float = 0,
         seed: int = 0,
     ) -> Named:
+        """Returns the train data, generated randomly from the given seed
+        Args:
+            label_proportion: The proportion of the data that is labeled.
+            validation_proportion: The proportion of the labeled data that is used for validation.
+            seed: The seed used to generate the random split.
+        Returns:
+            A tuple of the train and validation data, and unlabeled data.
+        """
         return (
             self.get_train_data(label_proportion, validation_proportion, seed),
-            f"pets_{label_proportion}_{validation_proportion}",
+            f"pets_l_{label_proportion}_v_{validation_proportion}",
         )
 
 
