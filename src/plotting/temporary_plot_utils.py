@@ -5,6 +5,7 @@ This file needs to:
     - Load a U-Net model from a file
     - Load pass it and the test data to an evaluation.
 """
+import os
 import matplotlib.pyplot as plt
 import matplotlib
 import torch
@@ -18,8 +19,10 @@ from torch.utils.data import DataLoader
 
 matplotlib.style.use("seaborn")
 
+MODEL_CLASSES = [UNet, LSD]
 
-def model_from_file(file_path: str, model_class: Any) -> Union[nn.Module, None]:
+
+def _model_from_file(file_path: str, model_class: Any) -> Union[nn.Module, None]:
     """Tries to load a model from a file. if it fails, returns None."""
     try:
         model = model_class()
@@ -27,6 +30,18 @@ def model_from_file(file_path: str, model_class: Any) -> Union[nn.Module, None]:
     except:
         model = None
     return model
+
+
+def model_from_file(file_path: str) -> Union[nn.Module, None]:
+    for m_class in MODEL_CLASSES:
+        model = _model_from_file(file_path, m_class)
+        if model is not None:
+            return model
+    if file_path[-2:] == "pt":
+        Warning(
+            "Cant load a model of this type, add the model class to ./src/plotting/temporary_plot_utils.py"
+        )
+    return None
 
 
 def evaluate_models(
@@ -45,18 +60,13 @@ def evaluate_models(
     test_loader = DataLoader(test_data, num_workers=10, batch_size=64)
     for model_f_name in model_f_names:
         # Hardcode all of possible classes here. not ideal.
-        for model_class in [UNet, LSD]:
-            model = model_from_file(model_f_name, model_class)
-            if model is not None:
-                break
-        if model is None:
-            Warning(f"Could not load model from file {model_f_name}")
-            continue
-        actual_model_f_names.append(model_f_name)
-        model.eval()
-        with torch.no_grad():
-            loss = criterion(model, test_loader)
-            losses.append(loss)
+        model = model_from_file(model_f_name)
+        if model is not None:
+            actual_model_f_names.append(model_f_name)
+            model.eval()
+            with torch.no_grad():
+                loss = criterion(model, test_loader)
+                losses.append(loss)
     return losses, actual_model_f_names
 
 
@@ -74,19 +84,38 @@ def models_bar(model_f_names: List[str], losses: List[float], criterion_name: st
     plt.show()
 
 
-def matshow_best_worst_img(
-    model_f_name: str,
-    model_class,
+def model_matshow_best_worst_img(
+    model_files: List[str],
     watched_criterion: Callable,
     test_dataset: Dataset,
     num_samples: int = 10,
-    file_save_name="",
+    files_save_path: str = "",
 ):
-    model = model_from_file(model_f_name, model_class)
+    for model_file in model_files:
+        if model_file is not None:
+            matshow_best_worst_img(
+                model_file,
+                watched_criterion,
+                test_dataset,
+                num_samples,
+                files_save_path,
+            )
+
+
+def matshow_best_worst_img(
+    model_f_name: str,
+    watched_criterion: Callable,
+    test_dataset: Dataset,
+    num_samples: int = 10,
+    file_save_path="",
+):
+    model = model_from_file(model_f_name)
     model.eval()
 
     test_loader = DataLoader(test_dataset, batch_size=64)
-    IoU, bests, worsts = watched_evaluate_IoU(model, test_loader, num_samples)
+    crit_vals, bests, worsts = watched_criterion(
+        model, test_loader, num_samples, device="cpu"
+    )
     model.to("cpu")
     # List of all our interesting datapoints.
     ind = [tup[0] for tup in worsts] + [tup[0] for tup in bests]
@@ -130,7 +159,9 @@ def matshow_best_worst_img(
         fig.suptitle(name[1].upper() + name[2:] + " Predictions", fontsize=20)
         fig.supylabel("Ground Truth Labels     Model Predictions", fontsize=16)
         fig.tight_layout()
-        fig.savefig(file_save_name + name + ".png")
+        fig.savefig(
+            os.path.join(file_save_path, model_f_name.split(".")[0] + name + ".png")
+        )
 
 
 def clean_file_names(file_names: List[str]) -> List[str]:
