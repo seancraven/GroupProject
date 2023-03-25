@@ -152,11 +152,13 @@ class PetsDataFetcher:
             unlabeled_filenames = u
         else:
             num_labeled = int(len(all_filenames) * label_proportion)
-            num_validation = int(num_labeled * validation_proportion)
+            num_validation = int(len(all_filenames) * validation_proportion)
 
             validation_filenames = all_filenames[:num_validation]
-            train_filenames = all_filenames[num_validation:num_labeled]
-            unlabeled_filenames = all_filenames[num_labeled:]
+            train_filenames = all_filenames[
+                num_validation : num_labeled + num_validation
+            ]
+            unlabeled_filenames = all_filenames[num_labeled + num_validation :]
 
         assert len(set(train_filenames).intersection(set(validation_filenames))) == 0
         assert len(set(train_filenames).intersection(set(unlabeled_filenames))) == 0
@@ -245,9 +247,14 @@ def _class_balanced_split(
 
     for classed_files in class_dict.values():
         num_labeled = int(len(classed_files) * label_proportion)
-        num_validation = int(num_labeled * validation_proportion)
+        num_validation = int(len(classed_files) * validation_proportion)
         validation_filenames += classed_files[:num_validation]
-        train_filenames += classed_files[num_validation:num_labeled]
-        unlabeled_filenames += classed_files[num_labeled:]
+        train_filenames += classed_files[num_validation : num_validation + num_labeled]
+        unlabeled_filenames += classed_files[num_labeled + num_validation :]
 
+        assert len(set(train_filenames).intersection(set(validation_filenames))) == 0
+        assert len(set(train_filenames).intersection(set(unlabeled_filenames))) == 0
+        assert (
+            len(set(validation_filenames).intersection(set(unlabeled_filenames))) == 0
+        )
     return validation_filenames, train_filenames, unlabeled_filenames
