@@ -110,10 +110,11 @@ class PetsDataFetcher:
         self,
         label_proportion: float=1.0,
         validation_proportion: float=0.0,
-        seed: int=0
+        seed: Optional[int]=None
     ) -> TrainPseudoSplit | TrainValidatePseudoSplit:
         """Returns the train data, generated randomly from the given seed """
-        random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
         train_txt = os.path.join(self.root, 'train.txt')
         all_filenames = sorted(self._get_valid_files_from_txt(train_txt))
         random.shuffle(all_filenames)
