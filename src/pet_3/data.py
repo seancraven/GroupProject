@@ -125,8 +125,8 @@ class PetsDataFetcher:
         The class balance split option will not give the same random splits
         as with class_balance=False.
         Args:
-            label_proportion: The proportion of the data that is labeled.
-            validation_proportion: The proportion of the labeled data that is used for validation.
+            label_proportion: The proportion of the train data that is labeled.
+            validation_proportion: The proportion of the train data that is used for validation.
             seed: The seed used to generate the random split.
         Returns:
             A tuple of the train and validation data, and unlabeled data.
@@ -195,8 +195,8 @@ class PetsDataFetcher:
     ) -> Named:
         """Returns the train data, generated randomly from the given seed
         Args:
-            label_proportion: The proportion of the data that is labeled.
-            validation_proportion: The proportion of the labeled data that is used for validation.
+            label_proportion: The proportion of the train data that is labeled.
+            validation_proportion: The proportion of the train labeled data that is used for validation.
             seed: The seed used to generate the random split.
         Returns:
             A tuple of the train and validation data, and unlabeled data.
@@ -229,7 +229,7 @@ def _class_balanced_split(
     Args:
         filenames: The filenames of the data.
         label_proportion: The proportion of the data that is labeled.
-        validation_proportion: The proportion of the labeled data that is used for validation.
+        validation_proportion: The proportion of the data that is used for validation.
     Returns:
         A tuple of the validation, train, and unlabeled data.
     """
