@@ -110,21 +110,23 @@ class PetsDataFetcher:
         self,
         label_proportion: float=1.0,
         validation_proportion: float=0.0,
-        seed: int=0
+        seed: Optional[int] = None
     ) -> TrainPseudoSplit | TrainValidatePseudoSplit:
         """Returns the train data, generated randomly from the given seed """
-        random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
         train_txt = os.path.join(self.root, 'train.txt')
         all_filenames = sorted(self._get_valid_files_from_txt(train_txt))
         random.shuffle(all_filenames)
         
         # Split into labeled and unlabeled
         num_labeled = int(len(all_filenames) * label_proportion)
-        num_validation = int(num_labeled * validation_proportion)
+        num_validation = 500
+
 
         validation_filenames = all_filenames[:num_validation]
-        train_filenames = all_filenames[num_validation:num_labeled]
-        unlabeled_filenames = all_filenames[num_labeled:]
+        train_filenames = all_filenames[num_validation:num_validation+num_labeled]
+        unlabeled_filenames = all_filenames[num_validation+num_labeled:]
 
         assert len(set(train_filenames).intersection(set(validation_filenames))) == 0
         assert len(set(train_filenames).intersection(set(unlabeled_filenames))) == 0

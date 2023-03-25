@@ -8,13 +8,14 @@ from src.pet_3.michael_data import PetsDataFetcher
 from src.utils.evaluation import evaluate_IoU
 
 TOTAL_BATCH_SIZE = 4
-LABEL_PROPORTION = 0.01
+LABEL_PROPORTION = 0.05
 VALIDATION_PROPORTION = 0.1
 DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
+# PERCENTILES = [0.1, 0.15, 0.2]
 PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
 NUM_DMT_EPOCHS = 10
-GAMMA_1 = 3
-GAMMA_2 = 3
+GAMMA_1 = 0
+GAMMA_2 = GAMMA_1
 
 using_pretrained = False
 unet_a = UNet()
@@ -35,9 +36,9 @@ baseline = UNet()
 
 fetcher = PetsDataFetcher(root='src/pet_3')
 labeled, validation, unlabeled = fetcher.get_train_data(
-    LABEL_PROPORTION, VALIDATION_PROPORTION,
-    seed = 1
+    LABEL_PROPORTION, VALIDATION_PROPORTION
 )
+# unlabeled = Subset(unlabeled, range(2*len(labeled)))
 print(f'Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}')
 
 dmt = DMT(
