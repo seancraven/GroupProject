@@ -53,7 +53,7 @@ class _BasePets(Dataset):
         label[label < 0.0075] = 1  # Only edge
         label[label > 0.009] = 1
         label[(0.0075 <= label) & (label <= 0.009)] = 0
-        label = Resize((256, 256))(label).round().long()
+        label = Resize((256, 256))(label).round().short()
         label = label.squeeze(0).flatten()
         return label
 
