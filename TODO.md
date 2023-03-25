@@ -47,9 +47,9 @@ Binman:
  - [x] Sean, clean out repo of crap.
 
 Other Sean Activities:
- - [ ] Make validation set same size as labelled set.
+ - [x] Make validation set same size as labelled set.
  - [ ] Train models.
- - [ ] quick and dirty plotting utils so that we can demostrate something.
- - [ ] depracate the old dataset interface.
- - [ ] Add validation from file.
+ - [x] quick and dirty plotting utils so that we can demostrate something.
+ - [x] depracate the old dataset interface.
+ - [x] Add validation from file.
  - [ ] Bug where best validation IOU is on the wrong model.

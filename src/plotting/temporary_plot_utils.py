@@ -13,7 +13,7 @@ from src.models.UNet import UNet
 from src.models.LSD import LSD
 from typing import List, Callable, Union, Any, Tuple
 from torch.utils.data import Dataset
-from src.utils.evaluation import evaluate_IoU
+from src.utils.evaluation import watched_evaluate_IoU
 from torch.utils.data import DataLoader
 
 matplotlib.style.use("seaborn")
@@ -72,6 +72,65 @@ def models_bar(model_f_names: List[str], losses: List[float], criterion_name: st
     ax.tick_params(axis="x", labelrotation=35)
     plt.tight_layout()
     plt.show()
+
+
+def matshow_best_worst_img(
+    model_f_name: str,
+    model_class,
+    watched_criterion: Callable,
+    test_dataset: Dataset,
+    num_samples: int = 10,
+    file_save_name="",
+):
+    model = model_from_file(model_f_name, model_class)
+    model.eval()
+
+    test_loader = DataLoader(test_dataset, batch_size=64)
+    IoU, bests, worsts = watched_evaluate_IoU(model, test_loader, num_samples)
+    model.to("cpu")
+    # List of all our interesting datapoints.
+    ind = [tup[0] for tup in worsts] + [tup[0] for tup in bests]
+
+    images = torch.stack([test_dataset[i][0] for i in ind])
+    lab = torch.stack([test_dataset[i][1] for i in ind])
+    lab = lab.reshape((-1, 256, 256))
+    lab.permute((1, 2, 0))
+    with torch.no_grad():
+        out = model(images) > 0.5
+    out = out[:, :, 1].reshape((-1, 256, 256))
+    out.permute((1, 2, 0))
+    assert out.shape[0] == lab.shape[0], "Wrong shapes."
+    worst_preds, worst_lab = (
+        out[:num_samples].numpy(),
+        lab[:num_samples].numpy(),
+    )
+    best_preds, best_lab = (
+        out[-num_samples:].numpy(),
+        lab[-num_samples:].numpy(),
+    )
+
+    w_fig, w_ax = plt.subplots(2, num_samples)
+    b_fig, b_ax = plt.subplots(2, num_samples)
+
+    for (fig, ax, pred, lab, name,) in zip(
+        [w_fig, b_fig],
+        [w_ax, b_ax],
+        [worst_preds, best_preds],
+        [worst_lab, best_lab],
+        ["_worst", "_best"],
+    ):
+        for i in range(num_samples):
+
+            ax[0, i].matshow(pred[i, :, :])
+            ax[1, i].matshow(lab[i, :, :])
+
+            ax[0, i].axis("off")
+            ax[1, i].axis("off")
+
+        fig.suptitle(name[1].upper() + name[2:] + " Predictions", fontsize=20)
+        fig.supylabel("Ground Truth Labels     Model Predictions", fontsize=16)
+        fig.tight_layout()
+        fig.savefig(file_save_name + name + ".png")
 
 
 def clean_file_names(file_names: List[str]) -> List[str]:
