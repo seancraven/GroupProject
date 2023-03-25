@@ -1,6 +1,6 @@
 import os
 import random
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 
 import torch
 from PIL import Image
@@ -85,7 +85,11 @@ class PetsUnlabeled(_BasePets):
 
 
 class PetsDataFetcher:
-    def __init__(self, root: str) -> None:
+    def __init__(
+        self,
+        root: str,
+    ) -> None:
+
         self.root = root
         self.test_path = os.path.join(self.root, "test_data")
         self.train_path = os.path.join(self.root, "train_data")
@@ -115,8 +119,11 @@ class PetsDataFetcher:
         label_proportion: float = 1.0,
         validation_proportion: float = 0.0,
         seed: int = 0,
+        class_balance: bool = False,
     ) -> Union[TrainPseudoSplit, TrainValidatePseudoSplit]:
-        """Returns the train data, generated randomly from the given seed
+        """Returns the train data, generated randomly from the given seed.
+        The class balance split option will not give the same random splits
+        as with class_balance=False.
         Args:
             label_proportion: The proportion of the data that is labeled.
             validation_proportion: The proportion of the labeled data that is used for validation.
@@ -124,6 +131,11 @@ class PetsDataFetcher:
         Returns:
             A tuple of the train and validation data, and unlabeled data.
         """
+        assert 0 <= label_proportion <= 1, "Label proportion must be between 0 and 1."
+        assert (
+            0 <= validation_proportion <= 1
+        ), "Validation proportion must be between 0 and 1."
+
         random.seed(seed)
         train_txt = os.path.join(self.root, "train.txt")
         # Stop wierd behaviour across os.
@@ -131,12 +143,20 @@ class PetsDataFetcher:
         random.shuffle(all_filenames)
 
         # Split into labeled and unlabeled
-        num_labeled = int(len(all_filenames) * label_proportion)
-        num_validation = int(num_labeled * validation_proportion)
+        if class_balance:
+            (v, t, u) = _class_balanced_split(
+                all_filenames, label_proportion, validation_proportion
+            )
+            validation_filenames = v
+            train_filenames = t
+            unlabeled_filenames = u
+        else:
+            num_labeled = int(len(all_filenames) * label_proportion)
+            num_validation = int(num_labeled * validation_proportion)
 
-        validation_filenames = all_filenames[:num_validation]
-        train_filenames = all_filenames[num_validation:num_labeled]
-        unlabeled_filenames = all_filenames[num_labeled:]
+            validation_filenames = all_filenames[:num_validation]
+            train_filenames = all_filenames[num_validation:num_labeled]
+            unlabeled_filenames = all_filenames[num_labeled:]
 
         assert len(set(train_filenames).intersection(set(validation_filenames))) == 0
         assert len(set(train_filenames).intersection(set(unlabeled_filenames))) == 0
@@ -169,6 +189,7 @@ class PetsDataFetcher:
         label_proportion: float = 1.0,
         validation_proportion: float = 0,
         seed: int = 0,
+        class_balance: bool = False,
     ) -> Named:
         """Returns the train data, generated randomly from the given seed
         Args:
@@ -194,3 +215,39 @@ def _deterministic_label_splits(root: str) -> List[float]:
             splits.append(split_fract)
 
     return splits
+
+
+def _class_balanced_split(
+    filenames: List[str],
+    label_proportion: float,
+    validation_proportion: float,
+) -> Tuple[List[str], List[str], List[str]]:
+    """Splits the data into labeled, unlabeled, and validation data,
+    while maintaining class balance.
+    Args:
+        filenames: The filenames of the data.
+        label_proportion: The proportion of the data that is labeled.
+        validation_proportion: The proportion of the labeled data that is used for validation.
+    Returns:
+        A tuple of the validation, train, and unlabeled data.
+    """
+
+    class_dict: Dict[str, List[str]] = {}
+    validation_filenames: List[str] = []
+    train_filenames: List[str] = []
+    unlabeled_filenames: List[str] = []
+    # Split by class
+    for file in filenames:
+        class_name = "".join(file.split("_")[:-1])
+        if class_name not in class_dict:
+            class_dict[class_name] = []
+        class_dict[class_name].append(file)
+
+    for classed_files in class_dict.values():
+        num_labeled = int(len(classed_files) * label_proportion)
+        num_validation = int(num_labeled * validation_proportion)
+        validation_filenames += classed_files[:num_validation]
+        train_filenames += classed_files[num_validation:num_labeled]
+        unlabeled_filenames += classed_files[num_labeled:]
+
+    return validation_filenames, train_filenames, unlabeled_filenames
