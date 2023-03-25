@@ -13,7 +13,7 @@ import time
 import torch
 from torch.utils.data import DataLoader
 import wandb  # type: ignore
-from src.pet_3.data import Pets
+from src.pet_3.deprocated_data import Pets
 
 
 if __name__ == "__main__":

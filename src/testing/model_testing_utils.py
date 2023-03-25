@@ -19,7 +19,7 @@ import torch.nn.functional as F
 from typing import Callable
 
 from torch.utils.data import DataLoader
-from src.pet_3.data import Pets
+from src.pet_3.deprocated_data import Pets
 
 
 

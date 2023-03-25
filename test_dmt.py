@@ -4,12 +4,12 @@ from torch.utils.data import DataLoader, Subset
 
 from src.models.UNet import UNet
 from src.models.DMT import DMT
-from src.pet_3.michael_data import PetsDataFetcher
+from src.pet_3.data import PetsDataFetcher
 from src.utils.evaluation import evaluate_IoU
 
-TOTAL_BATCH_SIZE = 4
-LABEL_PROPORTION = 0.01
-VALIDATION_PROPORTION = 0.1
+TOTAL_BATCH_SIZE = 32
+LABEL_PROPORTION = 0.2
+VALIDATION_PROPORTION = 0.5
 DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
 PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
 NUM_DMT_EPOCHS = 10

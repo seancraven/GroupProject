@@ -1,5 +1,5 @@
 from src.testing.model_testing_utils import LoadedModel
-from src.pet_3.data import Pets
+from src.pet_3.deprocated_data import Pets
 
 if __name__ == "__main__":
     #dave = LoadedModel("models/u_net_supervised/Mean Squared Error Loss_20.pt")

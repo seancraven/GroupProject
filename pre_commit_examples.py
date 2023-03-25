@@ -4,7 +4,7 @@
 from typing import Any, Iterator
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from src.pet_3.data import Pets
+from src.pet_3.deprocated_data import Pets
 
 
 def example_function(alpha: int, beta: str, gamma: Iterator[Any]) -> list[int]:

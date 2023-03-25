@@ -1,7 +1,7 @@
 # pylint: disable-all
 import torch
 
-from src.pet_3.data import Pets
+from src.pet_3.deprocated_data import Pets
 from src.testing.model_testing_utils import ModelMetrics
 from src.plotting.model_plotting_utils import (
     plot_bar,

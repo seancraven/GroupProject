@@ -3,7 +3,7 @@ import matplotlib.figure as fig
 import matplotlib.pyplot as plt
 
 from src.testing.model_testing_utils import LoadedModel, ModelMetrics
-from src.pet_3.data import Pets
+from src.pet_3.deprocated_data import Pets
 
 from typing import Dict, Callable
 

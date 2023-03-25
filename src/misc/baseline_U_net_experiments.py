@@ -16,7 +16,7 @@ from matplotlib.pyplot import imshow
 
 import wandb  # type: ignore
 
-from src.pet_3.data import Pets
+from src.pet_3.deprocated_data import Pets
 from LSD_model import LSD
 
 

@@ -52,3 +52,4 @@ Other Sean Activities:
  - [ ] quick and dirty plotting utils so that we can demostrate something.
  - [ ] depracate the old dataset interface.
  - [ ] Add validation from file.
+ - [ ] Bug where best validation IOU is on the wrong model.
