@@ -29,6 +29,7 @@ def evaluate_IoU(
 def watched_evaluate_IoU(
     model: nn.Module,
     data: DataLoader,
+    num_samples: int = 10,
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ) -> Tuple[float, List[Tuple[int, float]], List[Tuple[int, float]]]:
     model = model.to(device)
@@ -64,7 +65,7 @@ def watched_evaluate_IoU(
         ]
         worst_batch_best.sort(key=lambda x: x[1])
 
-        best_img = worst_batch_best[-10:]
-        worst_img = worst_batch_best[:10]
+        best_img = worst_batch_best[-num_samples:]
+        worst_img = worst_batch_best[:num_samples]
 
     return (score / seen_images).item(), best_img, worst_img  # type: ignore
