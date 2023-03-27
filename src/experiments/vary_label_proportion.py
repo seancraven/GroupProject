@@ -14,6 +14,3 @@ class VaryLabelProportion(BaseExperiment):
                 baseline_fname=f'baseline_{proportion}.pt',
                 best_model_fname=f'dmt_{proportion}.pt'
             )
-
-    def plot(self) -> None:
-        pass
