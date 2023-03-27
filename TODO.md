@@ -38,7 +38,7 @@ Readmes
  - [ ] DMT: Eirik, Alexei, Daniel
 
 
- - [x] Label Proportioins Need to be decided [0.01, 0.02, 0.05, .1, .5, 0.1]: Sean
+ - [x] Label Proportioins Need to be decided [x0.01, x0.02, 0.05, x.1, .5, 0.1]: Sean
 
 Bossman:
  - [ ] Alexei.
