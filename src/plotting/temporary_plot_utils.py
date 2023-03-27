@@ -69,7 +69,12 @@ def evaluate_models(
     return losses, actual_model_f_names
 
 
-def models_bar(model_f_names: List[str], losses: List[float], criterion_name: str):
+def models_bar(
+    model_f_names: List[str],
+    losses: List[float],
+    criterion_name: str,
+    plot_name: str = "test.png",
+):
     """Plots a bar chart of the models and their losses."""
     clean_names = clean_file_names(model_f_names)
     min_y, max_y = min(losses), max(losses)
@@ -80,7 +85,8 @@ def models_bar(model_f_names: List[str], losses: List[float], criterion_name: st
     ax.set_ylabel(criterion_name)
     ax.tick_params(axis="x", labelrotation=35)
     plt.tight_layout()
-    plt.show()
+    fig.savefig(plot_name)
+    plt.close()
 
 
 def models_matshow_best_worst_img(
@@ -106,15 +112,28 @@ def matshow_best_worst_img(
     watched_criterion: Callable,
     test_dataset: Dataset,
     num_samples: int = 10,
-    file_save_path="",
+    save_dir="",
 ):
+    """
+    Makes 2 girids of predictions vs labels, for the
+    best and worst models of the dataset.
+
+    Args:
+        model_f_name: The file name of the model to evaluate.
+        watched_criterion: A function that takes a model and a data loader and returns
+            (losses, best_index, worst_index), where best_index and worst_index
+            are list's of indecies from a dataset.
+        test_dataset: The test data to evaluate the models on.
+        num_samples: The number of samples to plot.
+        file_save_path: The path to save the images to.
+    """
     model = model_from_file(model_f_name)
+    if not model:
+        return
     model.eval()  # type :ignore
 
     test_loader = DataLoader(test_dataset, batch_size=64)
-    crit_vals, bests, worsts = watched_criterion(
-        model, test_loader, num_samples, device="cpu"
-    )
+    _, bests, worsts = watched_criterion(model, test_loader, num_samples)
     model.to("cpu")
     # List of all our interesting datapoints.
     ind = [tup[0] for tup in worsts] + [tup[0] for tup in bests]
@@ -123,11 +142,12 @@ def matshow_best_worst_img(
     lab = torch.stack([test_dataset[i][1] for i in ind])
     lab = lab.reshape((-1, 256, 256))
     lab.permute((1, 2, 0))
+
     with torch.no_grad():
         out = model(images) > 0.5
     out = out[:, :, 1].reshape((-1, 256, 256))
     out.permute((1, 2, 0))
-    assert out.shape[0] == lab.shape[0], "Wrong shapes."
+
     worst_preds, worst_lab = (
         out[:num_samples].numpy(),
         lab[:num_samples].numpy(),
@@ -157,11 +177,16 @@ def matshow_best_worst_img(
         fig.suptitle(name[1].upper() + name[2:] + " Predictions", fontsize=20)
         fig.supylabel("Ground Truth Labels     Model Predictions", fontsize=16)
         fig.tight_layout()
+        ## This doesn't work
         fig.savefig(
-            os.path.join(file_save_path, model_f_name.split(".")[0] + name + ".png")
+            os.path.join(save_dir, clean_file_names([model_f_name])[0] + name + ".png")
         )
+        plt.close()
 
 
 def clean_file_names(file_names: List[str]) -> List[str]:
-    """Removes the file path and extension from the file names."""
-    return [file_name.split("/")[-1].split(".")[0] for file_name in file_names]
+    """Removes the file path and extension from the file names.
+
+    Note Solution is delicate only works with .pt files.
+    """
+    return [file_name.split("/")[-1][:-3] for file_name in file_names]
