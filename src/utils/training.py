@@ -11,6 +11,19 @@ from src.utils.evaluation import evaluate_IoU
 from src.utils.misc import ReporterMixin
 
 
+class WatchedPlateauScheduler(ReduceLROnPlateau):
+    """ Wrapper around a scheduler that tracks whether the scheduler stepped """
+    def step(self, metric: float | torch.Tensor) -> None:
+        prev_lr = [gp['lr'] for gp in self.optimizer.param_groups]
+        super().step(metric)
+        new_lr = [gp['lr'] for gp in self.optimizer.param_groups]
+        did_step = (prev_lr != new_lr)
+        return did_step
+    
+    def reset(self) -> None:
+        self._reset()
+
+
 class EarlyStopping(ReporterMixin):
     """ Quick and dirty implementation of early stopping using validation metric. """
     def __init__(self, patience: int, min_delta: float = 0.0) -> None:
@@ -90,10 +103,10 @@ class PreTrainer(ReporterMixin):
         # of early stopping, since otherwise the scheduler never gets chance
         # to reduce the learning rate.
         self.optimizer = torch.optim.Adam(self.model.parameters())
-        self.loss_scheduler = ReduceLROnPlateau(self.optimizer, patience=5, verbose=True)
-        self.IoU_scheduler = ReduceLROnPlateau(self.optimizer, mode='max', patience=10, verbose=True)
+        self.loss_scheduler = WatchedPlateauScheduler(self.optimizer, patience=5, verbose=True)
+        self.IoU_scheduler = WatchedPlateauScheduler(self.optimizer, mode='max', patience=10, verbose=True)
         self.criterion = nn.CrossEntropyLoss()
-        self.early_stopping = EarlyStopping(patience=20)
+        self.early_stopping = EarlyStopping(patience=100)
 
 
     def train(self, max_epochs: int) -> None:
@@ -137,7 +150,9 @@ class PreTrainer(ReporterMixin):
 
             # Change the learning rate if needed
             epoch_mean_loss = epoch_loss / len(self.train_loader)
-            self.loss_scheduler.step(epoch_mean_loss)
+            did_step = self.loss_scheduler.step(epoch_mean_loss)
+            if did_step:
+                self.IoU_scheduler.reset()
             self.IoU_scheduler.step(validation_IoU)
 
 

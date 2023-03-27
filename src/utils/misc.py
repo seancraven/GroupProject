@@ -43,3 +43,10 @@ class ReporterMixin:
         log_string = "\t" + name + " | ".join(log_strings)
         self.info(log_string)
         return self._wandb_log_no_print(named_log_dict)
+    
+    @staticmethod
+    def wandb_finish():
+        try:
+            wandb.finish()
+        except:
+            pass

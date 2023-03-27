@@ -86,10 +86,14 @@ class PetsUnlabeled(_BasePets):
 
 
 class PetsDataFetcher:
+<<<<<<< HEAD
     def __init__(
         self,
         root: str,
     ) -> None:
+=======
+    def __init__(self, root: str) -> None:
+>>>>>>> c01a1e9 (Fix double scheduler)
         self.root = root
         self.test_path = os.path.join(self.root, "test_data")
         self.train_path = os.path.join(self.root, "train_data")
@@ -118,7 +122,7 @@ class PetsDataFetcher:
         self,
         label_proportion: float = 1.0,
         validation_proportion: float = 0.0,
-        seed: int = 0,
+        seed: Optional[int] = None,
         class_balance: bool = False,
     ) -> Union[TrainPseudoSplit, TrainValidatePseudoSplit]:
         """Returns the train data, generated randomly from the given seed.
@@ -136,7 +140,8 @@ class PetsDataFetcher:
             0 <= validation_proportion <= 1
         ), "Validation proportion must be between 0 and 1."
 
-        random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
         train_txt = os.path.join(self.root, "train.txt")
         # Stop wierd behaviour across os.
         all_filenames = sorted(self._get_valid_files_from_txt(train_txt))
@@ -190,7 +195,7 @@ class PetsDataFetcher:
         self,
         label_proportion: float = 1.0,
         validation_proportion: float = 0,
-        seed: int = 0,
+        seed: Optional[int] = None,
         class_balance: bool = False,
     ) -> Named:
         """Returns the train data, generated randomly from the given seed
