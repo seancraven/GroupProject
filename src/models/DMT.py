@@ -162,7 +162,7 @@ class DMT(nn.Module, ReporterMixin):
         if self.baseline is None:
             return
         trainer = PreTrainer(
-            self.baseline, self.labeled_loader, name="Baseline", device=self.device
+            self.baseline, self.labeled_loader, self.validation_loader, name="Baseline", device=self.device
         )
         trainer.train(max_epochs)
 
@@ -331,9 +331,10 @@ class DMT(nn.Module, ReporterMixin):
             self.wandb_log_named(
                 {"Best validation IoU": self.best_model_b_IoU}, "Model B"
             )
-            self.wandb_log_named(
-                {"Best validation IoU": self.baseline_IoU}, "Baseline"
-            )
+            if self.baseline is not None:
+                self.wandb_log_named(
+                    {"Best validation IoU": self.baseline_IoU}, "Baseline"
+                )
 
     def dynamic_train(self, percentiles: Iterable[float], num_epochs: int) -> None:
         # Potentially swap the models so that model A is the better one, since
