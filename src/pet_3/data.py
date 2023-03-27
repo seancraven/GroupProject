@@ -2,6 +2,7 @@ import os
 import random
 from typing import List, Optional, Tuple, Union, Dict
 
+
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
@@ -89,7 +90,6 @@ class PetsDataFetcher:
         self,
         root: str,
     ) -> None:
-
         self.root = root
         self.test_path = os.path.join(self.root, "test_data")
         self.train_path = os.path.join(self.root, "train_data")
@@ -202,7 +202,9 @@ class PetsDataFetcher:
             A tuple of the train and validation data, and unlabeled data.
         """
         return (
-            self.get_train_data(label_proportion, validation_proportion, seed),
+            self.get_train_data(
+                label_proportion, validation_proportion, seed, class_balance
+            ),
             f"pets_l_{label_proportion}_v_{validation_proportion}",
         )
 
