@@ -69,7 +69,13 @@ class BaseExperiment(ABC):
         pass
 
     def plot(self) -> None:
+        """Plot the results of the experiment.
+
+        Files are saved in the model folder.
+        """
         model_fnames = os.listdir(self.model_folder)
+        print(f"Found {len(model_fnames)} models in {self.model_folder}")
+
         model_fnames = [
             os.path.join(self.model_folder, fname) for fname in model_fnames
         ]

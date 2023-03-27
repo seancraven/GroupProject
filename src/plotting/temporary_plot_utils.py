@@ -21,9 +21,6 @@ from torch.utils.data import DataLoader
 matplotlib.style.use("seaborn")
 
 
-
-
-
 def evaluate_models(
     model_f_names: List[str], criterion: Callable, test_dataset: Dataset
 ) -> Tuple[List[float], List[str]]:
@@ -64,7 +61,7 @@ def models_bar(
         criterion: A function that takes a model and a dataloader and returns a loss.
         This is what the models are evaluated on.
         criterion_name: The name of the criterion.
-        """
+    """
     losses, model_f_names = evaluate_models(model_f_names, criterion, test_dataset)
     clean_names = _clean_file_names(model_f_names)
     min_y, max_y = min(losses), max(losses)
@@ -75,7 +72,7 @@ def models_bar(
     ax.set_ylabel(criterion_name)
     ax.tick_params(axis="x", labelrotation=35)
     plt.tight_layout()
-    fig.savefig(os.path.join(file_save_path, "models_bar.png"))
+    fig.savefig(file_save_path)
     plt.close()
 
 
@@ -169,8 +166,7 @@ def matshow_best_worst_img(
         fig.tight_layout()
         ## This doesn't work
         fig.savefig(
-            os.path.join(save_dir, _clean_file_names([model_f_name]
-                                                     )[0] + name + ".png")
+            os.path.join(save_dir, _clean_file_names([model_f_name])[0] + name + ".png")
         )
         plt.close()
 

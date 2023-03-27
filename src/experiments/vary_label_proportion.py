@@ -6,7 +6,7 @@ class VaryLabelProportion(BaseExperiment):
     @property
     def model_folder(self) -> str:
         return 'models/vary_label_proportion'
-    
+
     def run(self) -> None:
         for i, proportion in enum self.LABEL_PROPORTIONS:
             self._base_run(
