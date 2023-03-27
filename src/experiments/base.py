@@ -10,14 +10,15 @@ from typing import Type, Optional, Dict
 from src.models.DMT import DMT
 from src.models.UNet import UNet
 from src.pet_3.data import PetsDataFetcher
-from src.utils.evaluation import evaluate_IoU
+from src.utils.evaluation import evaluate_IoU, watched_evaluate_IoU
+from src.plotting.temporary_plot_utils import models_matshow_best_worst_img, models_bar
 
 
 class Experiments:
-    REGISTRY: Dict[str, 'BaseExperiment'] = {}
-    
+    REGISTRY: Dict[str, "BaseExperiment"] = {}
+
     @staticmethod
-    def register(experiment: Type['BaseExperiment']) -> None:
+    def register(experiment: Type["BaseExperiment"]) -> None:
         Experiments.REGISTRY[experiment.__name__] = experiment
 
     @staticmethod
@@ -42,10 +43,9 @@ class Experiments:
                 print(exc)
 
 
-
 class BaseExperiment(ABC):
     _SEED = 0
-    _ROOT = 'src/pet_3'
+    _ROOT = "src/pet_3"
 
     BATCH_SIZE = 32
     LABEL_PROPORTION = 0.1
@@ -68,24 +68,38 @@ class BaseExperiment(ABC):
     def run(self) -> None:
         pass
 
-    @abstractmethod
     def plot(self) -> None:
-        pass
+        model_fnames = os.listdir(self.model_folder)
+        model_fnames = [
+            os.path.join(self.model_folder, fname) for fname in model_fnames
+        ]
+        test_data = PetsDataFetcher(root=self._ROOT).get_test_data()
+
+        models_bar(
+            model_fnames,
+            evaluate_IoU,
+            test_data,
+            "IoU",
+            f"{os.path.join(self.model_folder, 'IoU_bar.png')}",
+        )
+        models_matshow_best_worst_img(
+            model_fnames, watched_evaluate_IoU, test_data, 4, f"{self.model_folder}"
+        )
 
     def _base_run(
         self,
         *,
-        batch_size: int=BATCH_SIZE,
-        label_proportion: float=LABEL_PROPORTION,
-        validation_proportion: float=VALIDATION_PROPORTION,
-        difference_maximized_proportion: float=DIFFERENCE_MAXIMIZED_PROPORTION,
-        percentiles: tuple=PERCENTILES,
-        num_dmt_epochs: int=NUM_DMT_EPOCHS,
-        gamma_1: int=GAMMA_1,
-        gamma_2: int=GAMMA_2,
-        seed: int=_SEED,
-        baseline_fname: Optional[str]=None,
-        best_model_fname: Optional[str]=None,
+        batch_size: int = BATCH_SIZE,
+        label_proportion: float = LABEL_PROPORTION,
+        validation_proportion: float = VALIDATION_PROPORTION,
+        difference_maximized_proportion: float = DIFFERENCE_MAXIMIZED_PROPORTION,
+        percentiles: tuple = PERCENTILES,
+        num_dmt_epochs: int = NUM_DMT_EPOCHS,
+        gamma_1: int = GAMMA_1,
+        gamma_2: int = GAMMA_2,
+        seed: int = _SEED,
+        baseline_fname: Optional[str] = None,
+        best_model_fname: Optional[str] = None,
     ) -> None:
         unet_a = UNet()
         unet_b = UNet()
@@ -104,7 +118,7 @@ class BaseExperiment(ABC):
             max_batch_size=batch_size,
             gamma_1=gamma_1,
             gamma_2=gamma_2,
-            baseline=baseline
+            baseline=baseline,
         )
         dmt.wandb_init(
             percentiles=percentiles,
