@@ -59,7 +59,6 @@ def evaluate_models(
     losses: List[float] = []
     test_loader = DataLoader(test_data, num_workers=10, batch_size=64)
     for model_f_name in model_f_names:
-        # Hardcode all of possible classes here. not ideal.
         model = model_from_file(model_f_name)
         if model is not None:
             actual_model_f_names.append(model_f_name)
@@ -84,14 +83,14 @@ def models_bar(model_f_names: List[str], losses: List[float], criterion_name: st
     plt.show()
 
 
-def model_matshow_best_worst_img(
-    model_files: List[str],
+def models_matshow_best_worst_img(
+    model_f_names: List[str],
     watched_criterion: Callable,
     test_dataset: Dataset,
     num_samples: int = 10,
     files_save_path: str = "",
 ):
-    for model_file in model_files:
+    for model_file in model_f_names:
         if model_file is not None:
             matshow_best_worst_img(
                 model_file,
@@ -110,7 +109,7 @@ def matshow_best_worst_img(
     file_save_path="",
 ):
     model = model_from_file(model_f_name)
-    model.eval()
+    model.eval()  # type :ignore
 
     test_loader = DataLoader(test_dataset, batch_size=64)
     crit_vals, bests, worsts = watched_criterion(
@@ -149,7 +148,6 @@ def matshow_best_worst_img(
         ["_worst", "_best"],
     ):
         for i in range(num_samples):
-
             ax[0, i].matshow(pred[i, :, :])
             ax[1, i].matshow(lab[i, :, :])
 
