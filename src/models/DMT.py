@@ -34,6 +34,7 @@ class DMT(nn.Module, ReporterMixin):
         baseline: Optional[nn.Module] = None,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
         verbosity: int = 2,
+        wandb_disable: bool = False,
     ):
         super().__init__()
         self.model_a = model_a.to(device)
@@ -331,9 +332,10 @@ class DMT(nn.Module, ReporterMixin):
             self.wandb_log_named(
                 {"Best validation IoU": self.best_model_b_IoU}, "Model B"
             )
-            self.wandb_log_named(
-                {"Best validation IoU": self.baseline_IoU}, "Baseline"
-            )
+            if self.baseline is not None:
+                self.wandb_log_named(
+                    {"Best validation IoU": self.baseline_IoU}, "Baseline"
+                )
 
     def dynamic_train(self, percentiles: Iterable[float], num_epochs: int) -> None:
         # Potentially swap the models so that model A is the better one, since

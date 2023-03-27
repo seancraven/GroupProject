@@ -49,10 +49,12 @@ class BaseExperiment(ABC):
 
     BATCH_SIZE = 32
     LABEL_PROPORTION = 0.1
+    ALL_LABEL_PROPORTIONS = (0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 1.0)
     VALIDATION_PROPORTION = 0.1
     DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
     PERCENTILES = (0.2, 0.4, 0.6, 0.8, 1.0)
     NUM_DMT_EPOCHS = 10
+    MAX_PRETRAIN_EPOCHS = 10_000
     GAMMA_1 = 3
     GAMMA_2 = 3
 
@@ -72,6 +74,39 @@ class BaseExperiment(ABC):
     def plot(self) -> None:
         pass
 
+    def _train_baseline_only(
+        self,
+        *,
+        batch_size: int=BATCH_SIZE,
+        label_proportion: float=LABEL_PROPORTION,
+        validation_proportion: float=VALIDATION_PROPORTION,
+        seed: int=_SEED,
+        max_pretrain_epochs: int=MAX_PRETRAIN_EPOCHS,
+        baseline_fname: Optional[str]=None,
+    ):
+        baseline = UNet()
+
+        fetcher = PetsDataFetcher(root=self._ROOT)
+        labeled, validation, unlabeled = fetcher.get_train_data(
+            label_proportion, validation_proportion, seed=seed, class_balance=True
+        )
+        dmt = DMT(  # Instantiate DMT with a lot of dummy arguments
+            None,
+            None,
+            labeled,
+            unlabeled,
+            validation,
+            max_batch_size=batch_size,
+            gamma_1=0,
+            gamma_2=0,
+            baseline=baseline
+        )
+        dmt.pretrain_baseline(max_epochs=max_pretrain_epochs)
+        if baseline_fname is not None:
+            fname = os.path.join(self.model_folder, baseline_fname)
+            dmt.save_baseline(fname)
+
+
     def _base_run(
         self,
         *,
@@ -81,6 +116,7 @@ class BaseExperiment(ABC):
         difference_maximized_proportion: float=DIFFERENCE_MAXIMIZED_PROPORTION,
         percentiles: tuple=PERCENTILES,
         num_dmt_epochs: int=NUM_DMT_EPOCHS,
+        max_pretrain_epochs: int=MAX_PRETRAIN_EPOCHS,
         gamma_1: int=GAMMA_1,
         gamma_2: int=GAMMA_2,
         seed: int=_SEED,
@@ -89,7 +125,7 @@ class BaseExperiment(ABC):
     ) -> None:
         unet_a = UNet()
         unet_b = UNet()
-        baseline = UNet()
+        baseline = UNet() if baseline_fname is not None else None
 
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
@@ -115,19 +151,14 @@ class BaseExperiment(ABC):
             gamma_1=gamma_1,
             gamma_2=gamma_2,
         )
-        dmt.pretrain(max_epochs=10_000, proportion=difference_maximized_proportion)
+        dmt.pretrain(max_epochs=max_pretrain_epochs, proportion=difference_maximized_proportion)
         dmt.dynamic_train(percentiles=percentiles, max_epochs=num_dmt_epochs)
 
-        baseline_IoU = self.test(dmt.baseline)
         best_model_IoU = self.test(dmt.best_model)
-        dmt.wandb_log(
-            {
-                "Baseline test IoU": baseline_IoU,
-                "Best model test IoU": best_model_IoU,
-            }
-        )
-
-        if baseline_fname is not None:
+        dmt.wandb_log({"Best model test IoU": best_model_IoU})
+        if baseline is not None:
+            baseline_IoU = self.test(dmt.baseline)
+            dmt.wandb_log({"Baseline test IoU": baseline_IoU})
             fname = os.path.join(self.model_folder, baseline_fname)
             dmt.save_baseline(fname)
 

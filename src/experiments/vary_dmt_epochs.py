@@ -11,6 +11,5 @@ class VaryDMTEpochs(BaseExperiment):
         for num_epochs in self.EPOCHS:
             self._base_run(
                 num_dmt_epochs=num_epochs,
-                baseline_fname=f'baseline_{num_epochs}.pt',
                 best_model_fname=f'dmt_{num_epochs}.pt'
             )

@@ -11,7 +11,6 @@ class VaryDifferenceMaximization(BaseExperiment):
         for proportion in self.PROPORTIONS:
             self._base_run(
                 difference_maximized_proportion=proportion,
-                baseline_fname=f'baseline_{proportion}.pt',
                 best_model_fname=f'dmt_{proportion}.pt'
             )
 
