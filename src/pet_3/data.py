@@ -202,7 +202,9 @@ class PetsDataFetcher:
             A tuple of the train and validation data, and unlabeled data.
         """
         return (
-            self.get_train_data(label_proportion, validation_proportion, seed),
+            self.get_train_data(
+                label_proportion, validation_proportion, seed, class_balance
+            ),
             f"pets_l_{label_proportion}_v_{validation_proportion}",
         )
 
