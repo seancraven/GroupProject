@@ -203,6 +203,7 @@ class DMT(nn.Module, ReporterMixin):
 
         total_batches = min(len(self.labeled_loader), len(self.unlabeled_loader))
         def _dynamic_gamma(gamma: float, t: int) -> float:
+            return gamma
             total_train_steps = num_epochs * total_batches
             return gamma * math.exp(5*(1 - (t / total_train_steps))**2)
 
@@ -271,7 +272,7 @@ class DMT(nn.Module, ReporterMixin):
                 student_predictions = student(labeled)
                 standard_loss = self.compute_standard_loss(student_predictions, labels)
                 # Total loss and update
-                total_loss = dynamic_loss + standard_loss
+                total_loss = dynamic_loss +  standard_loss
                 total_loss.backward()
                 opt.step()
 
