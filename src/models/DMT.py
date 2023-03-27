@@ -34,7 +34,6 @@ class DMT(nn.Module, ReporterMixin):
         baseline: Optional[nn.Module] = None,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
         verbosity: int = 2,
-        wandb_disable: bool = False,
     ):
         super().__init__()
         self.model_a = model_a.to(device)
@@ -163,7 +162,7 @@ class DMT(nn.Module, ReporterMixin):
         if self.baseline is None:
             return
         trainer = PreTrainer(
-            self.baseline, self.labeled_loader, name="Baseline", device=self.device
+            self.baseline, self.labeled_loader, self.validation_loader, name="Baseline", device=self.device
         )
         trainer.train(max_epochs)
 

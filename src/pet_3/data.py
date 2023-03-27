@@ -86,14 +86,7 @@ class PetsUnlabeled(_BasePets):
 
 
 class PetsDataFetcher:
-<<<<<<< HEAD
-    def __init__(
-        self,
-        root: str,
-    ) -> None:
-=======
     def __init__(self, root: str) -> None:
->>>>>>> c01a1e9 (Fix double scheduler)
         self.root = root
         self.test_path = os.path.join(self.root, "test_data")
         self.train_path = os.path.join(self.root, "train_data")
