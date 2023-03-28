@@ -1,23 +1,27 @@
 import gc
 import os
+from abc import ABC, abstractmethod
+from typing import Dict, Optional, Type
+
 import torch
 import torch.nn as nn
-
-from abc import ABC, abstractmethod, abstractproperty
 from torch.utils.data import DataLoader
-from typing import Type, Optional, Dict
 
 from src.models.DMT import DMT
 from src.models.UNet import UNet
 from src.pet_3.data import PetsDataFetcher
-from src.utils.evaluation import evaluate_IoU
+from src.plotting.temporary_plot_utils import (
+    models_bar,
+    models_matshow_best_worst_img,
+)
+from src.utils.evaluation import evaluate_IoU, watched_evaluate_IoU
 
 
 class Experiments:
-    REGISTRY: Dict[str, 'BaseExperiment'] = {}
-    
+    REGISTRY: Dict[str, "BaseExperiment"] = {}
+
     @staticmethod
-    def register(experiment: Type['BaseExperiment']) -> None:
+    def register(experiment: Type["BaseExperiment"]) -> None:
         Experiments.REGISTRY[experiment.__name__] = experiment
 
     @staticmethod
@@ -47,16 +51,16 @@ class Experiments:
 
 class BaseExperiment(ABC):
     _SEED = 0
-    _ROOT = 'src/pet_3'
+    _ROOT = "src/pet_3"
 
-    BATCH_SIZE = 5  # For poor Michael's computer
+    BATCH_SIZE = 32  # For poor Michael's computer
     LABEL_PROPORTION = 0.1
     ALL_LABEL_PROPORTIONS = (0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 1.0)
     VALIDATION_PROPORTION = 0.05
     DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
     PERCENTILES = (0.2, 0.4, 0.6, 0.8, 1.0)
-    NUM_DMT_EPOCHS = 1
-    MAX_PRETRAIN_EPOCHS = 1   #  Will be 10_000
+    NUM_DMT_EPOCHS = 10
+    MAX_PRETRAIN_EPOCHS = 10000  # Will be 10_000
     GAMMA_1 = 3
     GAMMA_2 = 3
 
@@ -64,7 +68,7 @@ class BaseExperiment(ABC):
         super().__init_subclass__(**kwargs)
         Experiments.register(cls)
 
-    @abstractproperty
+    @property
     def model_folder(self) -> str:
         pass
 
@@ -72,11 +76,35 @@ class BaseExperiment(ABC):
     def run(self) -> None:
         pass
 
-    @abstractmethod
     def plot(self) -> None:
-        pass
+        """Plot the results of the experiment.
+        Files are saved in the model folder.
+        """
+        model_fnames = os.listdir(self.model_folder)
+        print(f"Found {len(model_fnames)} models in {self.model_folder}")
 
-    @abstractproperty
+        model_fnames = [
+            os.path.join(self.model_folder, fname) for fname in model_fnames
+        ]
+        model_fnames = os.listdir(self.model_folder)
+        model_fnames = [
+            os.path.join(self.model_folder, fname) for fname in model_fnames
+        ]
+        model_fnames.sort()
+        test_data = PetsDataFetcher(root=self._ROOT).get_test_data()
+
+        models_bar(
+            model_fnames,
+            evaluate_IoU,
+            test_data,
+            "IoU",
+            f"{os.path.join(self.model_folder, 'IoU_bar.png')}",
+        )
+        models_matshow_best_worst_img(
+            model_fnames, watched_evaluate_IoU, test_data, 4, f"{self.model_folder}"
+        )
+
+    @property
     def description(self) -> str:
         pass
 
@@ -87,14 +115,13 @@ class BaseExperiment(ABC):
     def _train_baseline_only(
         self,
         *,
-        batch_size: int=BATCH_SIZE,
-        label_proportion: float=LABEL_PROPORTION,
-        validation_proportion: float=VALIDATION_PROPORTION,
-        seed: int=_SEED,
-        max_pretrain_epochs: int=MAX_PRETRAIN_EPOCHS,
-        baseline_fname: Optional[str]=None,
+        batch_size: int = BATCH_SIZE,
+        label_proportion: float = LABEL_PROPORTION,
+        validation_proportion: float = VALIDATION_PROPORTION,
+        seed: int = _SEED,
+        max_pretrain_epochs: int = MAX_PRETRAIN_EPOCHS,
+        baseline_fname: Optional[str] = None,
     ):
-
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
             label_proportion, validation_proportion, seed=seed, class_balance=True
@@ -107,31 +134,31 @@ class BaseExperiment(ABC):
             unlabeled_dataset=unlabeled,
             validation_dataset=validation,
             max_batch_size=batch_size,
-            gamma_1=0,  # Doesn't matter since were only doing the baseline
+            gamma_1=0,
+            # Doesn't matter since were only doing the baseline
             gamma_2=0,
-            baseline=UNet()
+            baseline=UNet(),
         )
         dmt.pretrain_baseline(max_epochs=max_pretrain_epochs)
         if baseline_fname is not None:
             fname = os.path.join(self.model_folder, baseline_fname)
             dmt.save_baseline(fname)
 
-
     def _base_run(
         self,
         *,
-        batch_size: int=BATCH_SIZE,
-        label_proportion: float=LABEL_PROPORTION,
-        validation_proportion: float=VALIDATION_PROPORTION,
-        difference_maximized_proportion: float=DIFFERENCE_MAXIMIZED_PROPORTION,
-        percentiles: tuple=PERCENTILES,
-        num_dmt_epochs: int=NUM_DMT_EPOCHS,
-        max_pretrain_epochs: int=MAX_PRETRAIN_EPOCHS,
-        gamma_1: int=GAMMA_1,
-        gamma_2: int=GAMMA_2,
-        seed: int=_SEED,
-        baseline_fname: Optional[str]=None,
-        best_model_fname: Optional[str]=None,
+        batch_size: int = BATCH_SIZE,
+        label_proportion: float = LABEL_PROPORTION,
+        validation_proportion: float = VALIDATION_PROPORTION,
+        difference_maximized_proportion: float = DIFFERENCE_MAXIMIZED_PROPORTION,
+        percentiles: tuple = PERCENTILES,
+        num_dmt_epochs: int = NUM_DMT_EPOCHS,
+        max_pretrain_epochs: int = MAX_PRETRAIN_EPOCHS,
+        gamma_1: int = GAMMA_1,
+        gamma_2: int = GAMMA_2,
+        seed: int = _SEED,
+        baseline_fname: Optional[str] = None,
+        best_model_fname: Optional[str] = None,
     ) -> None:
         unet_a = UNet()
         unet_b = UNet()
@@ -150,7 +177,7 @@ class BaseExperiment(ABC):
             max_batch_size=batch_size,
             gamma_1=gamma_1,
             gamma_2=gamma_2,
-            baseline=baseline
+            baseline=baseline,
         )
         dmt.wandb_init(
             percentiles=percentiles,
@@ -161,7 +188,9 @@ class BaseExperiment(ABC):
             gamma_1=gamma_1,
             gamma_2=gamma_2,
         )
-        dmt.pretrain(max_epochs=max_pretrain_epochs, proportion=difference_maximized_proportion)
+        dmt.pretrain(
+            max_epochs=max_pretrain_epochs, proportion=difference_maximized_proportion
+        )
         dmt.dynamic_train(percentiles=percentiles, max_epochs=num_dmt_epochs)
 
         best_model_IoU = self.test(dmt.best_model)
@@ -188,8 +217,8 @@ class BaseExperiment(ABC):
 class TrainBaselines(BaseExperiment):
     @property
     def model_folder(self) -> str:
-        return 'models/baselines'
-    
+        return "models/baselines"
+
     @property
     def description(self) -> str:
         return "Train baselines for all label proportions"
@@ -198,14 +227,10 @@ class TrainBaselines(BaseExperiment):
         NO_RUNS_PER_BASELINE = 5
         for proportion in self.ALL_LABEL_PROPORTIONS:
             for i in range(NO_RUNS_PER_BASELINE):
-                fname = 'baseline_{}_{}.pt'.format(proportion, i+1)
+                fname = "baseline_{}_{}.pt".format(proportion, i + 1)
                 self._train_baseline_only(
-                    label_proportion=proportion,
-                    baseline_fname=fname
+                    label_proportion=proportion, baseline_fname=fname
                 )
-
-    def plot(self) -> None:
-        pass
 
 
 class VaryDifferenceMaximization(BaseExperiment):
@@ -213,21 +238,18 @@ class VaryDifferenceMaximization(BaseExperiment):
 
     @property
     def model_folder(self) -> str:
-        return 'models/vary_difference_maximization'
-    
+        return "models/vary_difference_maximization"
+
     @property
     def description(self) -> str:
         return "Try different proportions of difference maximization"
-    
+
     def run(self) -> None:
         for proportion in self.PROPORTIONS:
             self._base_run(
                 difference_maximized_proportion=proportion,
-                best_model_fname=f'dmt_{proportion}.pt'
+                best_model_fname=f"dmt_{proportion}.pt",
             )
-
-    def plot(self) -> None:
-        pass
 
 
 class VaryDMTEpochs(BaseExperiment):
@@ -235,38 +257,30 @@ class VaryDMTEpochs(BaseExperiment):
 
     @property
     def model_folder(self) -> str:
-        return 'models/vary_dmt_epochs'
-    
+        return "models/vary_dmt_epochs"
+
     @property
     def description(self) -> str:
         return "Try different numbers of DMT epochs"
-    
+
     def run(self) -> None:
         for num_epochs in self.EPOCHS:
             self._base_run(
-                num_dmt_epochs=num_epochs,
-                best_model_fname=f'dmt_{num_epochs}.pt'
+                num_dmt_epochs=num_epochs, best_model_fname=f"dmt_{num_epochs}.pt"
             )
-
-    def plot(self) -> None:
-        pass
 
 
 class VaryLabelProportion(BaseExperiment):
     @property
     def model_folder(self) -> str:
-        return 'models/vary_label_proportion'
-    
+        return "models/vary_label_proportion"
+
     @property
     def description(self) -> str:
         return "Try different label proportions"
-    
+
     def run(self) -> None:
         for proportion in self.ALL_LABEL_PROPORTIONS:
             self._base_run(
-                label_proportion=proportion,
-                best_model_fname=f'dmt_{proportion}.pt'
+                label_proportion=proportion, best_model_fname=f"dmt_{proportion}.pt"
             )
-
-    def plot(self) -> None:
-        pass
