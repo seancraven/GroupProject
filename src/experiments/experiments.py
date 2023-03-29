@@ -191,7 +191,7 @@ class BaseExperiment(ABC):
         dmt.pretrain(
             max_epochs=max_pretrain_epochs, proportion=difference_maximized_proportion
         )
-        dmt.dynamic_train(percentiles=percentiles, max_epochs=num_dmt_epochs)
+        dmt.dynamic_train(percentiles=percentiles, num_epochs=num_dmt_epochs)
 
         best_model_IoU = self.test(dmt.best_model)
         dmt.wandb_log({"Best model test IoU": best_model_IoU})
@@ -224,13 +224,15 @@ class TrainBaselines(BaseExperiment):
         return "Train baselines for all label proportions"
 
     def run(self) -> None:
-        NO_RUNS_PER_BASELINE = 5
-        for proportion in self.ALL_LABEL_PROPORTIONS:
-            for i in range(NO_RUNS_PER_BASELINE):
-                fname = "baseline_{}_{}.pt".format(proportion, i + 1)
-                self._train_baseline_only(
-                    label_proportion=proportion, baseline_fname=fname
-                )
+        pass
+
+    # NO_RUNS_PER_BASELINE = 5
+    #     for proportion in self.ALL_LABEL_PROPORTIONS:
+    #         for i in range(NO_RUNS_PER_BASELINE):
+    #             fname = "baseline_{}_{}.pt".format(proportion, i + 1)
+    #             self._train_baseline_only(
+    #                 label_proportion=proportion, baseline_fname=fname
+    #             )
 
 
 class VaryDifferenceMaximization(BaseExperiment):

@@ -63,7 +63,17 @@ def models_bar(
         criterion_name: The name of the criterion.
     """
     losses, model_f_names = evaluate_models(model_f_names, criterion, test_dataset)
-    clean_names = _clean_file_names(model_f_names)
+
+    models_bar_from_list(losses, model_f_names)
+
+
+def models_bar_from_list(
+    losses: List[float],
+    names: List[str],
+    criterion_name: str = "",
+    file_save_path: str = "",
+):
+    clean_names = _clean_file_names(names)
     min_y, max_y = min(losses), max(losses)
 
     fig, ax = plt.subplots()
