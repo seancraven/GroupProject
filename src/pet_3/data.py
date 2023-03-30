@@ -58,7 +58,9 @@ class _BasePets(Dataset):
         label = label.squeeze(0).flatten()
         return label
 
-    def __getitem__(self, idx: int) -> torch.Tensor | Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(
+        self, idx: int
+    ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
         image = self.__get_image(idx)
         if self.label_folder is None:
             return image
