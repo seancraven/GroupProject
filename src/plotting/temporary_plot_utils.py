@@ -1,22 +1,16 @@
 """
-This module contains temporary functions that are used for plotting.
 
 This file needs to:
     - Load a U-Net model from a file
     - Load pass it and the test data to an evaluation.
 """
+from typing import List, Callable, Tuple, Any
 import os
 import matplotlib.pyplot as plt
 import matplotlib
 import torch
-from torch import nn
-from src.models.UNet import UNet
-from src.models.LSD import LSD
-from typing import List, Callable, Union, Any, Tuple
-from torch.utils.data import Dataset
-from src.utils.evaluation import watched_evaluate_IoU
+from torch.utils.data import Dataset, DataLoader
 from src.utils.loading import model_from_file
-from torch.utils.data import DataLoader
 
 matplotlib.style.use("seaborn")
 
@@ -34,6 +28,8 @@ def evaluate_models(
         A list of losses for each model.
     """
     actual_model_f_names = []
+    model_f_names = [i for i in model_f_names if i.endswith(".pt")]
+    model_f_names.sort()
     losses: List[float] = []
     test_loader = DataLoader(test_dataset, num_workers=10, batch_size=64)
     for model_f_name in model_f_names:
@@ -84,6 +80,25 @@ def models_bar_from_list(
     plt.tight_layout()
     fig.savefig(file_save_path)
     plt.close()
+
+
+def model_line_from_list(
+    multiple_losses: List[List[float]],
+    names: List[Any],
+    criterion_name: str = "",
+    x_label: str = "",
+    label: str = "",
+    file_save_path: str = "",
+):
+    fig, ax = plt.subplots()
+    for line_loss in multiple_losses:
+        ax.plot(names, line_loss, c="black")
+        ax.scatter(names, line_loss, c="black", marker="x", label=label)
+        ax.set_ylabel(criterion_name)
+        ax.set_xticks(names)
+        ax.set_xlabel(x_label)
+    fig.savefig(file_save_path)
+    return fig, ax
 
 
 def models_matshow_best_worst_img(
@@ -174,7 +189,7 @@ def matshow_best_worst_img(
         fig.suptitle(name[1].upper() + name[2:] + " Predictions", fontsize=20)
         fig.supylabel("Ground Truth Labels     Model Predictions", fontsize=16)
         fig.tight_layout()
-        ## This doesn't work
+        # This doesn't work
         fig.savefig(
             os.path.join(save_dir, _clean_file_names([model_f_name])[0] + name + ".png")
         )
