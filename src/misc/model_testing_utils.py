@@ -1,17 +1,5 @@
 # pylint: disable-all
 import os
-from dataclasses import dataclass
-
-import torch
-import numpy as np
-from torch import nn
-from typing import Callable
-from pet_3.data import Pets
-from torch.data.utils import DataLoader
-
-
-import numpy as np
-
 import torch
 from torch import nn
 import torch.nn.functional as F
