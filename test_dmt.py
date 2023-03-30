@@ -2,6 +2,7 @@ import wandb
 from torch.utils.data import DataLoader
 
 from src.models.UNet import UNet
+from src.models.FCN import FCN
 from src.models.DMT import DMT
 from src.pet_3.data import PetsDataFetcher
 from src.utils.evaluation import evaluate_IoU
@@ -16,8 +17,8 @@ GAMMA_1 = 3
 GAMMA_2 = 3
 
 using_pretrained = False
-unet_a = UNet()
-unet_b = UNet()
+unet = UNet()
+fcn = FCN()
 baseline = UNet()
 # try:
 #     unet_a_state = torch.load("DMT_model_a.pt")
@@ -41,8 +42,8 @@ print(
 )
 
 dmt = DMT(
-    unet_a,
-    unet_b,
+    unet,
+    fcn,
     labeled,
     unlabeled,
     validation,
