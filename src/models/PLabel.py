@@ -81,11 +81,8 @@ class PLabel(nn.Module):
     
     def compute_loss(
         self,
-        labeled: torch.Tensor,
+        confidences: torch.Tensor,
         labels: torch.Tensor,
-        unlabeled: torch.Tensor,
-        pseudolabels: torch.Tensor,
-        confidences: torch.Tensor
     ) -> torch.Tensor:
         criterion = nn.CrossEntropyLoss(reduction="none")
         logits = torch.log(confidences).permute(0, 2, 1)
@@ -142,10 +139,12 @@ class PLabel(nn.Module):
 
                 opt.zero_grad()
                 # predict on labeled data
-                
+                conf_labeled = self.model(labeled)
                 # predict on unlabeled data
-                confidences = self.model(unlabeled)
-                pseudolabels = self.compute_pseudolabels(confidences)
+                conf_unlabeled = self.model(unlabeled)
+                pseudolabels = self.compute_pseudolabels(conf_unlabeled)
+                epoch_loss += (1/len(self.labeled_loader))*self.compute_loss(conf_labeled, labels).sum() 
+                epoch_loss += (1/len(self.unlabeled_loader))*self.compute_loss(conf_unlabeled, pseudolabels).sum()
 
 
 
