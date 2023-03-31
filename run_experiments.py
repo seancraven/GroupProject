@@ -1,4 +1,5 @@
-from src.experiments.experiments import Experiments
+from src.experiments.experiments import VaryLabelProportion, TrainBaselines
 
 if __name__ == "__main__":
-    Experiments.run_all()
+    TrainBaselines().run()
+    VaryLabelProportion().run()

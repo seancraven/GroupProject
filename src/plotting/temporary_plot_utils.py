@@ -7,12 +7,15 @@ This file needs to:
 from typing import List, Callable, Tuple, Any
 import os
 import matplotlib.pyplot as plt
-import matplotlib
+import matplotlib as mpl
 import torch
 from torch.utils.data import Dataset, DataLoader
 from src.utils.loading import model_from_file
 
-matplotlib.style.use("seaborn")
+mpl.style.use("seaborn-ticks")
+mpl.rcParams["font.family"] = "sans-serif"
+mpl.rcParams["font.serif"] = "Computer Modern"
+mpl.rcParams["text.usetex"] = True
 
 
 def evaluate_models(
