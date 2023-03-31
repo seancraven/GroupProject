@@ -157,6 +157,14 @@ class DMT(nn.Module, ReporterMixin):
         ce = criterion(logits, labels)
         loss = ce.mean()
         return loss
+    
+    def pretrain_baseline(self, max_epochs: int) -> None:
+        if self.baseline is None:
+            return
+        trainer = PreTrainer(
+            self.baseline, self.labeled_loader, self.validation_loader, name="Baseline", device=self.device
+        )
+        trainer.train(max_epochs)
 
     def pretrain(self, max_epochs: int, proportion: float = 0.5) -> None:
         subset_a, subset_b = difference_maximized_sampling(
@@ -167,20 +175,19 @@ class DMT(nn.Module, ReporterMixin):
             (subset_a, subset_b),
         )
 
-        # Train models A/B on subsets A/B (and baseline on entire labeled dataset)
-        # until validation IoU stops improving
+        # Train models A/B on subsets A/B
         for model, loader, name in zip(
-            (self.model_a, self.model_b, self.baseline),
-            (loader_a, loader_b, self.labeled_loader),
-            ("Model A", "Model B", "Baseline"),
+            (self.model_a, self.model_b),
+            (loader_a, loader_b),
+            ("Model A", "Model B")
         ):
-            if model is None:
-                # Handles the case where we're not trying to produce a baseline
-                continue
             trainer = PreTrainer(
                 model, loader, self.validation_loader, name=name, device=self.device
             )
             trainer.train(max_epochs)
+
+        # Train baseline on full labeled dataset
+        self.pretrain_baseline(max_epochs)
 
     def _train_from_teacher(
         self,
@@ -203,6 +210,7 @@ class DMT(nn.Module, ReporterMixin):
 
         total_batches = min(len(self.labeled_loader), len(self.unlabeled_loader))
         def _dynamic_gamma(gamma: float, t: int) -> float:
+            return gamma
             total_train_steps = num_epochs * total_batches
             return gamma * math.exp(5*(1 - (t / total_train_steps))**2)
 
@@ -271,7 +279,7 @@ class DMT(nn.Module, ReporterMixin):
                 student_predictions = student(labeled)
                 standard_loss = self.compute_standard_loss(student_predictions, labels)
                 # Total loss and update
-                total_loss = dynamic_loss + standard_loss
+                total_loss = dynamic_loss +  standard_loss
                 total_loss.backward()
                 opt.step()
 
@@ -323,9 +331,10 @@ class DMT(nn.Module, ReporterMixin):
             self.wandb_log_named(
                 {"Best validation IoU": self.best_model_b_IoU}, "Model B"
             )
-            self.wandb_log_named(
-                {"Best validation IoU": self.baseline_IoU}, "Baseline"
-            )
+            if self.baseline is not None:
+                self.wandb_log_named(
+                    {"Best validation IoU": self.baseline_IoU}, "Baseline"
+                )
 
     def dynamic_train(self, percentiles: Iterable[float], num_epochs: int) -> None:
         # Potentially swap the models so that model A is the better one, since

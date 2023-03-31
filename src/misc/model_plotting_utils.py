@@ -10,13 +10,8 @@ from typing import Dict, Callable
 import os
 
 
-def plot_bar(
-        title : str, 
-        x_label : str, 
-        y_label : str,
-        **entries : float
-        ) -> fig.Figure:
-    """ 
+def plot_bar(title: str, x_label: str, y_label: str, **entries: float) -> fig.Figure:
+    """
     Plots a barplot for names entries
 
     Arguments:
@@ -51,7 +46,7 @@ def plot_bar(
 
     # if x_label not in [None, ''] :
     plt.xlabel(x_label)
-    
+
     # if y_label not in [None, ''] :
     plt.ylabel(y_label)
 
@@ -59,11 +54,11 @@ def plot_bar(
 
 
 def plot_img(
-        image : torch.Tensor,
-        title : str = None,
-        x_label : str = None,
-        y_label : str = None,
-        ) -> fig.Figure :
+    image: torch.Tensor,
+    title: str = None,
+    x_label: str = None,
+    y_label: str = None,
+) -> fig.Figure:
     """
     Plots image
 
@@ -91,13 +86,13 @@ def plot_img(
     plt.imshow(img)
 
     # Add plot title
-    if title not in [None, ''] :
+    if title not in [None, ""]:
         plt.title(title)
 
-    if x_label not in [None, ''] :
+    if x_label not in [None, ""]:
         plt.xlabel(x_label)
 
-    if y_label not in [None, ''] :
+    if y_label not in [None, ""]:
         plt.ylabel(y_label)
 
     # Return the figure object
@@ -105,11 +100,8 @@ def plot_img(
 
 
 def plot_img_row(
-        title : str = None,
-        x_label : str = None,
-        y_label : str = None,
-        **images : torch.Tensor
-        ) -> fig.Figure :
+    title: str = None, x_label: str = None, y_label: str = None, **images: torch.Tensor
+) -> fig.Figure:
     """
     Plots a row of images by names arguments in a row
     (i.e image name is argument name)
@@ -138,33 +130,32 @@ def plot_img_row(
     fig, axs = plt.subplots(1, len(keys), figsize=(20, 8))
 
     for i, ax in enumerate(axs.flat):
-        
         img = values[i].squeeze().permute(1, 2, 0)
         ax.imshow(img)
         ax.set_title(f"Image Name: \n{keys[i]}")
 
-        if x_label not in [None, ''] :
+        if x_label not in [None, ""]:
             ax.set_xlabel(x_label)
-    
-        if y_label not in [None, ''] :
+
+        if y_label not in [None, ""]:
             ax.set_ylabel(y_label)
-    
+
         ax.set_xticks([])
         ax.set_yticks([])
 
-    # Add plot title 
-    if title not in [None, ''] :
-        plt.suptitle(title, fontsize=16, fontweight='bold')
-    
+    # Add plot title
+    if title not in [None, ""]:
+        plt.suptitle(title, fontsize=16, fontweight="bold")
+
     return fig
 
 
 def plot_img_label_grid(
-        title : str = None,
-        x_label : str = None,
-        y_label : str = None,
-        **img_label_dict : Dict[str, torch.Tensor]
-        ) -> fig.Figure :
+    title: str = None,
+    x_label: str = None,
+    y_label: str = None,
+    **img_label_dict: Dict[str, torch.Tensor],
+) -> fig.Figure:
     """
     Plots a grid of images by names arguments in a row with labels
     (i.e image name is argument name)
@@ -189,19 +180,24 @@ def plot_img_label_grid(
     # Get the dictionary names
     dictionary_names = list(img_label_dict.keys())
 
-    assert dictionary_names == ['image_dictionary', 'label_dictionary'], "Dictionary names must be 'image_dictionary' and 'label_dictionary'"
+    assert dictionary_names == [
+        "image_dictionary",
+        "label_dictionary",
+    ], "Dictionary names must be 'image_dictionary' and 'label_dictionary'"
 
     # get image dictionary
-    img_dict = img_label_dict['image_dictionary']
+    img_dict = img_label_dict["image_dictionary"]
     img_dict_values = list(img_dict.values())
     img_dict_keys = list(img_dict.keys())
 
     # get label dictionary
-    label_dict = img_label_dict['label_dictionary']
+    label_dict = img_label_dict["label_dictionary"]
     label_dict_values = list(label_dict.values())
     label_dict_keys = list(label_dict.keys())
 
-    assert len(img_dict) == len(label_dict), "Image and label dictionaries must be the same length"
+    assert len(img_dict) == len(
+        label_dict
+    ), "Image and label dictionaries must be the same length"
 
     # plot
     fig, axs = plt.subplots(2, len(img_dict), figsize=(20, 8))
@@ -219,31 +215,31 @@ def plot_img_label_grid(
             seg_label = label_dict_values[label_idx].squeeze()
             ax.imshow(seg_label)
             ax.set_title(f"Image Label: \n{label_dict_keys[label_idx]}")
-        
+
         ax.set_xticks([])
         ax.set_yticks([])
-    
+
     # Add plot title
-    if title not in [None, ''] :
-       plt.suptitle(title, fontsize=16, fontweight='bold')
-    
-    if x_label not in [None, ''] :
+    if title not in [None, ""]:
+        plt.suptitle(title, fontsize=16, fontweight="bold")
+
+    if x_label not in [None, ""]:
         plt.xlabel(x_label)
-    
-    if y_label not in [None, ''] :
+
+    if y_label not in [None, ""]:
         plt.ylabel(y_label)
 
     return fig
 
 
 def plot_img_label_pred(
-        title : str,
-        x_label : str,
-        y_label : str,
-        image : torch.Tensor,
-        label : torch.Tensor,
-        prediction : torch.Tensor,
-        ) -> fig.Figure :
+    title: str,
+    x_label: str,
+    y_label: str,
+    image: torch.Tensor,
+    label: torch.Tensor,
+    prediction: torch.Tensor,
+) -> fig.Figure:
     """
     Arguments:
     ----------
@@ -255,11 +251,11 @@ def plot_img_label_pred(
                 > Plot y-axis label.
     img     : {Tensor}
                 > Image tensor to plot
-    label   : {Tensor} 
+    label   : {Tensor}
                 > Label tensor to plot
     pred    : {Tensor}
                 > Prediction tensor to plot
-    
+
     Returns:
     ----------
     fig     : {Figure}
@@ -290,7 +286,7 @@ def plot_img_label_pred(
     ax3.set_yticks([])
 
     # Add plot title
-    plt.suptitle(title, fontsize=16, fontweight='bold')
+    plt.suptitle(title, fontsize=16, fontweight="bold")
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
@@ -298,8 +294,8 @@ def plot_img_label_pred(
 
 
 def plot_model_figures(
-        model_path : str,
-        ) -> fig.Figure :
+    model_path: str,
+) -> fig.Figure:
     """
     Plots all figures for a given model
 
@@ -307,7 +303,7 @@ def plot_model_figures(
     ----------
     model_path  : {String}
                     > Path to model
-    
+
     Returns:
     ----------
     fig         : {Figure}
@@ -333,11 +329,11 @@ def plot_model_figures(
 
     # plot model metrics bar plot
     fig = plot_bar(
-        title = f"Model Metrics for {model.file_name}",
-        x_label = "Metric",
-        y_label = "Value",
-        accuracy = model_metrics.test_accuracy,
-        iou = model_metrics.test_iou,
+        title=f"Model Metrics for {model.file_name}",
+        x_label="Metric",
+        y_label="Value",
+        accuracy=model_metrics.test_accuracy,
+        iou=model_metrics.test_iou,
     )
 
     # save figure
@@ -346,16 +342,14 @@ def plot_model_figures(
 
     # plot model predictions
     fig = plot_img_label_pred(
-        title = f"Model Predictions for {model.file_name}",
-        x_label = "",
-        y_label = "",
-        image = testdataset[0][0],
-        label = testdataset[0][1],
-        prediction = model.forwad(testdataset[0][0]))
-    
+        title=f"Model Predictions for {model.file_name}",
+        x_label="",
+        y_label="",
+        image=testdataset[0][0],
+        label=testdataset[0][1],
+        prediction=model.forwad(testdataset[0][0]),
+    )
+
     # save figure
     path = os.path.join(directory_path, f"{model.file_name}_img_label_pred.png")
     fig.savefig(path)
-
-
-    

@@ -1,63 +1,40 @@
 """
-This module contains temporary functions that are used for plotting.
 
 This file needs to:
     - Load a U-Net model from a file
     - Load pass it and the test data to an evaluation.
 """
+from typing import List, Callable, Tuple, Any
 import os
 import matplotlib.pyplot as plt
-import matplotlib
+import matplotlib as mpl
 import torch
-from torch import nn
-from src.models.UNet import UNet
-from src.models.LSD import LSD
-from typing import List, Callable, Union, Any, Tuple
-from torch.utils.data import Dataset
-from src.utils.evaluation import watched_evaluate_IoU
-from torch.utils.data import DataLoader
+from torch.utils.data import Dataset, DataLoader
+from src.utils.loading import model_from_file
 
-matplotlib.style.use("seaborn")
-
-MODEL_CLASSES = [UNet, LSD]
-
-
-def _model_from_file(file_path: str, model_class: Any) -> Union[nn.Module, None]:
-    """Tries to load a model from a file. if it fails, returns None."""
-    try:
-        model = model_class()
-        model.load_state_dict(torch.load(file_path))
-    except:
-        model = None
-    return model
-
-
-def model_from_file(file_path: str) -> Union[nn.Module, None]:
-    for m_class in MODEL_CLASSES:
-        model = _model_from_file(file_path, m_class)
-        if model is not None:
-            return model
-    if file_path[-2:] == "pt":
-        Warning(
-            "Cant load a model of this type, add the model class to ./src/plotting/temporary_plot_utils.py"
-        )
-    return None
+mpl.style.use("seaborn-ticks")
+mpl.rcParams["font.family"] = "sans-serif"
+mpl.rcParams["font.serif"] = "Computer Modern"
+mpl.rcParams["text.usetex"] = True
 
 
 def evaluate_models(
-    model_f_names: List[str], criterion: Callable, test_data: Dataset
+    model_f_names: List[str], criterion: Callable, test_dataset: Dataset
 ) -> Tuple[List[float], List[str]]:
     """Evaluates a list of models and prints the results.
     Args:
         model_f_names: List of file names of models to evaluate.
-        criterion: A function that takes a model and a data loader and returns a loss.
-        test_data: The test data to evaluate the models on.
+        criterion: A function that takes a model and a data loader and
+        returns a loss.
+        test_dataset: The test data to evaluate the models on.
     Returns:
         A list of losses for each model.
     """
     actual_model_f_names = []
+    model_f_names = [i for i in model_f_names if i.endswith(".pt")]
+    model_f_names.sort()
     losses: List[float] = []
-    test_loader = DataLoader(test_data, num_workers=10, batch_size=64)
+    test_loader = DataLoader(test_dataset, num_workers=10, batch_size=64)
     for model_f_name in model_f_names:
         model = model_from_file(model_f_name)
         if model is not None:
@@ -71,12 +48,31 @@ def evaluate_models(
 
 def models_bar(
     model_f_names: List[str],
-    losses: List[float],
+    criterion: Callable,
+    test_dataset: Dataset,
     criterion_name: str,
-    plot_name: str = "test.png",
+    file_save_path: str = "",
 ):
-    """Plots a bar chart of the models and their losses."""
-    clean_names = clean_file_names(model_f_names)
+    """Plots a bar chart of the models and their evaluation on a criterion.
+
+    Args:
+        model_f_names: List of file names of models to evaluate.
+        criterion: A function that takes a model and a dataloader and returns a loss.
+        This is what the models are evaluated on.
+        criterion_name: The name of the criterion.
+    """
+    losses, model_f_names = evaluate_models(model_f_names, criterion, test_dataset)
+
+    models_bar_from_list(losses, model_f_names)
+
+
+def models_bar_from_list(
+    losses: List[float],
+    names: List[str],
+    criterion_name: str = "",
+    file_save_path: str = "",
+):
+    clean_names = _clean_file_names(names)
     min_y, max_y = min(losses), max(losses)
 
     fig, ax = plt.subplots()
@@ -85,8 +81,27 @@ def models_bar(
     ax.set_ylabel(criterion_name)
     ax.tick_params(axis="x", labelrotation=35)
     plt.tight_layout()
-    fig.savefig(plot_name)
+    fig.savefig(file_save_path)
     plt.close()
+
+
+def model_line_from_list(
+    multiple_losses: List[List[float]],
+    names: List[Any],
+    criterion_name: str = "",
+    x_label: str = "",
+    label: str = "",
+    file_save_path: str = "",
+):
+    fig, ax = plt.subplots()
+    for line_loss in multiple_losses:
+        ax.plot(names, line_loss, c="black")
+        ax.scatter(names, line_loss, c="black", marker="x", label=label)
+        ax.set_ylabel(criterion_name)
+        ax.set_xticks(names)
+        ax.set_xlabel(x_label)
+    fig.savefig(file_save_path)
+    return fig, ax
 
 
 def models_matshow_best_worst_img(
@@ -177,14 +192,14 @@ def matshow_best_worst_img(
         fig.suptitle(name[1].upper() + name[2:] + " Predictions", fontsize=20)
         fig.supylabel("Ground Truth Labels     Model Predictions", fontsize=16)
         fig.tight_layout()
-        ## This doesn't work
+        # This doesn't work
         fig.savefig(
-            os.path.join(save_dir, clean_file_names([model_f_name])[0] + name + ".png")
+            os.path.join(save_dir, _clean_file_names([model_f_name])[0] + name + ".png")
         )
         plt.close()
 
 
-def clean_file_names(file_names: List[str]) -> List[str]:
+def _clean_file_names(file_names: List[str]) -> List[str]:
     """Removes the file path and extension from the file names.
 
     Note Solution is delicate only works with .pt files.

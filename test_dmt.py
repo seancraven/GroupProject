@@ -1,5 +1,6 @@
+import matplotlib.pyplot as plt
 import wandb
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 
 from src.models.UNet import UNet
 from src.models.FCN import FCN
@@ -8,11 +9,11 @@ from src.pet_3.data import PetsDataFetcher
 from src.utils.evaluation import evaluate_IoU
 
 TOTAL_BATCH_SIZE = 32
-LABEL_PROPORTION = 0.8
+LABEL_PROPORTION = 0.01
 VALIDATION_PROPORTION = 0.1
-DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
-PERCENTILES = [0.2, 0.4, 0.6, 0.8, 1.0]
-NUM_DMT_EPOCHS = 10
+DIFFERENCE_MAXIMIZED_PROPORTION = 0.5
+PERCENTILES = [0.1, 0.2, 0.3, 0.4, 0.5]
+NUM_DMT_EPOCHS = 30
 GAMMA_1 = 3
 GAMMA_2 = 3
 

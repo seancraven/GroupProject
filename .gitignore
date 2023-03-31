@@ -1,4 +1,3 @@
-/images
 /models
 /wandb
 **/__pycache__
@@ -9,3 +8,9 @@
 **/train_data/
 *.pt
 test*
+*_script.py
+single_log.txt
+logfile.txt
+*.png
+.idea
+.vscode
