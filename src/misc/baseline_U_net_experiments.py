@@ -16,7 +16,7 @@ from matplotlib.pyplot import imshow
 
 import wandb  # type: ignore
 
-from src.pet_3.deprocated_data import Pets
+from ..src.pet_3.deprocated_data import Pets
 from LSD_model import LSD
 
 
@@ -116,7 +116,8 @@ def train_model_wanb(
         total_epoch_time = epoch_end_time - epoch_start_time
 
         # wandb logging
-        wandb.log({"Mean Epoch Loss": epoch_loss, "Mean Val Loss": val_loss, "Epoch Time": total_epoch_time})  # type: ignore
+        wandb.log({"Mean Epoch Loss": epoch_loss, "Mean Val Loss": val_loss,
+                  "Epoch Time": total_epoch_time})  # type: ignore
 
 
 def multi_model_baseline():
@@ -124,11 +125,11 @@ def multi_model_baseline():
     fractions = [i / 10 for i in range(1, 10)]
     train_set = Pets("./src/pet_3/", binary_labels=True)
     for split_fract in fractions:
-
         train_set.labeled_fraction = split_fract
         _, labeled = train_set.get_datasets()
 
-        train_loader = DataLoader(labeled, batch_size=32, shuffle=True, num_workers=8)
+        train_loader = DataLoader(
+            labeled, batch_size=32, shuffle=True, num_workers=8)
 
         model = load_u_net()
 
@@ -150,7 +151,10 @@ def multi_model_baseline():
             model, mean_square_error_loss, learning_rate, num_epoch, train_loader, ()
         )
 
-        file_name = os.path.join("../../models", "u_net_supervised", f"{loss_name}_{num_epoch}_{labeled.name}.pt"
+        file_name = os.path.join(
+            "../../models",
+            "u_net_supervised",
+            f"{loss_name}_{num_epoch}_{labeled.name}.pt",
         )
         torch.save(model.state_dict(), file_name)
 
@@ -176,7 +180,10 @@ def multi_model_baseline():
             model, binary_cross_entropy_loss, learning_rate, num_epoch, train_loader, ()
         )
 
-        file_name = os.path.join("../../models", "u_net_supervised", f"{loss_name}_{num_epoch}_{labeled.name}.pt"
+        file_name = os.path.join(
+            "../../models",
+            "u_net_supervised",
+            f"{loss_name}_{num_epoch}_{labeled.name}.pt",
         )
         torch.save(model.state_dict(), file_name)
 
