@@ -9,3 +9,11 @@
 **/train_data/
 *.pt
 test*
+*_script.py
+*.npy
+single_log.txt
+logfile.txt
+*.png
+.idea
+.vscode
+/figures
