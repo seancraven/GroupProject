@@ -55,7 +55,7 @@ class BaseExperiment(ABC):
 
     BATCH_SIZE = 32  # For poor Michael's computer
     LABEL_PROPORTION = 0.1
-    ALL_LABEL_PROPORTIONS = (0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 1.0)
+    ALL_LABEL_PROPORTIONS = (0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 0.95)
     VALIDATION_PROPORTION = 0.05
     DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
     PERCENTILES = (0.2, 0.4, 0.6, 0.8, 1.0)
@@ -226,13 +226,13 @@ class TrainBaselines(BaseExperiment):
     def run(self) -> None:
         pass
 
-    # NO_RUNS_PER_BASELINE = 5
-    #     for proportion in self.ALL_LABEL_PROPORTIONS:
-    #         for i in range(NO_RUNS_PER_BASELINE):
-    #             fname = "baseline_{}_{}.pt".format(proportion, i + 1)
-    #             self._train_baseline_only(
-    #                 label_proportion=proportion, baseline_fname=fname
-    #             )
+        NO_RUNS_PER_BASELINE = 5
+        for proportion in [self.ALL_LABEL_PROPORTIONS[-1]]:
+            for i in range(NO_RUNS_PER_BASELINE):
+                fname = "baseline_{}_{}.pt".format(proportion, i + 1)
+                self._train_baseline_only(
+                    label_proportion=proportion, baseline_fname=fname
+                )
 
 
 class VaryDifferenceMaximization(BaseExperiment):
@@ -282,7 +282,7 @@ class VaryLabelProportion(BaseExperiment):
         return "Try different label proportions"
 
     def run(self) -> None:
-        for proportion in self.ALL_LABEL_PROPORTIONS:
+        for proportion in [self.ALL_LABEL_PROPORTIONS]:
             self._base_run(
                 label_proportion=proportion, best_model_fname=f"dmt_{proportion}.pt"
             )
