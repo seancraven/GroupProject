@@ -192,7 +192,7 @@ class PLabel(nn.Module):
                     "Train IoU": train_accuracy,
                     "Validation IoU": val_accuracy,
                 },
-                'dick',
+                'Consitency PLabel',
             )
             if self.baseline is not None:
                 self.wandb_log_named(
