@@ -141,15 +141,18 @@ class PLabel(nn.Module):
                 )
 
                 opt.zero_grad()
+
                 # predict on labeled data
                 
                 # predict on unlabeled data
                 confidences = self.model(unlabeled)
                 pseudolabels = self.compute_pseudolabels(confidences)
 
+                
 
 
-   def _train_from_teacher(
+
+   def _train_from_teacher( # re-writter
         self,
         alpha: float,
         num_epochs: int,
@@ -212,24 +215,24 @@ class PLabel(nn.Module):
                     )
                 # These lines do a sanity check
                 student_labels = torch.argmax(student_confidences, dim=-1)
-                DMT.sanity_check(
-                    unlabeled,
-                    pseudolabels,
-                    student_labels,
-                    mask,
-                    weights,
-                    0,
-                    "test1.png",
-                )
-                DMT.sanity_check(
-                    unlabeled,
-                    pseudolabels,
-                    student_labels,
-                    mask,
-                    weights,
-                    1,
-                    "test2.png",
-                )
+                # DMT.sanity_check(
+                #     unlabeled,
+                #     pseudolabels,
+                #     student_labels,
+                #     mask,
+                #     weights,
+                #     0,
+                #     "test1.png",
+                # )
+                # DMT.sanity_check(
+                #     unlabeled,
+                #     pseudolabels,
+                #     student_labels,
+                #     mask,
+                #     weights,
+                #     1,
+                #     "test2.png",
+                # )
 
                 dynamic_loss = self.compute_dynamic_loss(
                     student_confidences, pseudolabels, weights
