@@ -207,7 +207,7 @@ class PLabel(nn.Module):
     ):
         try:
             wandb.init(
-                project="DMT model",
+                project="PLabel model",
                 config={
                     "Percentiles": percentiles,
                     "Number of epochs": num_epochs,
