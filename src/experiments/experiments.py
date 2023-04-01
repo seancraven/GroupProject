@@ -342,3 +342,19 @@ class VaryLabelProportion(BaseExperiment):
             self._base_run(
                 label_proportion=proportion, best_model_fname=f"dmt_{proportion}.pt"
             )
+
+# PLABEL EXPERIMENTS
+class PLabelVaryLabelProportion(BaseExperiment):
+    @property
+    def model_folder(self) -> str:
+        return "models/plabel_vary_label_proportion"
+
+    @property
+    def description(self) -> str:
+        return "Try different label proportions"
+
+    def run(self) -> None:
+        for proportion in self.ALL_LABEL_PROPORTIONS:
+            self._plabel_run(
+                label_proportion=proportion, model_fname=f"plabel_{proportion}.pt"
+            )
