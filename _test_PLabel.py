@@ -10,9 +10,7 @@ from src.utils.evaluation import evaluate_IoU
 TOTAL_BATCH_SIZE = 32
 LABEL_PROPORTION = 0.01
 VALIDATION_PROPORTION = 0.1
-DIFFERENCE_MAXIMIZED_PROPORTION = 0.5
-PERCENTILES = [0.1, 0.2, 0.3, 0.4, 0.5]
-NUM_DMT_EPOCHS = 30
+NUM_EPOCHS = 50
 # GAMMA_1 = 3
 # GAMMA_2 = 3
 
@@ -51,13 +49,12 @@ plabel = PLabel(
 )
 
 plabel.wandb_init(
-    percentiles=PERCENTILES,
-    num_epochs=NUM_DMT_EPOCHS,
+    num_epochs=NUM_EPOCHS,
     batch_size=TOTAL_BATCH_SIZE,
     label_ratio=LABEL_PROPORTION,
 )
 plabel.pretrain(max_epochs=10000)
-plabel.train(num_epochs=NUM_DMT_EPOCHS)
+plabel.train(num_epochs=NUM_EPOCHS)
 test_data = fetcher.get_test_data()
 test_loader = DataLoader(test_data, batch_size=TOTAL_BATCH_SIZE)
 baseline_test_IoU = evaluate_IoU(plabel.baseline, test_loader)
