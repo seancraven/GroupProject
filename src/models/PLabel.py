@@ -58,7 +58,7 @@ class PLabel(nn.Module):
         )
 
     def compute_pseudolabels(
-        self, confidences: torch.Tensor, alpha: float
+        self, confidences: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Computes pseudolabels for the unlabeled data. We choose the class that 
@@ -143,8 +143,8 @@ class PLabel(nn.Module):
                 # predict on unlabeled data
                 conf_unlabeled = self.model(unlabeled)
                 pseudolabels = self.compute_pseudolabels(conf_unlabeled)
-                labeled_loss += self.compute_loss(conf_labeled, labels).sum() 
-                unlabeled_loss += self.compute_loss(conf_unlabeled, pseudolabels).sum()
+                labeled_loss = self.compute_loss(conf_labeled, labels).sum() 
+                unlabeled_loss = self.compute_loss(conf_unlabeled, pseudolabels).sum()
                 total_loss = labeled_loss + unlabeled_loss
                 total_loss.backward()
                 opt.step()
