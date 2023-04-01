@@ -7,6 +7,7 @@ from src.utils.datasets import balanced_minibatch_sizes
 from src.utils.evaluation import evaluate_IoU
 from src.utils.training import PreTrainer, FineTuner as FT
 from functools import partial
+import copy
 
 import time
 
@@ -55,7 +56,6 @@ class PLabel(nn.Module):
             lambda loader: partial(evaluate_IoU, data=loader, device=self.device),
             (self.labeled_loader, self.validation_loader),
         )
-        self.model_IoU = -torch.inf
 
     def compute_pseudolabels(
         self, confidences: torch.Tensor, alpha: float
@@ -111,6 +111,8 @@ class PLabel(nn.Module):
 
     def train(self, num_epochs: int) -> None:
         self.model_IoU = self.validation_IoU(self.model)
+        self.best_model_IoU = self.model_IoU
+        self.best_model = self.model
         self.baseline_IoU = (
             self.validation_IoU(self.baseline) if self.baseline is not None else None
         )
@@ -150,7 +152,6 @@ class PLabel(nn.Module):
                 # update epoch losses
                 epoch_labeled_loss += labeled_loss.item()
                 epoch_unlabeled_loss += unlabeled_loss.item()
-            
             scheduler.step()
             toc = time.time()
 
@@ -167,6 +168,10 @@ class PLabel(nn.Module):
                 self.model, self.validation_loader, self.device
             )
 
+            if val_accuracy > self.best_model_IoU:
+                self.best_model_IoU = val_accuracy
+                self.best_model = self.model
+
             # Everything below here is just logging
             self.wandb_log(
                 {
@@ -181,12 +186,13 @@ class PLabel(nn.Module):
                     "Train IoU": train_accuracy,
                     "Validation IoU": val_accuracy,
                 },
-                'Consitency PLabel',
+                'Consistency PLabel',
             )
             if self.baseline is not None:
                 self.wandb_log_named(
                     {"Best validation IoU": self.baseline_IoU}, "Baseline"
                 )
+
     @staticmethod
     def wandb_init(
         num_epochs,
@@ -207,9 +213,9 @@ class PLabel(nn.Module):
 
     def save_model(self, filename: str) -> None:
         """Save the model to the filename specified"""
-        if self.model is None:
+        if self.best_model is None:
             raise ValueError("Model has not been trained yet")
-        torch.save(self.model.state_dict(), filename)
+        torch.save(self.best_model.state_dict(), filename)
 
     def save_baseline(self, filename: str) -> None:
         """Save the baseline model to the filename specified"""

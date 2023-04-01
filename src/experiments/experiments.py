@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 
 from src.models.DMT import DMT
 from src.models.UNet import UNet
+from src.models.PLabel import PLabel
 from src.pet_3.data import PetsDataFetcher
 from src.plotting.temporary_plot_utils import (
     models_bar,
@@ -205,6 +206,60 @@ class BaseExperiment(ABC):
             fname = os.path.join(self.model_folder, best_model_fname)
             dmt.save_best_model(fname)
 
+    # PLABEL RUN   
+    def _plabel_run(
+        self,
+        *,
+        batch_size: int = BATCH_SIZE,
+        label_proportion: float = LABEL_PROPORTION,
+        validation_proportion: float = VALIDATION_PROPORTION,
+        # We run DMT for each percentile, so we need to multiply by the number of percentiles here
+        num_epochs: int = len(PERCENTILES)*NUM_DMT_EPOCHS,
+        max_pretrain_epochs: int = MAX_PRETRAIN_EPOCHS,
+        seed: int = _SEED,
+        baseline_fname: Optional[str] = None,
+        model_fname: Optional[str] = None,
+    ) -> None:
+        unet_p = UNet()
+        baseline = UNet() if baseline_fname is not None else None
+
+        fetcher = PetsDataFetcher(root=self._ROOT)
+        labeled, validation, unlabeled = fetcher.get_train_data(
+            label_proportion, validation_proportion, seed=seed, class_balance=True
+        )
+
+        # PLabel stuff
+        unet_p = UNet()
+        plabel = PLabel(
+            unet_p,
+            labeled,
+            unlabeled,
+            validation,
+            max_batch_size=batch_size,
+            baseline=baseline,
+        )
+        plabel.wandb_init(
+            num_epochs=num_epochs,
+            batch_size=batch_size,
+            label_ratio=label_proportion,
+        )
+        plabel.pretrain(
+            max_epochs=max_pretrain_epochs,
+        )
+        plabel.train(num_epochs=num_epochs)
+
+        plabel_IoU = self.test(plabel.model)
+        plabel.wandb_log({"Model test IoU": plabel_IoU})
+        if baseline is not None:
+            baseline_IoU = self.test(plabel.baseline)
+            plabel.wandb_log({"Baseline test IoU": baseline_IoU})
+            fname = os.path.join(self.model_folder, baseline_fname)
+            plabel.save_baseline(fname)
+
+        if model_fname is not None:
+            fname = os.path.join(self.model_folder, model_fname)
+            plabel.save_model(fname)
+
     @staticmethod
     def test(model: nn.Module) -> float:
         fetcher = PetsDataFetcher(root="src/pet_3")
@@ -282,6 +337,7 @@ class VaryLabelProportion(BaseExperiment):
         return "Try different label proportions"
 
     def run(self) -> None:
+        self.create_model_folder()
         for proportion in [self.ALL_LABEL_PROPORTIONS]:
             self._base_run(
                 label_proportion=proportion, best_model_fname=f"dmt_{proportion}.pt"
