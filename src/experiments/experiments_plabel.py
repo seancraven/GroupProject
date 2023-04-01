@@ -160,6 +160,8 @@ class BaseExperiment(ABC):
         seed: int = _SEED,
         baseline_fname: Optional[str] = None,
         best_model_fname: Optional[str] = None,
+        # plabel name
+        plabel_fname: Optional[str] = None,
     ) -> None:
         unet_a = UNet()
         unet_b = UNet()
@@ -213,8 +215,7 @@ class BaseExperiment(ABC):
         batch_size: int = BATCH_SIZE,
         label_proportion: float = LABEL_PROPORTION,
         validation_proportion: float = VALIDATION_PROPORTION,
-        # We run DMT for each percentile, so we need to multiply by the number of percentiles here
-        num_epochs: int = len(PERCENTILES)*NUM_DMT_EPOCHS,
+        num_epochs: int = NUM_DMT_EPOCHS,
         max_pretrain_epochs: int = MAX_PRETRAIN_EPOCHS,
         seed: int = _SEED,
         baseline_fname: Optional[str] = None,
@@ -353,7 +354,6 @@ class PLabelVaryLabelProportion(BaseExperiment):
         return "Try different label proportions"
 
     def run(self) -> None:
-        self.create_model_folder()
         for proportion in self.ALL_LABEL_PROPORTIONS:
             self._plabel_run(
                 label_proportion=proportion, model_fname=f"plabel_{proportion}.pt"
