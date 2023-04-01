@@ -15,17 +15,6 @@ import wandb
 
 class PLabel(nn.Module):
     """Psuedo-Label"""
-
-    """
-    To do:
-    - complete init done
-    - compute_pseudolabels() done
-    - compute_loss()
-    - pretrain() done
-    - train()
-    - wandb logging
-    
-    """
     def __init__(
         self,
         model: nn.Module,
@@ -200,7 +189,6 @@ class PLabel(nn.Module):
                 )
     @staticmethod
     def wandb_init(
-        percentiles,
         num_epochs,
         batch_size,
         label_ratio,
@@ -209,7 +197,6 @@ class PLabel(nn.Module):
             wandb.init(
                 project="PLabel model",
                 config={
-                    "Percentiles": percentiles,
                     "Number of epochs": num_epochs,
                     "Batch size": batch_size,
                     "Label ratio": label_ratio,

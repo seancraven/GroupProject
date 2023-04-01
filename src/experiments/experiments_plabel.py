@@ -208,15 +208,14 @@ class BaseExperiment(ABC):
             fname = os.path.join(self.model_folder, best_model_fname)
             dmt.save_best_model(fname)
 
-    # PLABEL  RUN   
+    # PLABEL RUN   
     def _plabel_run(
         self,
         *,
         batch_size: int = BATCH_SIZE,
         label_proportion: float = LABEL_PROPORTION,
         validation_proportion: float = VALIDATION_PROPORTION,
-        percentiles: tuple = PERCENTILES,
-        num_plabel_epochs: int = NUM_DMT_EPOCHS,
+        num_epochs: int = NUM_DMT_EPOCHS,
         max_pretrain_epochs: int = MAX_PRETRAIN_EPOCHS,
         seed: int = _SEED,
         baseline_fname: Optional[str] = None,
@@ -241,15 +240,14 @@ class BaseExperiment(ABC):
             baseline=baseline,
         )
         plabel.wandb_init(
-            percentiles=percentiles,
-            num_epochs=num_plabel_epochs,
+            num_epochs=num_epochs,
             batch_size=batch_size,
             label_ratio=label_proportion,
         )
         plabel.pretrain(
             max_epochs=max_pretrain_epochs,
         )
-        plabel.train(num_epochs=num_plabel_epochs)
+        plabel.train(num_epochs=num_epochs)
 
         plabel_IoU = self.test(plabel.model)
         plabel.wandb_log({"Model test IoU": plabel_IoU})
@@ -349,14 +347,14 @@ class VaryLabelProportion(BaseExperiment):
 class PLabelVaryLabelProportion(BaseExperiment):
     @property
     def model_folder(self) -> str:
-        return "models/vary_label_proportion"
+        return "models/plabel_vary_label_proportion"
 
     @property
     def description(self) -> str:
         return "Try different label proportions"
 
     def run(self) -> None:
-        for proportion in [self.ALL_LABEL_PROPORTIONS]:
+        for proportion in self.ALL_LABEL_PROPORTIONS:
             self._plabel_run(
-                label_proportion=proportion, best_model_fname=f"plabel_{proportion}.pt"
+                label_proportion=proportion, model_fname=f"plabel_{proportion}.pt"
             )
