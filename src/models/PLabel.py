@@ -63,7 +63,6 @@ class PLabel(nn.Module):
             unlabeled_batch_size, # batch size
             *self.unlabeled_loader.dataset[0][0].size()) # C x H x W
         ).to(self.device)
-        print(len(self.unlabeled_loader),len(self.labeled_loader))
 
     def compute_pseudolabels(
         self, confidences: torch.Tensor
