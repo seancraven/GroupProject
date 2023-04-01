@@ -1,0 +1,467 @@
+
+===== Pretraining Pseudo-Labeling Model =====
+Epoch 1/10000
+	Pseudo-Labeling ModelEpoch time: 1.1497 | Epoch mean loss: 0.7102 | Validation IoU: 0.4229 | Train IoU: 0.4225 | Best validation IoU: 0.4229
+Epoch 2/10000
+	Pseudo-Labeling ModelEpoch time: 0.3190 | Epoch mean loss: 0.6783 | Validation IoU: 0.4229 | Train IoU: 0.4225 | Best validation IoU: 0.4229
+Epoch 3/10000
+	Pseudo-Labeling ModelEpoch time: 0.3459 | Epoch mean loss: 0.5905 | Validation IoU: 0.4229 | Train IoU: 0.4225 | Best validation IoU: 0.4229
+Epoch 4/10000
+	Pseudo-Labeling ModelEpoch time: 0.3205 | Epoch mean loss: 0.6326 | Validation IoU: 0.4268 | Train IoU: 0.4381 | Best validation IoU: 0.4268
+Epoch 5/10000
+	Pseudo-Labeling ModelEpoch time: 0.3281 | Epoch mean loss: 0.6017 | Validation IoU: 0.4354 | Train IoU: 0.4403 | Best validation IoU: 0.4354
+Epoch 6/10000
+	Pseudo-Labeling ModelEpoch time: 0.3185 | Epoch mean loss: 0.5915 | Validation IoU: 0.0073 | Train IoU: 0.0070 | Best validation IoU: 0.4354
+Epoch 7/10000
+	Pseudo-Labeling ModelEpoch time: 0.3454 | Epoch mean loss: 0.6487 | Validation IoU: 0.4733 | Train IoU: 0.4877 | Best validation IoU: 0.4733
+Epoch 8/10000
+	Pseudo-Labeling ModelEpoch time: 0.3157 | Epoch mean loss: 0.6247 | Validation IoU: 0.4231 | Train IoU: 0.4232 | Best validation IoU: 0.4733
+Epoch 9/10000
+	Pseudo-Labeling ModelEpoch time: 0.3250 | Epoch mean loss: 0.5688 | Validation IoU: 0.4343 | Train IoU: 0.4442 | Best validation IoU: 0.4733
+Epoch 10/10000
+	Pseudo-Labeling ModelEpoch time: 0.3247 | Epoch mean loss: 0.5128 | Validation IoU: 0.5173 | Train IoU: 0.5394 | Best validation IoU: 0.5173
+Epoch 11/10000
+	Pseudo-Labeling ModelEpoch time: 0.3189 | Epoch mean loss: 0.5150 | Validation IoU: 0.5394 | Train IoU: 0.5649 | Best validation IoU: 0.5394
+Epoch 12/10000
+	Pseudo-Labeling ModelEpoch time: 0.3459 | Epoch mean loss: 0.4883 | Validation IoU: 0.4864 | Train IoU: 0.5334 | Best validation IoU: 0.5394
+Epoch 13/10000
+	Pseudo-Labeling ModelEpoch time: 0.3225 | Epoch mean loss: 0.4688 | Validation IoU: 0.3867 | Train IoU: 0.4518 | Best validation IoU: 0.5394
+Epoch 14/10000
+	Pseudo-Labeling ModelEpoch time: 0.3314 | Epoch mean loss: 0.4806 | Validation IoU: 0.3634 | Train IoU: 0.4569 | Best validation IoU: 0.5394
+Epoch 15/10000
+	Pseudo-Labeling ModelEpoch time: 0.3163 | Epoch mean loss: 0.4694 | Validation IoU: 0.4465 | Train IoU: 0.5593 | Best validation IoU: 0.5394
+Epoch 16/10000
+	Pseudo-Labeling ModelEpoch time: 0.3181 | Epoch mean loss: 0.4353 | Validation IoU: 0.4898 | Train IoU: 0.5763 | Best validation IoU: 0.5394
+Epoch 17/10000
+	Pseudo-Labeling ModelEpoch time: 0.3233 | Epoch mean loss: 0.4664 | Validation IoU: 0.5274 | Train IoU: 0.6297 | Best validation IoU: 0.5394
+Epoch 18/10000
+	Pseudo-Labeling ModelEpoch time: 0.3172 | Epoch mean loss: 0.4759 | Validation IoU: 0.5238 | Train IoU: 0.5868 | Best validation IoU: 0.5394
+Epoch 19/10000
+	Pseudo-Labeling ModelEpoch time: 0.3240 | Epoch mean loss: 0.4544 | Validation IoU: 0.5149 | Train IoU: 0.5372 | Best validation IoU: 0.5394
+Epoch 20/10000
+	Pseudo-Labeling ModelEpoch time: 0.3216 | Epoch mean loss: 0.4708 | Validation IoU: 0.5165 | Train IoU: 0.5422 | Best validation IoU: 0.5394
+Epoch 21/10000
+	Pseudo-Labeling ModelEpoch time: 0.3224 | Epoch mean loss: 0.4394 | Validation IoU: 0.5215 | Train IoU: 0.5688 | Best validation IoU: 0.5394
+Epoch 00022: reducing learning rate of group 0 to 1.0000e-04.
+Epoch 22/10000
+	Pseudo-Labeling ModelEpoch time: 0.3221 | Epoch mean loss: 0.4535 | Validation IoU: 0.5541 | Train IoU: 0.6037 | Best validation IoU: 0.5541
+Epoch 23/10000
+	Pseudo-Labeling ModelEpoch time: 0.3173 | Epoch mean loss: 0.4080 | Validation IoU: 0.5632 | Train IoU: 0.6233 | Best validation IoU: 0.5632
+Epoch 24/10000
+	Pseudo-Labeling ModelEpoch time: 0.3148 | Epoch mean loss: 0.4285 | Validation IoU: 0.5660 | Train IoU: 0.6406 | Best validation IoU: 0.5660
+Epoch 25/10000
+	Pseudo-Labeling ModelEpoch time: 0.3202 | Epoch mean loss: 0.5057 | Validation IoU: 0.5614 | Train IoU: 0.6533 | Best validation IoU: 0.5660
+Epoch 26/10000
+	Pseudo-Labeling ModelEpoch time: 0.3340 | Epoch mean loss: 0.4157 | Validation IoU: 0.5580 | Train IoU: 0.6598 | Best validation IoU: 0.5660
+Epoch 27/10000
+	Pseudo-Labeling ModelEpoch time: 0.3228 | Epoch mean loss: 0.3858 | Validation IoU: 0.5568 | Train IoU: 0.6683 | Best validation IoU: 0.5660
+Epoch 28/10000
+	Pseudo-Labeling ModelEpoch time: 0.3238 | Epoch mean loss: 0.4459 | Validation IoU: 0.5578 | Train IoU: 0.6769 | Best validation IoU: 0.5660
+Epoch 29/10000
+	Pseudo-Labeling ModelEpoch time: 0.3213 | Epoch mean loss: 0.4154 | Validation IoU: 0.5593 | Train IoU: 0.6916 | Best validation IoU: 0.5660
+Epoch 30/10000
+	Pseudo-Labeling ModelEpoch time: 0.3189 | Epoch mean loss: 0.4312 | Validation IoU: 0.5583 | Train IoU: 0.7009 | Best validation IoU: 0.5660
+Epoch 31/10000
+	Pseudo-Labeling ModelEpoch time: 0.3203 | Epoch mean loss: 0.4292 | Validation IoU: 0.5608 | Train IoU: 0.7093 | Best validation IoU: 0.5660
+Epoch 32/10000
+	Pseudo-Labeling ModelEpoch time: 0.3176 | Epoch mean loss: 0.3712 | Validation IoU: 0.5587 | Train IoU: 0.7167 | Best validation IoU: 0.5660
+Epoch 33/10000
+	Pseudo-Labeling ModelEpoch time: 0.3178 | Epoch mean loss: 0.3845 | Validation IoU: 0.5560 | Train IoU: 0.7238 | Best validation IoU: 0.5660
+Epoch 34/10000
+	Pseudo-Labeling ModelEpoch time: 0.3478 | Epoch mean loss: 0.3895 | Validation IoU: 0.5536 | Train IoU: 0.7255 | Best validation IoU: 0.5660
+Epoch 00035: reducing learning rate of group 0 to 1.0000e-05.
+Epoch 35/10000
+	Pseudo-Labeling ModelEpoch time: 0.3198 | Epoch mean loss: 0.4002 | Validation IoU: 0.5442 | Train IoU: 0.7280 | Best validation IoU: 0.5660
+Epoch 36/10000
+	Pseudo-Labeling ModelEpoch time: 0.3215 | Epoch mean loss: 0.3641 | Validation IoU: 0.5346 | Train IoU: 0.7230 | Best validation IoU: 0.5660
+Epoch 37/10000
+	Pseudo-Labeling ModelEpoch time: 0.3167 | Epoch mean loss: 0.3822 | Validation IoU: 0.5445 | Train IoU: 0.7316 | Best validation IoU: 0.5660
+Epoch 38/10000
+	Pseudo-Labeling ModelEpoch time: 0.3213 | Epoch mean loss: 0.3894 | Validation IoU: 0.5459 | Train IoU: 0.7291 | Best validation IoU: 0.5660
+Epoch 39/10000
+	Pseudo-Labeling ModelEpoch time: 0.3479 | Epoch mean loss: 0.3763 | Validation IoU: 0.5480 | Train IoU: 0.7302 | Best validation IoU: 0.5660
+Epoch 40/10000
+	Pseudo-Labeling ModelEpoch time: 0.3161 | Epoch mean loss: 0.3790 | Validation IoU: 0.5473 | Train IoU: 0.7310 | Best validation IoU: 0.5660
+Epoch 41/10000
+	Pseudo-Labeling ModelEpoch time: 0.3221 | Epoch mean loss: 0.3661 | Validation IoU: 0.5466 | Train IoU: 0.7301 | Best validation IoU: 0.5660
+Epoch 00042: reducing learning rate of group 0 to 1.0000e-06.
+Epoch 42/10000
+	Pseudo-Labeling ModelEpoch time: 0.3163 | Epoch mean loss: 0.3642 | Validation IoU: 0.5445 | Train IoU: 0.7345 | Best validation IoU: 0.5660
+Epoch 43/10000
+	Pseudo-Labeling ModelEpoch time: 0.3190 | Epoch mean loss: 0.3704 | Validation IoU: 0.5457 | Train IoU: 0.7292 | Best validation IoU: 0.5660
+Epoch 44/10000
+	Pseudo-Labeling ModelEpoch time: 0.3223 | Epoch mean loss: 0.3855 | Validation IoU: 0.5502 | Train IoU: 0.7301 | Best validation IoU: 0.5660
+Epoch 45/10000
+	Pseudo-Labeling ModelEpoch time: 0.3215 | Epoch mean loss: 0.3683 | Validation IoU: 0.5522 | Train IoU: 0.7291 | Best validation IoU: 0.5660
+Epoch 46/10000
+	Pseudo-Labeling ModelEpoch time: 0.3196 | Epoch mean loss: 0.3596 | Validation IoU: 0.5500 | Train IoU: 0.7309 | Best validation IoU: 0.5660
+Epoch 47/10000
+	Pseudo-Labeling ModelEpoch time: 0.3233 | Epoch mean loss: 0.3937 | Validation IoU: 0.5571 | Train IoU: 0.7340 | Best validation IoU: 0.5660
+Epoch 48/10000
+	Pseudo-Labeling ModelEpoch time: 0.3508 | Epoch mean loss: 0.3691 | Validation IoU: 0.5609 | Train IoU: 0.7388 | Best validation IoU: 0.5660
+Epoch 49/10000
+	Pseudo-Labeling ModelEpoch time: 0.3171 | Epoch mean loss: 0.4117 | Validation IoU: 0.5575 | Train IoU: 0.7360 | Best validation IoU: 0.5660
+Epoch 50/10000
+	Pseudo-Labeling ModelEpoch time: 0.3170 | Epoch mean loss: 0.3965 | Validation IoU: 0.5536 | Train IoU: 0.7343 | Best validation IoU: 0.5660
+Epoch 51/10000
+	Pseudo-Labeling ModelEpoch time: 0.3241 | Epoch mean loss: 0.3669 | Validation IoU: 0.5533 | Train IoU: 0.7355 | Best validation IoU: 0.5660
+Epoch 00052: reducing learning rate of group 0 to 1.0000e-07.
+Epoch 52/10000
+	Pseudo-Labeling ModelEpoch time: 0.3201 | Epoch mean loss: 0.3651 | Validation IoU: 0.5532 | Train IoU: 0.7346 | Best validation IoU: 0.5660
+Epoch 53/10000
+	Pseudo-Labeling ModelEpoch time: 0.3266 | Epoch mean loss: 0.3864 | Validation IoU: 0.5515 | Train IoU: 0.7354 | Best validation IoU: 0.5660
+Epoch 54/10000
+	Pseudo-Labeling ModelEpoch time: 0.3240 | Epoch mean loss: 0.3552 | Validation IoU: 0.5505 | Train IoU: 0.7333 | Best validation IoU: 0.5660
+Epoch 55/10000
+	Pseudo-Labeling ModelEpoch time: 0.3204 | Epoch mean loss: 0.3719 | Validation IoU: 0.5486 | Train IoU: 0.7348 | Best validation IoU: 0.5660
+Epoch 56/10000
+	Pseudo-Labeling ModelEpoch time: 0.3210 | Epoch mean loss: 0.3916 | Validation IoU: 0.5526 | Train IoU: 0.7366 | Best validation IoU: 0.5660
+Epoch 57/10000
+	Pseudo-Labeling ModelEpoch time: 0.3178 | Epoch mean loss: 0.4455 | Validation IoU: 0.5607 | Train IoU: 0.7356 | Best validation IoU: 0.5660
+Epoch 58/10000
+	Pseudo-Labeling ModelEpoch time: 0.3195 | Epoch mean loss: 0.3650 | Validation IoU: 0.5628 | Train IoU: 0.7389 | Best validation IoU: 0.5660
+Epoch 59/10000
+	Pseudo-Labeling ModelEpoch time: 0.3208 | Epoch mean loss: 0.4141 | Validation IoU: 0.5570 | Train IoU: 0.7348 | Best validation IoU: 0.5660
+Epoch 00060: reducing learning rate of group 0 to 1.0000e-08.
+Epoch 60/10000
+	Pseudo-Labeling ModelEpoch time: 0.3195 | Epoch mean loss: 0.3620 | Validation IoU: 0.5649 | Train IoU: 0.7338 | Best validation IoU: 0.5660
+Epoch 61/10000
+	Pseudo-Labeling ModelEpoch time: 0.3237 | Epoch mean loss: 0.3687 | Validation IoU: 0.5587 | Train IoU: 0.7312 | Best validation IoU: 0.5660
+Epoch 62/10000
+	Pseudo-Labeling ModelEpoch time: 0.3204 | Epoch mean loss: 0.3792 | Validation IoU: 0.5585 | Train IoU: 0.7316 | Best validation IoU: 0.5660
+Epoch 63/10000
+	Pseudo-Labeling ModelEpoch time: 0.3191 | Epoch mean loss: 0.3438 | Validation IoU: 0.5624 | Train IoU: 0.7311 | Best validation IoU: 0.5660
+Epoch 64/10000
+	Pseudo-Labeling ModelEpoch time: 0.3223 | Epoch mean loss: 0.3559 | Validation IoU: 0.5622 | Train IoU: 0.7330 | Best validation IoU: 0.5660
+Epoch 65/10000
+	Pseudo-Labeling ModelEpoch time: 0.3282 | Epoch mean loss: 0.3862 | Validation IoU: 0.5680 | Train IoU: 0.7308 | Best validation IoU: 0.5680
+Epoch 66/10000
+	Pseudo-Labeling ModelEpoch time: 0.3215 | Epoch mean loss: 0.4018 | Validation IoU: 0.5612 | Train IoU: 0.7327 | Best validation IoU: 0.5680
+Epoch 67/10000
+	Pseudo-Labeling ModelEpoch time: 0.3239 | Epoch mean loss: 0.3934 | Validation IoU: 0.5621 | Train IoU: 0.7328 | Best validation IoU: 0.5680
+Epoch 68/10000
+	Pseudo-Labeling ModelEpoch time: 0.3221 | Epoch mean loss: 0.3499 | Validation IoU: 0.5604 | Train IoU: 0.7334 | Best validation IoU: 0.5680
+Epoch 69/10000
+	Pseudo-Labeling ModelEpoch time: 0.3233 | Epoch mean loss: 0.3729 | Validation IoU: 0.5522 | Train IoU: 0.7348 | Best validation IoU: 0.5680
+Epoch 70/10000
+	Pseudo-Labeling ModelEpoch time: 0.3230 | Epoch mean loss: 0.3592 | Validation IoU: 0.5491 | Train IoU: 0.7330 | Best validation IoU: 0.5680
+Epoch 71/10000
+	Pseudo-Labeling ModelEpoch time: 0.3266 | Epoch mean loss: 0.3529 | Validation IoU: 0.5475 | Train IoU: 0.7296 | Best validation IoU: 0.5680
+Epoch 72/10000
+	Pseudo-Labeling ModelEpoch time: 0.3275 | Epoch mean loss: 0.3965 | Validation IoU: 0.5536 | Train IoU: 0.7334 | Best validation IoU: 0.5680
+Epoch 73/10000
+	Pseudo-Labeling ModelEpoch time: 0.3275 | Epoch mean loss: 0.3777 | Validation IoU: 0.5501 | Train IoU: 0.7367 | Best validation IoU: 0.5680
+Epoch 74/10000
+	Pseudo-Labeling ModelEpoch time: 0.3258 | Epoch mean loss: 0.3835 | Validation IoU: 0.5531 | Train IoU: 0.7374 | Best validation IoU: 0.5680
+Epoch 75/10000
+	Pseudo-Labeling ModelEpoch time: 0.3224 | Epoch mean loss: 0.3815 | Validation IoU: 0.5540 | Train IoU: 0.7342 | Best validation IoU: 0.5680
+Epoch 76/10000
+	Pseudo-Labeling ModelEpoch time: 0.3242 | Epoch mean loss: 0.3824 | Validation IoU: 0.5556 | Train IoU: 0.7361 | Best validation IoU: 0.5680
+Epoch 77/10000
+	Pseudo-Labeling ModelEpoch time: 0.3263 | Epoch mean loss: 0.3734 | Validation IoU: 0.5525 | Train IoU: 0.7266 | Best validation IoU: 0.5680
+Epoch 78/10000
+	Pseudo-Labeling ModelEpoch time: 0.3248 | Epoch mean loss: 0.3934 | Validation IoU: 0.5492 | Train IoU: 0.7328 | Best validation IoU: 0.5680
+Epoch 79/10000
+	Pseudo-Labeling ModelEpoch time: 0.3358 | Epoch mean loss: 0.3711 | Validation IoU: 0.5493 | Train IoU: 0.7348 | Best validation IoU: 0.5680
+Epoch 80/10000
+	Pseudo-Labeling ModelEpoch time: 0.3244 | Epoch mean loss: 0.4239 | Validation IoU: 0.5601 | Train IoU: 0.7411 | Best validation IoU: 0.5680
+Epoch 81/10000
+	Pseudo-Labeling ModelEpoch time: 0.3198 | Epoch mean loss: 0.3566 | Validation IoU: 0.5594 | Train IoU: 0.7394 | Best validation IoU: 0.5680
+Epoch 82/10000
+	Pseudo-Labeling ModelEpoch time: 0.3240 | Epoch mean loss: 0.3780 | Validation IoU: 0.5549 | Train IoU: 0.7357 | Best validation IoU: 0.5680
+Epoch 83/10000
+	Pseudo-Labeling ModelEpoch time: 0.3253 | Epoch mean loss: 0.3905 | Validation IoU: 0.5489 | Train IoU: 0.7322 | Best validation IoU: 0.5680
+Epoch 84/10000
+	Pseudo-Labeling ModelEpoch time: 0.3187 | Epoch mean loss: 0.3677 | Validation IoU: 0.5469 | Train IoU: 0.7299 | Best validation IoU: 0.5680
+Epoch 85/10000
+	Pseudo-Labeling ModelEpoch time: 0.3199 | Epoch mean loss: 0.3594 | Validation IoU: 0.5481 | Train IoU: 0.7297 | Best validation IoU: 0.5680
+Epoch 86/10000
+	Pseudo-Labeling ModelEpoch time: 0.3207 | Epoch mean loss: 0.4117 | Validation IoU: 0.5611 | Train IoU: 0.7376 | Best validation IoU: 0.5680
+Epoch 87/10000
+	Pseudo-Labeling ModelEpoch time: 0.3209 | Epoch mean loss: 0.3810 | Validation IoU: 0.5675 | Train IoU: 0.7361 | Best validation IoU: 0.5680
+Epoch 88/10000
+	Pseudo-Labeling ModelEpoch time: 0.3306 | Epoch mean loss: 0.3787 | Validation IoU: 0.5626 | Train IoU: 0.7405 | Best validation IoU: 0.5680
+Epoch 89/10000
+	Pseudo-Labeling ModelEpoch time: 0.3194 | Epoch mean loss: 0.4291 | Validation IoU: 0.5620 | Train IoU: 0.7377 | Best validation IoU: 0.5680
+Epoch 90/10000
+	Pseudo-Labeling ModelEpoch time: 0.3218 | Epoch mean loss: 0.3899 | Validation IoU: 0.5610 | Train IoU: 0.7375 | Best validation IoU: 0.5680
+Epoch 91/10000
+	Pseudo-Labeling ModelEpoch time: 0.3213 | Epoch mean loss: 0.4066 | Validation IoU: 0.5694 | Train IoU: 0.7386 | Best validation IoU: 0.5694
+Epoch 92/10000
+	Pseudo-Labeling ModelEpoch time: 0.3220 | Epoch mean loss: 0.3913 | Validation IoU: 0.5644 | Train IoU: 0.7394 | Best validation IoU: 0.5694
+Epoch 93/10000
+	Pseudo-Labeling ModelEpoch time: 0.3264 | Epoch mean loss: 0.4007 | Validation IoU: 0.5570 | Train IoU: 0.7354 | Best validation IoU: 0.5694
+Epoch 94/10000
+	Pseudo-Labeling ModelEpoch time: 0.3560 | Epoch mean loss: 0.4486 | Validation IoU: 0.5544 | Train IoU: 0.7346 | Best validation IoU: 0.5694
+Epoch 95/10000
+	Pseudo-Labeling ModelEpoch time: 0.3225 | Epoch mean loss: 0.4074 | Validation IoU: 0.5588 | Train IoU: 0.7373 | Best validation IoU: 0.5694
+Epoch 96/10000
+	Pseudo-Labeling ModelEpoch time: 0.3278 | Epoch mean loss: 0.3800 | Validation IoU: 0.5570 | Train IoU: 0.7346 | Best validation IoU: 0.5694
+Epoch 97/10000
+	Pseudo-Labeling ModelEpoch time: 0.3557 | Epoch mean loss: 0.3564 | Validation IoU: 0.5549 | Train IoU: 0.7308 | Best validation IoU: 0.5694
+Epoch 98/10000
+	Pseudo-Labeling ModelEpoch time: 0.3423 | Epoch mean loss: 0.4478 | Validation IoU: 0.5560 | Train IoU: 0.7293 | Best validation IoU: 0.5694
+Epoch 99/10000
+	Pseudo-Labeling ModelEpoch time: 0.3257 | Epoch mean loss: 0.3922 | Validation IoU: 0.5615 | Train IoU: 0.7322 | Best validation IoU: 0.5694
+Epoch 100/10000
+	Pseudo-Labeling ModelEpoch time: 0.3272 | Epoch mean loss: 0.3615 | Validation IoU: 0.5584 | Train IoU: 0.7335 | Best validation IoU: 0.5694
+Epoch 101/10000
+	Pseudo-Labeling ModelEpoch time: 0.3220 | Epoch mean loss: 0.3804 | Validation IoU: 0.5609 | Train IoU: 0.7301 | Best validation IoU: 0.5694
+Epoch 102/10000
+	Pseudo-Labeling ModelEpoch time: 0.3194 | Epoch mean loss: 0.4311 | Validation IoU: 0.5665 | Train IoU: 0.7306 | Best validation IoU: 0.5694
+Epoch 103/10000
+	Pseudo-Labeling ModelEpoch time: 0.3196 | Epoch mean loss: 0.3865 | Validation IoU: 0.5603 | Train IoU: 0.7297 | Best validation IoU: 0.5694
+Epoch 104/10000
+	Pseudo-Labeling ModelEpoch time: 0.3223 | Epoch mean loss: 0.3785 | Validation IoU: 0.5624 | Train IoU: 0.7311 | Best validation IoU: 0.5694
+Epoch 105/10000
+	Pseudo-Labeling ModelEpoch time: 0.3201 | Epoch mean loss: 0.3660 | Validation IoU: 0.5607 | Train IoU: 0.7300 | Best validation IoU: 0.5694
+Epoch 106/10000
+	Pseudo-Labeling ModelEpoch time: 0.3276 | Epoch mean loss: 0.3994 | Validation IoU: 0.5604 | Train IoU: 0.7290 | Best validation IoU: 0.5694
+Epoch 107/10000
+	Pseudo-Labeling ModelEpoch time: 0.3272 | Epoch mean loss: 0.3640 | Validation IoU: 0.5585 | Train IoU: 0.7292 | Best validation IoU: 0.5694
+Epoch 108/10000
+	Pseudo-Labeling ModelEpoch time: 0.3488 | Epoch mean loss: 0.3661 | Validation IoU: 0.5577 | Train IoU: 0.7305 | Best validation IoU: 0.5694
+Epoch 109/10000
+	Pseudo-Labeling ModelEpoch time: 0.3235 | Epoch mean loss: 0.3725 | Validation IoU: 0.5577 | Train IoU: 0.7276 | Best validation IoU: 0.5694
+Epoch 110/10000
+	Pseudo-Labeling ModelEpoch time: 0.3268 | Epoch mean loss: 0.3764 | Validation IoU: 0.5560 | Train IoU: 0.7357 | Best validation IoU: 0.5694
+Epoch 111/10000
+	Pseudo-Labeling ModelEpoch time: 0.3283 | Epoch mean loss: 0.4188 | Validation IoU: 0.5524 | Train IoU: 0.7349 | Best validation IoU: 0.5694
+Epoch 112/10000
+	Pseudo-Labeling ModelEpoch time: 0.3261 | Epoch mean loss: 0.3512 | Validation IoU: 0.5562 | Train IoU: 0.7330 | Best validation IoU: 0.5694
+Epoch 113/10000
+	Pseudo-Labeling ModelEpoch time: 0.3219 | Epoch mean loss: 0.3991 | Validation IoU: 0.5593 | Train IoU: 0.7341 | Best validation IoU: 0.5694
+Epoch 114/10000
+	Pseudo-Labeling ModelEpoch time: 0.3239 | Epoch mean loss: 0.3718 | Validation IoU: 0.5572 | Train IoU: 0.7344 | Best validation IoU: 0.5694
+Epoch 115/10000
+	Pseudo-Labeling ModelEpoch time: 0.3234 | Epoch mean loss: 0.3595 | Validation IoU: 0.5530 | Train IoU: 0.7330 | Best validation IoU: 0.5694
+Epoch 116/10000
+	Pseudo-Labeling ModelEpoch time: 0.3276 | Epoch mean loss: 0.3616 | Validation IoU: 0.5558 | Train IoU: 0.7314 | Best validation IoU: 0.5694
+Epoch 117/10000
+	Pseudo-Labeling ModelEpoch time: 0.3223 | Epoch mean loss: 0.3944 | Validation IoU: 0.5582 | Train IoU: 0.7329 | Best validation IoU: 0.5694
+Epoch 118/10000
+	Pseudo-Labeling ModelEpoch time: 0.3331 | Epoch mean loss: 0.3827 | Validation IoU: 0.5563 | Train IoU: 0.7320 | Best validation IoU: 0.5694
+Epoch 119/10000
+	Pseudo-Labeling ModelEpoch time: 0.3258 | Epoch mean loss: 0.4339 | Validation IoU: 0.5692 | Train IoU: 0.7297 | Best validation IoU: 0.5694
+Epoch 120/10000
+	Pseudo-Labeling ModelEpoch time: 0.3512 | Epoch mean loss: 0.3704 | Validation IoU: 0.5642 | Train IoU: 0.7307 | Best validation IoU: 0.5694
+Epoch 121/10000
+	Pseudo-Labeling ModelEpoch time: 0.3302 | Epoch mean loss: 0.4142 | Validation IoU: 0.5637 | Train IoU: 0.7315 | Best validation IoU: 0.5694
+Epoch 122/10000
+	Pseudo-Labeling ModelEpoch time: 0.3250 | Epoch mean loss: 0.3660 | Validation IoU: 0.5634 | Train IoU: 0.7344 | Best validation IoU: 0.5694
+Epoch 123/10000
+	Pseudo-Labeling ModelEpoch time: 0.3338 | Epoch mean loss: 0.3641 | Validation IoU: 0.5591 | Train IoU: 0.7318 | Best validation IoU: 0.5694
+Epoch 124/10000
+	Pseudo-Labeling ModelEpoch time: 0.3271 | Epoch mean loss: 0.3864 | Validation IoU: 0.5644 | Train IoU: 0.7304 | Best validation IoU: 0.5694
+Epoch 125/10000
+	Pseudo-Labeling ModelEpoch time: 0.3226 | Epoch mean loss: 0.3767 | Validation IoU: 0.5625 | Train IoU: 0.7287 | Best validation IoU: 0.5694
+Epoch 126/10000
+	Pseudo-Labeling ModelEpoch time: 0.3267 | Epoch mean loss: 0.3793 | Validation IoU: 0.5580 | Train IoU: 0.7305 | Best validation IoU: 0.5694
+Epoch 127/10000
+	Pseudo-Labeling ModelEpoch time: 0.3256 | Epoch mean loss: 0.3817 | Validation IoU: 0.5608 | Train IoU: 0.7305 | Best validation IoU: 0.5694
+Epoch 128/10000
+	Pseudo-Labeling ModelEpoch time: 0.3251 | Epoch mean loss: 0.3787 | Validation IoU: 0.5639 | Train IoU: 0.7333 | Best validation IoU: 0.5694
+Epoch 129/10000
+	Pseudo-Labeling ModelEpoch time: 0.3254 | Epoch mean loss: 0.3716 | Validation IoU: 0.5720 | Train IoU: 0.7402 | Best validation IoU: 0.5720
+Epoch 130/10000
+	Pseudo-Labeling ModelEpoch time: 0.3276 | Epoch mean loss: 0.3594 | Validation IoU: 0.5711 | Train IoU: 0.7396 | Best validation IoU: 0.5720
+Epoch 131/10000
+	Pseudo-Labeling ModelEpoch time: 0.3234 | Epoch mean loss: 0.3686 | Validation IoU: 0.5697 | Train IoU: 0.7392 | Best validation IoU: 0.5720
+Epoch 132/10000
+	Pseudo-Labeling ModelEpoch time: 0.3287 | Epoch mean loss: 0.3782 | Validation IoU: 0.5693 | Train IoU: 0.7383 | Best validation IoU: 0.5720
+Epoch 133/10000
+	Pseudo-Labeling ModelEpoch time: 0.3249 | Epoch mean loss: 0.3612 | Validation IoU: 0.5689 | Train IoU: 0.7362 | Best validation IoU: 0.5720
+Epoch 134/10000
+	Pseudo-Labeling ModelEpoch time: 0.3292 | Epoch mean loss: 0.3928 | Validation IoU: 0.5667 | Train IoU: 0.7338 | Best validation IoU: 0.5720
+Epoch 135/10000
+	Pseudo-Labeling ModelEpoch time: 0.3285 | Epoch mean loss: 0.3640 | Validation IoU: 0.5647 | Train IoU: 0.7364 | Best validation IoU: 0.5720
+Epoch 136/10000
+	Pseudo-Labeling ModelEpoch time: 0.3225 | Epoch mean loss: 0.3752 | Validation IoU: 0.5642 | Train IoU: 0.7361 | Best validation IoU: 0.5720
+Epoch 137/10000
+	Pseudo-Labeling ModelEpoch time: 0.3201 | Epoch mean loss: 0.3713 | Validation IoU: 0.5664 | Train IoU: 0.7360 | Best validation IoU: 0.5720
+Epoch 138/10000
+	Pseudo-Labeling ModelEpoch time: 0.3282 | Epoch mean loss: 0.3542 | Validation IoU: 0.5616 | Train IoU: 0.7346 | Best validation IoU: 0.5720
+Epoch 139/10000
+	Pseudo-Labeling ModelEpoch time: 0.3258 | Epoch mean loss: 0.4063 | Validation IoU: 0.5614 | Train IoU: 0.7320 | Best validation IoU: 0.5720
+Epoch 140/10000
+	Pseudo-Labeling ModelEpoch time: 0.3430 | Epoch mean loss: 0.3596 | Validation IoU: 0.5607 | Train IoU: 0.7368 | Best validation IoU: 0.5720
+Epoch 141/10000
+	Pseudo-Labeling ModelEpoch time: 0.3325 | Epoch mean loss: 0.3876 | Validation IoU: 0.5600 | Train IoU: 0.7361 | Best validation IoU: 0.5720
+Epoch 142/10000
+	Pseudo-Labeling ModelEpoch time: 0.3311 | Epoch mean loss: 0.4026 | Validation IoU: 0.5575 | Train IoU: 0.7332 | Best validation IoU: 0.5720
+Epoch 143/10000
+	Pseudo-Labeling ModelEpoch time: 0.3256 | Epoch mean loss: 0.3817 | Validation IoU: 0.5608 | Train IoU: 0.7326 | Best validation IoU: 0.5720
+Epoch 144/10000
+	Pseudo-Labeling ModelEpoch time: 0.3267 | Epoch mean loss: 0.3674 | Validation IoU: 0.5617 | Train IoU: 0.7355 | Best validation IoU: 0.5720
+Epoch 145/10000
+	Pseudo-Labeling ModelEpoch time: 0.3406 | Epoch mean loss: 0.3983 | Validation IoU: 0.5585 | Train IoU: 0.7356 | Best validation IoU: 0.5720
+Epoch 146/10000
+	Pseudo-Labeling ModelEpoch time: 0.3294 | Epoch mean loss: 0.3618 | Validation IoU: 0.5594 | Train IoU: 0.7353 | Best validation IoU: 0.5720
+Epoch 147/10000
+	Pseudo-Labeling ModelEpoch time: 0.3255 | Epoch mean loss: 0.3574 | Validation IoU: 0.5612 | Train IoU: 0.7360 | Best validation IoU: 0.5720
+Epoch 148/10000
+	Pseudo-Labeling ModelEpoch time: 0.3595 | Epoch mean loss: 0.3692 | Validation IoU: 0.5594 | Train IoU: 0.7344 | Best validation IoU: 0.5720
+Epoch 149/10000
+	Pseudo-Labeling ModelEpoch time: 0.3286 | Epoch mean loss: 0.4009 | Validation IoU: 0.5606 | Train IoU: 0.7329 | Best validation IoU: 0.5720
+Epoch 150/10000
+	Pseudo-Labeling ModelEpoch time: 0.3528 | Epoch mean loss: 0.3687 | Validation IoU: 0.5548 | Train IoU: 0.7334 | Best validation IoU: 0.5720
+Epoch 151/10000
+	Pseudo-Labeling ModelEpoch time: 0.3298 | Epoch mean loss: 0.3830 | Validation IoU: 0.5568 | Train IoU: 0.7315 | Best validation IoU: 0.5720
+Epoch 152/10000
+	Pseudo-Labeling ModelEpoch time: 0.3293 | Epoch mean loss: 0.3632 | Validation IoU: 0.5537 | Train IoU: 0.7324 | Best validation IoU: 0.5720
+Epoch 153/10000
+	Pseudo-Labeling ModelEpoch time: 0.3228 | Epoch mean loss: 0.3920 | Validation IoU: 0.5525 | Train IoU: 0.7303 | Best validation IoU: 0.5720
+Epoch 154/10000
+	Pseudo-Labeling ModelEpoch time: 0.3576 | Epoch mean loss: 0.3567 | Validation IoU: 0.5527 | Train IoU: 0.7316 | Best validation IoU: 0.5720
+Epoch 155/10000
+	Pseudo-Labeling ModelEpoch time: 0.3248 | Epoch mean loss: 0.4412 | Validation IoU: 0.5598 | Train IoU: 0.7337 | Best validation IoU: 0.5720
+Epoch 156/10000
+	Pseudo-Labeling ModelEpoch time: 0.3234 | Epoch mean loss: 0.3695 | Validation IoU: 0.5600 | Train IoU: 0.7344 | Best validation IoU: 0.5720
+Epoch 157/10000
+	Pseudo-Labeling ModelEpoch time: 0.3280 | Epoch mean loss: 0.3738 | Validation IoU: 0.5540 | Train IoU: 0.7352 | Best validation IoU: 0.5720
+Epoch 158/10000
+	Pseudo-Labeling ModelEpoch time: 0.3344 | Epoch mean loss: 0.3981 | Validation IoU: 0.5546 | Train IoU: 0.7338 | Best validation IoU: 0.5720
+Epoch 159/10000
+	Pseudo-Labeling ModelEpoch time: 0.3324 | Epoch mean loss: 0.3670 | Validation IoU: 0.5536 | Train IoU: 0.7351 | Best validation IoU: 0.5720
+Epoch 160/10000
+	Pseudo-Labeling ModelEpoch time: 0.3289 | Epoch mean loss: 0.3894 | Validation IoU: 0.5475 | Train IoU: 0.7322 | Best validation IoU: 0.5720
+Epoch 161/10000
+	Pseudo-Labeling ModelEpoch time: 0.3581 | Epoch mean loss: 0.3997 | Validation IoU: 0.5542 | Train IoU: 0.7356 | Best validation IoU: 0.5720
+Epoch 162/10000
+	Pseudo-Labeling ModelEpoch time: 0.3385 | Epoch mean loss: 0.4099 | Validation IoU: 0.5614 | Train IoU: 0.7339 | Best validation IoU: 0.5720
+Epoch 163/10000
+	Pseudo-Labeling ModelEpoch time: 0.3321 | Epoch mean loss: 0.3839 | Validation IoU: 0.5597 | Train IoU: 0.7367 | Best validation IoU: 0.5720
+Epoch 164/10000
+	Pseudo-Labeling ModelEpoch time: 0.3293 | Epoch mean loss: 0.3739 | Validation IoU: 0.5595 | Train IoU: 0.7352 | Best validation IoU: 0.5720
+Epoch 165/10000
+	Pseudo-Labeling ModelEpoch time: 0.3592 | Epoch mean loss: 0.3689 | Validation IoU: 0.5567 | Train IoU: 0.7319 | Best validation IoU: 0.5720
+Epoch 166/10000
+	Pseudo-Labeling ModelEpoch time: 0.3302 | Epoch mean loss: 0.4068 | Validation IoU: 0.5594 | Train IoU: 0.7348 | Best validation IoU: 0.5720
+Epoch 167/10000
+	Pseudo-Labeling ModelEpoch time: 0.3373 | Epoch mean loss: 0.3707 | Validation IoU: 0.5611 | Train IoU: 0.7347 | Best validation IoU: 0.5720
+Epoch 168/10000
+	Pseudo-Labeling ModelEpoch time: 0.3290 | Epoch mean loss: 0.3974 | Validation IoU: 0.5608 | Train IoU: 0.7363 | Best validation IoU: 0.5720
+Epoch 169/10000
+	Pseudo-Labeling ModelEpoch time: 0.3297 | Epoch mean loss: 0.3713 | Validation IoU: 0.5636 | Train IoU: 0.7343 | Best validation IoU: 0.5720
+Epoch 170/10000
+	Pseudo-Labeling ModelEpoch time: 0.3300 | Epoch mean loss: 0.3644 | Validation IoU: 0.5659 | Train IoU: 0.7352 | Best validation IoU: 0.5720
+Epoch 171/10000
+	Pseudo-Labeling ModelEpoch time: 0.3371 | Epoch mean loss: 0.3805 | Validation IoU: 0.5616 | Train IoU: 0.7340 | Best validation IoU: 0.5720
+Epoch 172/10000
+	Pseudo-Labeling ModelEpoch time: 0.3286 | Epoch mean loss: 0.3765 | Validation IoU: 0.5601 | Train IoU: 0.7339 | Best validation IoU: 0.5720
+Epoch 173/10000
+	Pseudo-Labeling ModelEpoch time: 0.3465 | Epoch mean loss: 0.3768 | Validation IoU: 0.5640 | Train IoU: 0.7384 | Best validation IoU: 0.5720
+Epoch 174/10000
+	Pseudo-Labeling ModelEpoch time: 0.3313 | Epoch mean loss: 0.3668 | Validation IoU: 0.5605 | Train IoU: 0.7381 | Best validation IoU: 0.5720
+Epoch 175/10000
+	Pseudo-Labeling ModelEpoch time: 0.3271 | Epoch mean loss: 0.3904 | Validation IoU: 0.5693 | Train IoU: 0.7343 | Best validation IoU: 0.5720
+Epoch 176/10000
+	Pseudo-Labeling ModelEpoch time: 0.3289 | Epoch mean loss: 0.3578 | Validation IoU: 0.5647 | Train IoU: 0.7333 | Best validation IoU: 0.5720
+Epoch 177/10000
+	Pseudo-Labeling ModelEpoch time: 0.3270 | Epoch mean loss: 0.4014 | Validation IoU: 0.5644 | Train IoU: 0.7332 | Best validation IoU: 0.5720
+Epoch 178/10000
+	Pseudo-Labeling ModelEpoch time: 0.3389 | Epoch mean loss: 0.3613 | Validation IoU: 0.5653 | Train IoU: 0.7331 | Best validation IoU: 0.5720
+Epoch 179/10000
+	Pseudo-Labeling ModelEpoch time: 0.3239 | Epoch mean loss: 0.3729 | Validation IoU: 0.5613 | Train IoU: 0.7317 | Best validation IoU: 0.5720
+Epoch 180/10000
+	Pseudo-Labeling ModelEpoch time: 0.3255 | Epoch mean loss: 0.3886 | Validation IoU: 0.5606 | Train IoU: 0.7324 | Best validation IoU: 0.5720
+Epoch 181/10000
+	Pseudo-Labeling ModelEpoch time: 0.3299 | Epoch mean loss: 0.3653 | Validation IoU: 0.5564 | Train IoU: 0.7315 | Best validation IoU: 0.5720
+Epoch 182/10000
+	Pseudo-Labeling ModelEpoch time: 0.3237 | Epoch mean loss: 0.4044 | Validation IoU: 0.5514 | Train IoU: 0.7282 | Best validation IoU: 0.5720
+Epoch 183/10000
+	Pseudo-Labeling ModelEpoch time: 0.3297 | Epoch mean loss: 0.4330 | Validation IoU: 0.5534 | Train IoU: 0.7301 | Best validation IoU: 0.5720
+Epoch 184/10000
+	Pseudo-Labeling ModelEpoch time: 0.3566 | Epoch mean loss: 0.3821 | Validation IoU: 0.5494 | Train IoU: 0.7303 | Best validation IoU: 0.5720
+Epoch 185/10000
+	Pseudo-Labeling ModelEpoch time: 0.3279 | Epoch mean loss: 0.4480 | Validation IoU: 0.5577 | Train IoU: 0.7263 | Best validation IoU: 0.5720
+Epoch 186/10000
+	Pseudo-Labeling ModelEpoch time: 0.3387 | Epoch mean loss: 0.3954 | Validation IoU: 0.5529 | Train IoU: 0.7284 | Best validation IoU: 0.5720
+Epoch 187/10000
+	Pseudo-Labeling ModelEpoch time: 0.3567 | Epoch mean loss: 0.3859 | Validation IoU: 0.5579 | Train IoU: 0.7285 | Best validation IoU: 0.5720
+Epoch 188/10000
+	Pseudo-Labeling ModelEpoch time: 0.3291 | Epoch mean loss: 0.3803 | Validation IoU: 0.5557 | Train IoU: 0.7190 | Best validation IoU: 0.5720
+Epoch 189/10000
+	Pseudo-Labeling ModelEpoch time: 0.3274 | Epoch mean loss: 0.3679 | Validation IoU: 0.5552 | Train IoU: 0.7301 | Best validation IoU: 0.5720
+Epoch 190/10000
+	Pseudo-Labeling ModelEpoch time: 0.3555 | Epoch mean loss: 0.4061 | Validation IoU: 0.5521 | Train IoU: 0.7293 | Best validation IoU: 0.5720
+Epoch 191/10000
+	Pseudo-Labeling ModelEpoch time: 0.3332 | Epoch mean loss: 0.4193 | Validation IoU: 0.5510 | Train IoU: 0.7283 | Best validation IoU: 0.5720
+Epoch 192/10000
+	Pseudo-Labeling ModelEpoch time: 0.3249 | Epoch mean loss: 0.3617 | Validation IoU: 0.5468 | Train IoU: 0.7289 | Best validation IoU: 0.5720
+Epoch 193/10000
+	Pseudo-Labeling ModelEpoch time: 0.3545 | Epoch mean loss: 0.3876 | Validation IoU: 0.5534 | Train IoU: 0.7291 | Best validation IoU: 0.5720
+Epoch 194/10000
+	Pseudo-Labeling ModelEpoch time: 0.3304 | Epoch mean loss: 0.3971 | Validation IoU: 0.5439 | Train IoU: 0.7254 | Best validation IoU: 0.5720
+Epoch 195/10000
+	Pseudo-Labeling ModelEpoch time: 0.3264 | Epoch mean loss: 0.3777 | Validation IoU: 0.5516 | Train IoU: 0.7268 | Best validation IoU: 0.5720
+Epoch 196/10000
+	Pseudo-Labeling ModelEpoch time: 0.3291 | Epoch mean loss: 0.3909 | Validation IoU: 0.5565 | Train IoU: 0.7296 | Best validation IoU: 0.5720
+Epoch 197/10000
+	Pseudo-Labeling ModelEpoch time: 0.3248 | Epoch mean loss: 0.3737 | Validation IoU: 0.5565 | Train IoU: 0.7295 | Best validation IoU: 0.5720
+Epoch 198/10000
+	Pseudo-Labeling ModelEpoch time: 0.3301 | Epoch mean loss: 0.3986 | Validation IoU: 0.5581 | Train IoU: 0.7305 | Best validation IoU: 0.5720
+Epoch 199/10000
+	Pseudo-Labeling ModelEpoch time: 0.3282 | Epoch mean loss: 0.4163 | Validation IoU: 0.5592 | Train IoU: 0.7319 | Best validation IoU: 0.5720
+Epoch 200/10000
+	Pseudo-Labeling ModelEpoch time: 0.3235 | Epoch mean loss: 0.3649 | Validation IoU: 0.5563 | Train IoU: 0.7332 | Best validation IoU: 0.5720
+Epoch 201/10000
+	Pseudo-Labeling ModelEpoch time: 0.3247 | Epoch mean loss: 0.4077 | Validation IoU: 0.5595 | Train IoU: 0.7359 | Best validation IoU: 0.5720
+Epoch 202/10000
+	Pseudo-Labeling ModelEpoch time: 0.3267 | Epoch mean loss: 0.3769 | Validation IoU: 0.5563 | Train IoU: 0.7341 | Best validation IoU: 0.5720
+Epoch 203/10000
+	Pseudo-Labeling ModelEpoch time: 0.3219 | Epoch mean loss: 0.3810 | Validation IoU: 0.5522 | Train IoU: 0.7301 | Best validation IoU: 0.5720
+Epoch 204/10000
+	Pseudo-Labeling ModelEpoch time: 0.3258 | Epoch mean loss: 0.3795 | Validation IoU: 0.5559 | Train IoU: 0.7334 | Best validation IoU: 0.5720
+Epoch 205/10000
+	Pseudo-Labeling ModelEpoch time: 0.3257 | Epoch mean loss: 0.4319 | Validation IoU: 0.5517 | Train IoU: 0.7311 | Best validation IoU: 0.5720
+Epoch 206/10000
+	Pseudo-Labeling ModelEpoch time: 0.3346 | Epoch mean loss: 0.3834 | Validation IoU: 0.5527 | Train IoU: 0.7313 | Best validation IoU: 0.5720
+Epoch 207/10000
+	Pseudo-Labeling ModelEpoch time: 0.3234 | Epoch mean loss: 0.3672 | Validation IoU: 0.5505 | Train IoU: 0.7334 | Best validation IoU: 0.5720
+Epoch 208/10000
+	Pseudo-Labeling ModelEpoch time: 0.3485 | Epoch mean loss: 0.3755 | Validation IoU: 0.5475 | Train IoU: 0.7303 | Best validation IoU: 0.5720
+Epoch 209/10000
+	Pseudo-Labeling ModelEpoch time: 0.3268 | Epoch mean loss: 0.3714 | Validation IoU: 0.5492 | Train IoU: 0.7305 | Best validation IoU: 0.5720
+Epoch 210/10000
+	Pseudo-Labeling ModelEpoch time: 0.3321 | Epoch mean loss: 0.4064 | Validation IoU: 0.5528 | Train IoU: 0.7311 | Best validation IoU: 0.5720
+Epoch 211/10000
+	Pseudo-Labeling ModelEpoch time: 0.3510 | Epoch mean loss: 0.3814 | Validation IoU: 0.5477 | Train IoU: 0.7302 | Best validation IoU: 0.5720
+Epoch 212/10000
+	Pseudo-Labeling ModelEpoch time: 0.3277 | Epoch mean loss: 0.3860 | Validation IoU: 0.5500 | Train IoU: 0.7314 | Best validation IoU: 0.5720
+Epoch 213/10000
+	Pseudo-Labeling ModelEpoch time: 0.3473 | Epoch mean loss: 0.3915 | Validation IoU: 0.5467 | Train IoU: 0.7300 | Best validation IoU: 0.5720
+Epoch 214/10000
+	Pseudo-Labeling ModelEpoch time: 0.3513 | Epoch mean loss: 0.3753 | Validation IoU: 0.5424 | Train IoU: 0.7306 | Best validation IoU: 0.5720
+Epoch 215/10000
+	Pseudo-Labeling ModelEpoch time: 0.3276 | Epoch mean loss: 0.3911 | Validation IoU: 0.5420 | Train IoU: 0.7246 | Best validation IoU: 0.5720
+Epoch 216/10000
+	Pseudo-Labeling ModelEpoch time: 0.3289 | Epoch mean loss: 0.5086 | Validation IoU: 0.5516 | Train IoU: 0.7288 | Best validation IoU: 0.5720
+Epoch 217/10000
+	Pseudo-Labeling ModelEpoch time: 0.3570 | Epoch mean loss: 0.3798 | Validation IoU: 0.5595 | Train IoU: 0.7297 | Best validation IoU: 0.5720
+Epoch 218/10000
+	Pseudo-Labeling ModelEpoch time: 0.3286 | Epoch mean loss: 0.4559 | Validation IoU: 0.5590 | Train IoU: 0.7288 | Best validation IoU: 0.5720
+Epoch 219/10000
+	Pseudo-Labeling ModelEpoch time: 0.3522 | Epoch mean loss: 0.3901 | Validation IoU: 0.5529 | Train IoU: 0.7256 | Best validation IoU: 0.5720
+Epoch 220/10000
+	Pseudo-Labeling ModelEpoch time: 0.3281 | Epoch mean loss: 0.4037 | Validation IoU: 0.5544 | Train IoU: 0.7290 | Best validation IoU: 0.5720
+Epoch 221/10000
+	Pseudo-Labeling ModelEpoch time: 0.3256 | Epoch mean loss: 0.3622 | Validation IoU: 0.5481 | Train IoU: 0.7285 | Best validation IoU: 0.5720
+Epoch 222/10000
+	Pseudo-Labeling ModelEpoch time: 0.3288 | Epoch mean loss: 0.3766 | Validation IoU: 0.5485 | Train IoU: 0.7293 | Best validation IoU: 0.5720
+Epoch 223/10000
+	Pseudo-Labeling ModelEpoch time: 0.3261 | Epoch mean loss: 0.4137 | Validation IoU: 0.5489 | Train IoU: 0.7306 | Best validation IoU: 0.5720
+Epoch 224/10000
+	Pseudo-Labeling ModelEpoch time: 0.3294 | Epoch mean loss: 0.4218 | Validation IoU: 0.5468 | Train IoU: 0.7270 | Best validation IoU: 0.5720
+Epoch 225/10000
+	Pseudo-Labeling ModelEpoch time: 0.3247 | Epoch mean loss: 0.3692 | Validation IoU: 0.5499 | Train IoU: 0.7281 | Best validation IoU: 0.5720
+Epoch 226/10000
+	Pseudo-Labeling ModelEpoch time: 0.3261 | Epoch mean loss: 0.3677 | Validation IoU: 0.5526 | Train IoU: 0.7306 | Best validation IoU: 0.5720
+Epoch 227/10000
+	Pseudo-Labeling ModelEpoch time: 0.3282 | Epoch mean loss: 0.3650 | Validation IoU: 0.5533 | Train IoU: 0.7313 | Best validation IoU: 0.5720
+Epoch 228/10000
+	Pseudo-Labeling ModelEpoch time: 0.3262 | Epoch mean loss: 0.3742 | Validation IoU: 0.5560 | Train IoU: 0.7309 | Best validation IoU: 0.5720
+Epoch 229/10000
+	Pseudo-Labeling ModelEpoch time: 0.3258 | Epoch mean loss: 0.3958 | Validation IoU: 0.5639 | Train IoU: 0.7328 | Best validation IoU: 0.5720
+Stopping early after 229 epochs; no improvement in validation IoU after 100 epochs.
+Restored best parameters.
