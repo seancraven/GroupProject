@@ -59,6 +59,9 @@ class PLabel(nn.Module, ReporterMixin):
 
         # Calculate unlabeled loss using the pseudo-labels from the previous time step.
         # Since there are no previous pseudo-labels for the first time step, we initialise randomly
+        """
+        This is wrong and needs to be changed.
+        """
         self.pseudolabels = torch.randint(
             low=0,
             high=2,
@@ -68,6 +71,9 @@ class PLabel(nn.Module, ReporterMixin):
                 self.unlabeled_loader.dataset[0][0].size()[0] ** 2,
             ),  # C x H x W
         ).to(self.device)
+        """
+        Up to here.
+        """
 
     def compute_pseudolabels(
         self, confidences: torch.Tensor
@@ -150,6 +156,18 @@ class PLabel(nn.Module, ReporterMixin):
             for t, (unlabeled, (labeled, labels)) in enumerate(
                 zip(self.unlabeled_loader, self.labeled_loader)
             ):
+                """
+                This is wrong and needs to be changed.
+
+
+                Currently the training loop assumes that the plabels stay at the same index,
+                in the dataloader. This is wrong.
+
+
+                The fix is to use the current epoch model.
+                We also need to use a weighting on the pseudo_lab loss.
+                as in the paper.
+                """
                 unlabeled, labeled, labels = map(
                     lambda x: x.to(self.device), (unlabeled, labeled, labels)
                 )
@@ -188,6 +206,11 @@ class PLabel(nn.Module, ReporterMixin):
             val_accuracy = self.validation_IoU(self.model)
 
             if val_accuracy > self.best_model_IoU:
+                """
+                This is wrong and needs to be changed.
+
+                This passes best model by ref needs to be by value.
+                """
                 self.best_model_IoU = val_accuracy
                 self.best_model = self.model
 
