@@ -12,20 +12,22 @@ from src.utils.misc import ReporterMixin
 
 
 class WatchedPlateauScheduler(ReduceLROnPlateau):
-    """ Wrapper around a scheduler that tracks whether the scheduler stepped """
-    def step(self, metric: float | torch.Tensor) -> None:
-        prev_lr = [gp['lr'] for gp in self.optimizer.param_groups]
+    """Wrapper around a scheduler that tracks whether the scheduler stepped"""
+
+    def step(self, metric: float | torch.Tensor) -> bool:
+        prev_lr = [gp["lr"] for gp in self.optimizer.param_groups]
         super().step(metric)
-        new_lr = [gp['lr'] for gp in self.optimizer.param_groups]
-        did_step = (prev_lr != new_lr)
+        new_lr = [gp["lr"] for gp in self.optimizer.param_groups]
+        did_step = prev_lr != new_lr
         return did_step
-    
+
     def reset(self) -> None:
         self._reset()
 
 
 class EarlyStopping(ReporterMixin):
-    """ Quick and dirty implementation of early stopping using validation metric. """
+    """Quick and dirty implementation of early stopping using validation metric."""
+
     def __init__(self, patience: int, min_delta: float = 0.0) -> None:
         """
         Args:
@@ -50,18 +52,18 @@ class EarlyStopping(ReporterMixin):
         """
         if validation >= self.best_validation + self.min_delta:
             self.best_validation = validation
-            # Has to be a deep copy, or you get shallow copies of the 
+            # Has to be a deep copy, or you get shallow copies of the
             # state dict and the best parameters just track the model's
             # current parameters
             self.best_parameters = copy.deepcopy(model.state_dict())
             self.bad_epochs = 0
-            self.debug(f'Best validation {validation:.4f}, updated best params')
+            self.debug(f"Best validation {validation:.4f}, updated best params")
         else:
             self.bad_epochs += 1
 
     @property
     def should_stop(self) -> bool:
-        """ Returns True if the training should stop, False otherwise. """
+        """Returns True if the training should stop, False otherwise."""
         return self.bad_epochs >= self.patience
 
     def restore_best_parameters(self, model: nn.Module) -> None:
@@ -78,15 +80,16 @@ class EarlyStopping(ReporterMixin):
 
 
 class PreTrainer(ReporterMixin):
-    """ Pre-trains a model until the validation IoU stops improving """
+    """Pre-trains a model until the validation IoU stops improving"""
+
     def __init__(
         self,
         model: nn.Module,
         train_loader: DataLoader,
         val_loader: DataLoader,
-        name = '',
-        device = 'cuda' if torch.cuda.is_available() else 'cpu',
-        verbosity: int = 2
+        name="",
+        device="cuda" if torch.cuda.is_available() else "cpu",
+        verbosity: int = 2,
     ) -> None:
         super().__init__()
         self.model = model.to(device)
@@ -95,7 +98,7 @@ class PreTrainer(ReporterMixin):
         self.name = name
         self.device = device
         self.verbosity = verbosity
-        
+
         # The DMT paper doesn't say how to pretrain models, they just use models
         # pretrained elsewhere. We'll use Adam with default hyperparameters,
         # as well as a learning rate scheduler and early stopping.
@@ -103,11 +106,14 @@ class PreTrainer(ReporterMixin):
         # of early stopping, since otherwise the scheduler never gets chance
         # to reduce the learning rate.
         self.optimizer = torch.optim.Adam(self.model.parameters())
-        self.loss_scheduler = WatchedPlateauScheduler(self.optimizer, patience=5, verbose=True)
-        self.IoU_scheduler = WatchedPlateauScheduler(self.optimizer, mode='max', patience=10, verbose=True)
+        self.loss_scheduler = WatchedPlateauScheduler(
+            self.optimizer, patience=5, verbose=True
+        )
+        self.IoU_scheduler = WatchedPlateauScheduler(
+            self.optimizer, mode="max", patience=10, verbose=True
+        )
         self.criterion = nn.CrossEntropyLoss()
         self.early_stopping = EarlyStopping(patience=100)
-
 
     def train(self, max_epochs: int) -> None:
         """
@@ -116,11 +122,11 @@ class PreTrainer(ReporterMixin):
 
         Args:
             max_epochs: Maximum number of epochs to train for.
-        
+
         Returns:
             None (but the model is modified by reference)
         """
-        self.info(f'\n===== Pretraining {self.name} =====')
+        self.info(f"\n===== Pretraining {self.name} =====")
         for epoch in range(max_epochs):
             # Perform a loop over the training set
             self.model.train()
@@ -133,7 +139,7 @@ class PreTrainer(ReporterMixin):
                 outputs = self.model(inputs)  # Of shape (B, W*H, C)
                 # Cross-entropy needs logits, and inputs of shape (B, C, W*H)
                 # and targets has shape (B, 1, W*H)
-                logits = torch.log(outputs).permute(0,2,1)
+                logits = torch.log(outputs).permute(0, 2, 1)
                 targets = targets.squeeze(1)
                 loss = self.criterion(logits, targets)
                 loss.backward()
@@ -155,18 +161,18 @@ class PreTrainer(ReporterMixin):
                 self.IoU_scheduler.reset()
             self.IoU_scheduler.step(validation_IoU)
 
-
             self.early_stopping.monitor(self.model, validation_IoU)
 
-            self.info(f'Epoch {epoch+1}/{max_epochs}')
-            self.wandb_log_named({
-                    "Epoch time": toc-tic,
+            self.info(f"Epoch {epoch+1}/{max_epochs}")
+            self.wandb_log_named(
+                {
+                    "Epoch time": toc - tic,
                     "Epoch mean loss": epoch_mean_loss,
                     "Validation IoU": validation_IoU,
                     "Train IoU": train_IoU,
                     "Best validation IoU": self.early_stopping.best_validation,
                 },
-                self.name
+                self.name,
             )
 
             # Check if we should stop early, and if so restore the best parameters
@@ -179,7 +185,7 @@ class PreTrainer(ReporterMixin):
         else:
             # Only gets executed if we didn't break out of the for loop
             self.info(f"Finished training after {max_epochs} epochs.")
-        
+
         # End of training; restore the best parameters of the model
         # according to the validation IoU
         self.info("Restored best parameters.")
@@ -191,25 +197,24 @@ class FineTuner:
     Helper class to create the optimizer and learning rate scheduler for the
     'fine-tuning' stage of DMT
     """
+
     # The values below are from the DMT paper
     DEFAULT_LR = 4e-3
     DEFAULT_MOMENTUM = 0.9
+
     def __init__(
         self,
         model: nn.Module,
         no_epochs: int,
         labeled_loader: DataLoader,
-        unlabeled_loader: DataLoader
+        unlabeled_loader: DataLoader,
     ) -> None:
         # In the paper they just use SGD with learning rate 4e-3 and momentum 0.9
         self.optimizer = torch.optim.SGD(
-            model.parameters(),
-            lr=self.DEFAULT_LR,
-            momentum=self.DEFAULT_MOMENTUM
+            model.parameters(), lr=self.DEFAULT_LR, momentum=self.DEFAULT_MOMENTUM
         )
         no_minibatches = min(len(labeled_loader), len(unlabeled_loader)) * no_epochs
         # This is the scheduler they use in the DMT code in the official repo
         self.scheduler = torch.optim.lr_scheduler.LambdaLR(
-            self.optimizer,
-            lambda x: (1 - x / no_minibatches) ** 0.9
+            self.optimizer, lambda x: (1 - x / no_minibatches) ** 0.9
         )
