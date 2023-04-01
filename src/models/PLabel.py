@@ -55,8 +55,18 @@ class PLabel(nn.Module):
             (self.labeled_loader, self.validation_loader),
         )
 
+        # Calculate unlabeled loss using the pseudo-labels from the previous time step. 
+        # Since there are no previous pseudo-labels for the first time step, we initialise randomly
+        self.pseudolabels = torch.randint(
+            low=0, high=2, 
+            size=(len(self.unlabeled_loader), # number of batches
+            unlabeled_batch_size, # batch size
+            *self.unlabeled_loader.dataset[0][0].size()) # C x H x W
+        ).to(self.device)
+        print(len(self.unlabeled_loader),len(self.labeled_loader))
+
     def compute_pseudolabels(
-        self, confidences: torch.Tensor, alpha: float
+        self, confidences: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Computes pseudolabels for the unlabeled data. We choose the class that 
@@ -72,7 +82,6 @@ class PLabel(nn.Module):
     
     @staticmethod
     def compute_loss(
-        self,
         confidences: torch.Tensor,
         labels: torch.Tensor,
     ) -> torch.Tensor:
@@ -119,10 +128,7 @@ class PLabel(nn.Module):
         fine_tuner = FT(self.model, num_epochs, self.labeled_loader, self.unlabeled_loader)
         opt, scheduler = fine_tuner.optimizer, fine_tuner.scheduler
 
-        total_batches = min(len(self.labeled_loader), len(self.unlabeled_loader))
-
         for epoch in range(num_epochs):
-
             epoch_labeled_loss = 0.0
             epoch_unlabeled_loss = 0.0
             
@@ -140,9 +146,9 @@ class PLabel(nn.Module):
                 conf_labeled = self.model(labeled)
                 # predict on unlabeled data
                 conf_unlabeled = self.model(unlabeled)
-                pseudolabels = self.compute_pseudolabels(conf_unlabeled)
-                labeled_loss += self.compute_loss(conf_labeled, labels).sum() 
-                unlabeled_loss += self.compute_loss(conf_unlabeled, pseudolabels).sum()
+                labeled_loss = self.compute_loss(conf_labeled, labels).sum() 
+                # use pseudo-labels from previous time step
+                unlabeled_loss = self.compute_loss(conf_unlabeled, self.pseudolabels[t]).sum() 
                 total_loss = labeled_loss + unlabeled_loss
                 total_loss.backward()
                 opt.step()
@@ -150,21 +156,20 @@ class PLabel(nn.Module):
                 # update epoch losses
                 epoch_labeled_loss += labeled_loss.item()
                 epoch_unlabeled_loss += unlabeled_loss.item()
+                # update pseudo-labels
+                self.pseudolabels[t] = self.compute_pseudolabels(conf_unlabeled)
             scheduler.step()
             toc = time.time()
 
             # Bookkeeping
-            epoch_mean_labeled_loss = epoch_labeled_loss / (t + 1)
-            epoch_mean_unlabeled_loss = epoch_unlabeled_loss / (t + 1)
+            # note this part is 
+            epoch_mean_labeled_loss = epoch_labeled_loss / (t+1)
+            epoch_mean_unlabeled_loss = epoch_unlabeled_loss / (t+1)
             epoch_mean_loss = epoch_mean_labeled_loss + epoch_mean_unlabeled_loss
 
             # I0U
-            train_accuracy = evaluate_IoU(
-                self.model, self.labeled_loader, self.device
-            )
-            val_accuracy = evaluate_IoU(
-                self.model, self.validation_loader, self.device
-            )
+            train_accuracy = self.train_IoU(self.model)
+            val_accuracy = self.validation_IoU(self.model)
 
             if val_accuracy > self.best_model_IoU:
                 self.best_model_IoU = val_accuracy
