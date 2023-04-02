@@ -17,7 +17,7 @@ mpl.rcParams["text.usetex"] = True
 
 
 if __name__ == "__main__":
-    label_fractions = [0.01, 0.02, 0.05, 0.1, 0.5, 0.8]
+    label_fractions = [0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 1.0]
     baseline_file = os.path.join("eval_data", "baseline_loss.npy")
     dmt_file = os.path.join("eval_data", "dmt_loss.npy")
     save_file = os.path.join("final_figs", "label_proportion_experiment.png")
@@ -42,6 +42,7 @@ if __name__ == "__main__":
 
         baseline_models_list.sort()
         dmt_models_list.sort()
+        print(dmt_models_list)
 
         baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
@@ -49,9 +50,9 @@ if __name__ == "__main__":
         np.save(baseline_file, baselines_loss)
         np.save(dmt_file, loss)
 
-    mean_baseline_loss = [sum(baselines_loss[i : i + 5]) / 5 for i in range(0, 30, 5)]
+    mean_baseline_loss = [sum(baselines_loss[i : i + 5]) / 5 for i in range(0, 35, 5)]
     std_baseline_loss = [
-        2 * np.std(baselines_loss[i : i + 5]) / 5**0.5 for i in range(0, 30, 5)
+        2 * np.std(baselines_loss[i : i + 5]) / 5**0.5 for i in range(0, 35, 5)
     ]
 
     ## Plotting
