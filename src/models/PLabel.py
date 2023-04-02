@@ -159,6 +159,7 @@ class PLabel(nn.Module, ReporterMixin):
         for epoch in range(num_epochs):
             epoch_labeled_loss = 0.0
             epoch_unlabeled_loss = 0.0
+            epoch_n = 0
 
             tic = time.time()
             for (unlabeled, (labeled, labels)) in zip(
@@ -192,14 +193,15 @@ class PLabel(nn.Module, ReporterMixin):
                 # update epoch losses
                 epoch_labeled_loss += labeled_loss.item()
                 epoch_unlabeled_loss += unlabeled_loss.item()
+                epoch_n += unlabeled.shape[0]
 
             scheduler.step()
             toc = time.time()
 
             # Bookkeeping
             # note this part is
-            epoch_mean_labeled_loss = epoch_labeled_loss / (self.t + 1)
-            epoch_mean_unlabeled_loss = epoch_unlabeled_loss / (self.t + 1)
+            epoch_mean_labeled_loss = epoch_labeled_loss / (epoch_n)
+            epoch_mean_unlabeled_loss = epoch_unlabeled_loss / (epoch_n)
             epoch_mean_loss = epoch_mean_labeled_loss + epoch_mean_unlabeled_loss
 
             # I0U
