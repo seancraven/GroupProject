@@ -1,5 +1,4 @@
-from src.experiments.experiments import VaryLabelProportion, TrainBaselines
+from src.experiments.experiments import PLabelVaryLabelProportion
 
 if __name__ == "__main__":
-    TrainBaselines().run()
-    VaryLabelProportion().run()
+    PLabelVaryLabelProportion().run()

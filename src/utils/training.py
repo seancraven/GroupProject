@@ -85,7 +85,7 @@ class PreTrainer(ReporterMixin):
     def __init__(
         self,
         model: nn.Module,
-        train_loader: DataLoader,
+        train_loader: DataLoader_,
         val_loader: DataLoader,
         name="",
         device="cuda" if torch.cuda.is_available() else "cpu",

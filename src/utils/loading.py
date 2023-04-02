@@ -12,7 +12,8 @@ def _model_from_file(file_path: str, model_class: Any) -> Union[nn.Module, None]
     try:
         model = model_class()
         model.load_state_dict(torch.load(file_path))
-    except Exception as _:
+    except Exception as e:
+        print(e)
         model = None
     return model
 
