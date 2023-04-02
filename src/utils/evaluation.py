@@ -11,19 +11,24 @@ def evaluate_IoU(
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ) -> float:
     model = model.to(device)
-    score = 0
     seen_images = 0
+
+    IoUs = torch.zeros((2,))
 
     for images, labels in data:
         images, labels = images.to(device), labels.to(device)
         predictions = model(images).argmax(dim=-1)
-        intersection = (torch.logical_and(predictions == 1, labels == 1)).sum()
-        union = (torch.logical_or(predictions == 1, labels == 1)).sum()
-        IoU = intersection / union  # Got this proportion correct on this batch
-        score += IoU * images.shape[0]
+
+        # We're only interested in the binary case where we predict 0s and 1s
+        for i in range(2):
+            intersection = (torch.logical_and(predictions == i, labels == i)).sum()
+            union = (torch.logical_or(predictions == i, labels == i)).sum()
+            IoUs[i] += (intersection / union) * images.shape[0]  # Weight by batch size
+
         seen_images += images.shape[0]
 
-    return (score / seen_images).item()  # type: ignore
+    return (IoUs / seen_images).mean().item()
+
 
 
 def watched_evaluate_IoU(
