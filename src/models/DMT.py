@@ -157,12 +157,16 @@ class DMT(nn.Module, ReporterMixin):
         ce = criterion(logits, labels)
         loss = ce.mean()
         return loss
-    
+
     def pretrain_baseline(self, max_epochs: int) -> None:
         if self.baseline is None:
             return
         trainer = PreTrainer(
-            self.baseline, self.labeled_loader, self.validation_loader, name="Baseline", device=self.device
+            self.baseline,
+            self.labeled_loader,
+            self.validation_loader,
+            name="Baseline",
+            device=self.device,
         )
         trainer.train(max_epochs)
 
@@ -177,9 +181,7 @@ class DMT(nn.Module, ReporterMixin):
 
         # Train models A/B on subsets A/B
         for model, loader, name in zip(
-            (self.model_a, self.model_b),
-            (loader_a, loader_b),
-            ("Model A", "Model B")
+            (self.model_a, self.model_b), (loader_a, loader_b), ("Model A", "Model B")
         ):
             trainer = PreTrainer(
                 model, loader, self.validation_loader, name=name, device=self.device
@@ -207,12 +209,12 @@ class DMT(nn.Module, ReporterMixin):
         fine_tuner = FT(student, num_epochs, self.labeled_loader, self.unlabeled_loader)
         opt, scheduler = fine_tuner.optimizer, fine_tuner.scheduler
 
-
         total_batches = min(len(self.labeled_loader), len(self.unlabeled_loader))
+
         def _dynamic_gamma(gamma: float, t: int) -> float:
             return gamma
             total_train_steps = num_epochs * total_batches
-            return gamma * math.exp(5*(1 - (t / total_train_steps))**2)
+            return gamma * math.exp(5 * (1 - (t / total_train_steps)) ** 2)
 
         for epoch in range(num_epochs):
             epoch_dynamic_loss = 0.0
@@ -243,13 +245,11 @@ class DMT(nn.Module, ReporterMixin):
                         teacher_confidences,
                         student_confidences,
                         gamma_1=_dynamic_gamma(
-                            self.gamma_1_max,
-                            epoch * total_batches + t
+                            self.gamma_1_max, epoch * total_batches + t
                         ),
                         gamma_2=_dynamic_gamma(
-                            self.gamma_2_max,
-                            epoch * total_batches + t
-                        )
+                            self.gamma_2_max, epoch * total_batches + t
+                        ),
                     )
                 # These lines do a sanity check
                 student_labels = torch.argmax(student_confidences, dim=-1)
@@ -279,7 +279,7 @@ class DMT(nn.Module, ReporterMixin):
                 student_predictions = student(labeled)
                 standard_loss = self.compute_standard_loss(student_predictions, labels)
                 # Total loss and update
-                total_loss = dynamic_loss +  standard_loss
+                total_loss = dynamic_loss + standard_loss
                 total_loss.backward()
                 opt.step()
 

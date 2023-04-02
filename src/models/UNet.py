@@ -1,5 +1,6 @@
 import torch
 
+
 class UNet(torch.nn.Module):
     def __init__(self):
         super().__init__()
@@ -11,13 +12,13 @@ class UNet(torch.nn.Module):
             init_features=32,
             pretrained=False,
         )
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         preds = self.model(x)
-        preds = preds.flatten(2,-1)  # Shape (B, C, H*W)
+        preds = preds.flatten(2, -1)  # Shape (B, C, H*W)
         preds = preds.permute(0, 2, 1)  # Shape (B, H*W, C)
         return preds
-    
+
     @classmethod
     def from_state_dict(cls, state_dict) -> "UNet":
         unet = cls()

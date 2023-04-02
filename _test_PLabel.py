@@ -1,7 +1,7 @@
-
 import wandb
 from torch.utils.data import DataLoader, Subset
 
+from src.models.LSD import LSD
 from src.models.UNet import UNet
 from src.models.PLabel import PLabel
 from src.pet_3.data import PetsDataFetcher
@@ -39,8 +39,11 @@ print(
     f"Labeled: {len(labeled)} | Validation: {len(validation)} | Unlabeled: {len(unlabeled)}"
 )
 
+lsd = LSD()
+unet = UNet()
 plabel = PLabel(
-    unet,
+   # unet,
+    lsd,
     labeled,
     unlabeled,
     validation,
