@@ -206,7 +206,7 @@ class BaseExperiment(ABC):
             fname = os.path.join(self.model_folder, best_model_fname)
             dmt.save_best_model(fname)
 
-    # PLABEL RUN   
+    # PLABEL RUN
     def _plabel_run(
         self,
         *,
@@ -214,7 +214,7 @@ class BaseExperiment(ABC):
         label_proportion: float = LABEL_PROPORTION,
         validation_proportion: float = VALIDATION_PROPORTION,
         # We run DMT for each percentile, so we need to multiply by the number of percentiles here
-        num_epochs: int = len(PERCENTILES)*NUM_DMT_EPOCHS,
+        num_epochs: int = len(PERCENTILES) * NUM_DMT_EPOCHS,
         max_pretrain_epochs: int = MAX_PRETRAIN_EPOCHS,
         seed: int = _SEED,
         baseline_fname: Optional[str] = None,
@@ -341,6 +341,7 @@ class VaryLabelProportion(BaseExperiment):
             self._base_run(
                 label_proportion=proportion, best_model_fname=f"dmt_{proportion}.pt"
             )
+
 
 # PLABEL EXPERIMENTS
 class PLabelVaryLabelProportion(BaseExperiment):

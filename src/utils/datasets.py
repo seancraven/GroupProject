@@ -24,12 +24,13 @@ def balanced_minibatch_sizes(
     return labeled_batch_size, unlabeled_batch_size
 
 
-def difference_maximized_sampling(dataset: Dataset, proportion: float=0.5) -> Tuple[Dataset, Dataset]:
+def difference_maximized_sampling(
+    dataset: Dataset, proportion: float = 0.5
+) -> Tuple[Dataset, Dataset]:
     """
     Returns two subsets of the dataset such that the overlap between them is minimized.
     """
     subset_1 = Subset(dataset, range(int(len(dataset) * proportion)))
-    subset_2 = Subset(dataset, range(int(1-proportion) * len(dataset), len(dataset)))
+    subset_2 = Subset(dataset, range(int(1 - proportion) * len(dataset), len(dataset)))
 
     return subset_1, subset_2
-

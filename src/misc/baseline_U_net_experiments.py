@@ -116,8 +116,13 @@ def train_model_wanb(
         total_epoch_time = epoch_end_time - epoch_start_time
 
         # wandb logging
-        wandb.log({"Mean Epoch Loss": epoch_loss, "Mean Val Loss": val_loss,
-                  "Epoch Time": total_epoch_time})  # type: ignore
+        wandb.log(
+            {
+                "Mean Epoch Loss": epoch_loss,
+                "Mean Val Loss": val_loss,
+                "Epoch Time": total_epoch_time,
+            }
+        )  # type: ignore
 
 
 def multi_model_baseline():
@@ -128,8 +133,7 @@ def multi_model_baseline():
         train_set.labeled_fraction = split_fract
         _, labeled = train_set.get_datasets()
 
-        train_loader = DataLoader(
-            labeled, batch_size=32, shuffle=True, num_workers=8)
+        train_loader = DataLoader(labeled, batch_size=32, shuffle=True, num_workers=8)
 
         model = load_u_net()
 
