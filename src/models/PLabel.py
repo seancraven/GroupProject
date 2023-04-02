@@ -77,13 +77,13 @@ class PLabel(nn.Module, ReporterMixin):
 
     # Linear Scheduler
     @staticmethod
-    def calcuate_alpha(t, t1, t2, max_alpha):
+    def calculate_alpha(t, t1, t2, max_alpha):
         schedule_ratio = (t - t1) / (t2 - t1) * max_alpha
         return min(max(0, schedule_ratio), max_alpha)
 
     def alpha_schedule_step(self):
         self.t += 1
-        self.alpha = self.calcuate_alpha(self.t, self.t1, self.t2, self.max_alpha)
+        self.alpha = self.calculate_alpha(self.t, self.t1, self.t2, self.max_alpha)
 
     def compute_pseudolabels(
         self, confidences: torch.Tensor
