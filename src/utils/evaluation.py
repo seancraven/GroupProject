@@ -13,7 +13,7 @@ def evaluate_IoU(
     model = model.to(device)
     seen_images = 0
 
-    IoUs = torch.zeros((2,))
+    IoUs = torch.zeros((2,)).to(device)
 
     for images, labels in data:
         images, labels = images.to(device), labels.to(device)
