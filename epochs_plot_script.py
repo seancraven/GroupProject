@@ -21,28 +21,36 @@ if __name__ == "__main__":
     epochs = [5, 10, 20, 30]
     baseline_file = os.path.join("eval_data", "baseline_loss.npy")
     dmt_file = os.path.join("eval_data", "dmt_loss_epoch.npy")
+    plabel_file = os.path.join("eval_data", "plabel_loss.npy")
     save_file = os.path.join("final_figs", "epoch_experiment.png")
 
     if os.path.isfile(dmt_file) and os.path.isfile(baseline_file):
         loss = np.load(dmt_file)
         baselines_loss = np.load(baseline_file)
+        plabel_loss = np.load(plabel_file)
     else:
         # Load
         models_dir = os.path.join("models", "vary_dmt_epochs")
         baseline_dir = os.path.join("models", "baselines")
+        plabel_dir = os.path.join("models", "plabel_vary_label_proportion")
         data = PetsDataFetcher("src/pet_3/").get_test_data()
         dmt_models_list = os.listdir(models_dir)
         baseline_models_list = os.listdir(baseline_dir)
+        plabel_models_list = os.listdir(plabel_dir)
         baseline_models_list = [
             os.path.join(baseline_dir, f_name) for f_name in baseline_models_list
         ]
         dmt_models_list = [
             os.path.join(models_dir, f_name) for f_name in dmt_models_list
         ]
+        plabel_models_list = [
+            os.path.join(plabel_dir, f_name) for f_name in plabel_models_list
+        ]
 
         # Eval
         baseline_models_list.sort()
         dmt_models_list.sort()
+        plabel_models_list.sort()
 
         baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
         np.save(baseline_file, baselines_loss)
@@ -50,12 +58,15 @@ if __name__ == "__main__":
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
         np.save(dmt_file, loss)
 
+        plabel_loss, _ = evaluate_models(plabel_models_list, evaluate_IoU, data)
+        np.save(plabel_file, plabel_loss)
     # Logic
     baseline_same_label = baselines_loss[14:19]  # 0.1 label fraction
     baseline_val = np.mean(baseline_same_label)
     baseline_ste = 2 * np.std(baseline_same_label) / 5**0.5
     lb = baseline_val - baseline_ste
     ub = baseline_val + baseline_ste
+    plabel_val = plabel_loss[3]
 
     ## Plotting
     plot_range = np.arange(0, 40, 5)
@@ -71,6 +82,14 @@ if __name__ == "__main__":
     )
     ax.plot(
         plot_range, [baseline_val for _ in plot_range], color="grey", linestyle="--"
+    )
+    ax.plot(
+        plot_range,
+        [plabel_val for _ in plot_range],
+        color="navy",
+        linestyle="--",
+        alpha=0.2,
+        label="Pseudo Label",
     )
     ax.set_xlim(4, 31)
     ax.set_xlabel("Epochs Between \n Student Teacher Reversal", fontsize=20)

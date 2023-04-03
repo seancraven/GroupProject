@@ -67,18 +67,25 @@ if __name__ == "__main__":
         np.save(plabel_file, plabel_loss)
 
     mean_baseline_loss = [sum(baselines_loss[i : i + 5]) / 5 for i in range(0, 35, 5)]
-    std_baseline_loss = [
+    ste_baseline_loss = [
         2 * np.std(baselines_loss[i : i + 5]) / 5**0.5 for i in range(0, 35, 5)
     ]
+    # std_baseline_loss = [2 * np.std(baselines_loss[i : i + 5]) for i in range(0, 35, 5)]
 
     ## Plotting
     fig, ax = plt.subplots()
     ax.plot(label_fractions, loss, label="DMT", color="black", marker="x")
-    ax.plot(label_fractions, plabel_loss, label="PLABEL", color="navy", marker="x")
+    ax.plot(
+        label_fractions,
+        plabel_loss,
+        color="navy",
+        marker="x",
+        label="Pseudo Label",
+    )
     ax.errorbar(
         label_fractions,
         mean_baseline_loss,
-        yerr=std_baseline_loss,
+        yerr=ste_baseline_loss,
         color="grey",
         label="Baseline",
         capsize=5.0,
