@@ -30,6 +30,25 @@ def evaluate_IoU(
     return (IoUs / seen_images).mean().item()
 
 
+def evaluate_acc(
+    model: nn.Module,
+    data: DataLoader,
+    device: str = "cuda" if torch.cuda.is_available() else "cpu",
+) -> float:
+    model = model.to(device)
+    seen_images = 0
+
+    acc = 0.0
+
+    for images, labels in data:
+        images, labels = images.to(device), labels.to(device)
+        predictions = model(images).argmax(dim=-1)
+
+        # We're only interested in the binary case where we predict 0s and 1s
+        acc = (predictions == labels).sum().item()
+        acc += acc
+    return acc / len(DataLoader.dataset)
+
 
 def watched_evaluate_IoU(
     model: nn.Module,

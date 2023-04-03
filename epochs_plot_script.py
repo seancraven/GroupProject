@@ -71,7 +71,7 @@ if __name__ == "__main__":
     ## Plotting
     plot_range = np.arange(0, 40, 5)
     fig, ax = plt.subplots()
-    ax.plot(epochs, loss, color="black", marker="x")
+    ax.plot(epochs, loss, color="black", marker="x", label="DMT")
     ax.fill_between(
         plot_range,
         [lb for _ in plot_range],
