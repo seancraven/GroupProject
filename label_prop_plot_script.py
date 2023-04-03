@@ -20,35 +20,51 @@ if __name__ == "__main__":
     label_fractions = [0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 1.0]
     baseline_file = os.path.join("eval_data", "baseline_loss.npy")
     dmt_file = os.path.join("eval_data", "dmt_loss.npy")
+    plabel_file = os.path.join("eval_data", "plabel_loss.npy")
     save_file = os.path.join("final_figs", "label_proportion_experiment.png")
 
-    if os.path.isfile(baseline_file) and os.path.isfile(dmt_file):
+    if (
+        os.path.isfile(baseline_file)
+        and os.path.isfile(dmt_file)
+        and os.path.isfile(plabel_file)
+    ):
         baselines_loss = np.load(baseline_file)
         loss = np.load(dmt_file)
+        plabel_loss = np.load(plabel_file)
 
     else:
+        data = PetsDataFetcher("src/pet_3/").get_test_data()
         # Block only works on sean's machine
         models_dir = os.path.join("models", "vary_label_proportion")
         baseline_dir = os.path.join("models", "baselines")
-        data = PetsDataFetcher("src/pet_3/").get_test_data()
-        dmt_models_list = os.listdir(models_dir)
+        plabel_dir = os.path.join("models", "plabel_vary_label_proportion")
+
         baseline_models_list = os.listdir(baseline_dir)
         baseline_models_list = [
             os.path.join(baseline_dir, f_name) for f_name in baseline_models_list
         ]
+
+        dmt_models_list = os.listdir(models_dir)
         dmt_models_list = [
             os.path.join(models_dir, f_name) for f_name in dmt_models_list
         ]
 
+        plabel_models_list = os.listdir(plabel_dir)
+        plabel_models_list = [
+            os.path.join(plabel_dir, f_name) for f_name in plabel_models_list
+        ]
+
+        plabel_models_list.sort()
         baseline_models_list.sort()
         dmt_models_list.sort()
-        print(dmt_models_list)
 
         baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
+        plabel_loss, _ = evaluate_models(plabel_models_list, evaluate_IoU, data)
 
         np.save(baseline_file, baselines_loss)
         np.save(dmt_file, loss)
+        np.save(plabel_file, plabel_loss)
 
     mean_baseline_loss = [sum(baselines_loss[i : i + 5]) / 5 for i in range(0, 35, 5)]
     std_baseline_loss = [
@@ -58,6 +74,7 @@ if __name__ == "__main__":
     ## Plotting
     fig, ax = plt.subplots()
     ax.plot(label_fractions, loss, label="DMT", color="black", marker="x")
+    ax.plot(label_fractions, plabel_loss, label="PLABEL", color="navy", marker="x")
     ax.errorbar(
         label_fractions,
         mean_baseline_loss,
