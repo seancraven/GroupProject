@@ -107,8 +107,14 @@ def save_image_grid(
 # pylint: disable-all
 if __name__ == "__main__":
 
-    weird_idxs, weird_images, weird_labels, dataset = search_for_weird_labels("test")
+    weird_idxs, weird_images, weird_labels, dataset = search_for_weird_labels(
+        "test"
+    )
 
     save_image_grid(
-        weird_idxs, weird_images, weird_labels, dataset, "weirdo_segmentation_grid.png"
+        weird_idxs,
+        weird_images,
+        weird_labels,
+        dataset,
+        "weirdo_segmentation_grid.png",
     )

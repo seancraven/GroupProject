@@ -5,7 +5,10 @@ class FCN(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.model = torch.hub.load(
-            "pytorch/vision:v0.10.0", "fcn_resnet50", num_classes=2, pretrained=False
+            "pytorch/vision:v0.10.0",
+            "fcn_resnet50",
+            num_classes=2,
+            pretrained=False,
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

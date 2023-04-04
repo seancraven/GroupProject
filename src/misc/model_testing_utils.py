@@ -45,7 +45,9 @@ class ModelMetrics:
         """Calculate accuracy metric"""
 
         self.model.eval()
-        test_loader = DataLoader(self.test_dataset, batch_size=1, num_workers=8)
+        test_loader = DataLoader(
+            self.test_dataset, batch_size=1, num_workers=8
+        )
 
         with torch.no_grad():
             correct_pixels = 0
@@ -55,7 +57,9 @@ class ModelMetrics:
                 output = self.model.forward(data)
                 pred = (output > 0.5).int()
                 correct_pixels += (pred == target).sum().item()
-                total_pixels += (target.shape[2] * target.shape[3]) * target.shape[0]
+                total_pixels += (
+                    target.shape[2] * target.shape[3]
+                ) * target.shape[0]
 
         return correct_pixels / total_pixels
 
@@ -63,7 +67,9 @@ class ModelMetrics:
         """Calculates the binary cross entropy loss"""
 
         self.model.eval()
-        test_loader = DataLoader(self.test_dataset, batch_size=1, shuffle=True)
+        test_loader = DataLoader(
+            self.test_dataset, batch_size=1, shuffle=True
+        )
 
         with torch.no_grad():
             loss_sum = 0.0
@@ -78,7 +84,9 @@ class ModelMetrics:
         """Calculate IoU metric"""
 
         self.model.eval()
-        test_loader = DataLoader(self.test_dataset, batch_size=1, shuffle=True)
+        test_loader = DataLoader(
+            self.test_dataset, batch_size=1, shuffle=True
+        )
 
         with torch.no_grad():
             intersection_sum = 0.0

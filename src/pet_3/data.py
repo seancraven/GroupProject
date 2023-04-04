@@ -10,7 +10,9 @@ from torchvision.transforms.transforms import Resize, ToTensor
 
 from src.pet_3.download_utils import _populate_data
 
-TrainValidatePseudoSplit = Tuple["PetsLabeled", "PetsLabeled", "PetsUnlabeled"]
+TrainValidatePseudoSplit = Tuple[
+    "PetsLabeled", "PetsLabeled", "PetsUnlabeled"
+]
 TrainPseudoSplit = Tuple["PetsLabeled", "PetsUnlabeled"]
 Named = Tuple[Union[TrainPseudoSplit, TrainValidatePseudoSplit], str]
 
@@ -93,7 +95,9 @@ class PetsDataFetcher:
         self.test_path = os.path.join(self.root, "test_data")
         self.train_path = os.path.join(self.root, "train_data")
 
-        if not all(os.path.isdir(x) for x in [self.test_path, self.train_path]):
+        if not all(
+            os.path.isdir(x) for x in [self.test_path, self.train_path]
+        ):
             _populate_data(self.root)
 
     @staticmethod
@@ -130,7 +134,9 @@ class PetsDataFetcher:
         Returns:
             A tuple of the train and validation data, and unlabeled data.
         """
-        assert 0 <= label_proportion <= 1, "Label proportion must be between 0 and 1."
+        assert (
+            0 <= label_proportion <= 1
+        ), "Label proportion must be between 0 and 1."
         assert (
             0 <= validation_proportion <= 1
         ), "Validation proportion must be between 0 and 1."
@@ -158,12 +164,25 @@ class PetsDataFetcher:
             train_filenames = all_filenames[
                 num_validation : num_labeled + num_validation
             ]
-            unlabeled_filenames = all_filenames[num_labeled + num_validation :]
+            unlabeled_filenames = all_filenames[
+                num_labeled + num_validation :
+            ]
 
-        assert len(set(train_filenames).intersection(set(validation_filenames))) == 0
-        assert len(set(train_filenames).intersection(set(unlabeled_filenames))) == 0
         assert (
-            len(set(validation_filenames).intersection(set(unlabeled_filenames))) == 0
+            len(set(train_filenames).intersection(set(validation_filenames)))
+            == 0
+        )
+        assert (
+            len(set(train_filenames).intersection(set(unlabeled_filenames)))
+            == 0
+        )
+        assert (
+            len(
+                set(validation_filenames).intersection(
+                    set(unlabeled_filenames)
+                )
+            )
+            == 0
         )
 
         if validation_proportion > 0 and len(validation_filenames) == 0:
@@ -179,7 +198,8 @@ class PetsDataFetcher:
             (train_filenames, validation_filenames),
         )
         unlabeled = PetsUnlabeled(
-            unlabeled_filenames, image_folder=os.path.join(self.train_path, "images")
+            unlabeled_filenames,
+            image_folder=os.path.join(self.train_path, "images"),
         )
 
         if validation_proportion > 0:
@@ -251,12 +271,25 @@ def _class_balanced_split(
         num_labeled = int(len(classed_files) * label_proportion)
         num_validation = int(len(classed_files) * validation_proportion)
         validation_filenames += classed_files[:num_validation]
-        train_filenames += classed_files[num_validation : num_validation + num_labeled]
+        train_filenames += classed_files[
+            num_validation : num_validation + num_labeled
+        ]
         unlabeled_filenames += classed_files[num_labeled + num_validation :]
 
-        assert len(set(train_filenames).intersection(set(validation_filenames))) == 0
-        assert len(set(train_filenames).intersection(set(unlabeled_filenames))) == 0
         assert (
-            len(set(validation_filenames).intersection(set(unlabeled_filenames))) == 0
+            len(set(train_filenames).intersection(set(validation_filenames)))
+            == 0
+        )
+        assert (
+            len(set(train_filenames).intersection(set(unlabeled_filenames)))
+            == 0
+        )
+        assert (
+            len(
+                set(validation_filenames).intersection(
+                    set(unlabeled_filenames)
+                )
+            )
+            == 0
         )
     return validation_filenames, train_filenames, unlabeled_filenames

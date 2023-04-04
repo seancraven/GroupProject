@@ -102,7 +102,11 @@ class BaseExperiment(ABC):
             f"{os.path.join(self.model_folder, 'IoU_bar.png')}",
         )
         models_matshow_best_worst_img(
-            model_fnames, watched_evaluate_IoU, test_data, 4, f"{self.model_folder}"
+            model_fnames,
+            watched_evaluate_IoU,
+            test_data,
+            4,
+            f"{self.model_folder}",
         )
 
     @property
@@ -125,7 +129,10 @@ class BaseExperiment(ABC):
     ):
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
-            label_proportion, validation_proportion, seed=seed, class_balance=True
+            label_proportion,
+            validation_proportion,
+            seed=seed,
+            class_balance=True,
         )
         # Instantiate DMT, but only use baseline
         dmt = DMT(
@@ -167,7 +174,10 @@ class BaseExperiment(ABC):
 
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
-            label_proportion, validation_proportion, seed=seed, class_balance=True
+            label_proportion,
+            validation_proportion,
+            seed=seed,
+            class_balance=True,
         )
         dmt = DMT(
             unet_a,
@@ -190,7 +200,8 @@ class BaseExperiment(ABC):
             gamma_2=gamma_2,
         )
         dmt.pretrain(
-            max_epochs=max_pretrain_epochs, proportion=difference_maximized_proportion
+            max_epochs=max_pretrain_epochs,
+            proportion=difference_maximized_proportion,
         )
         dmt.dynamic_train(percentiles=percentiles, num_epochs=num_dmt_epochs)
 
@@ -225,7 +236,10 @@ class BaseExperiment(ABC):
 
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
-            label_proportion, validation_proportion, seed=seed, class_balance=True
+            label_proportion,
+            validation_proportion,
+            seed=seed,
+            class_balance=True,
         )
 
         # PLabel stuff
@@ -264,7 +278,9 @@ class BaseExperiment(ABC):
     def test(model: nn.Module) -> float:
         fetcher = PetsDataFetcher(root="src/pet_3")
         test_data = fetcher.get_test_data()
-        test_loader = DataLoader(test_data, batch_size=BaseExperiment.BATCH_SIZE)
+        test_loader = DataLoader(
+            test_data, batch_size=BaseExperiment.BATCH_SIZE
+        )
         test_IoU = evaluate_IoU(model, test_loader)
         return test_IoU
 
@@ -323,7 +339,8 @@ class VaryDMTEpochs(BaseExperiment):
     def run(self) -> None:
         for num_epochs in self.EPOCHS:
             self._base_run(
-                num_dmt_epochs=num_epochs, best_model_fname=f"dmt_{num_epochs}.pt"
+                num_dmt_epochs=num_epochs,
+                best_model_fname=f"dmt_{num_epochs}.pt",
             )
 
 
@@ -339,7 +356,8 @@ class VaryLabelProportion(BaseExperiment):
     def run(self) -> None:
         for proportion in self.ALL_LABEL_PROPORTIONS:
             self._base_run(
-                label_proportion=proportion, best_model_fname=f"dmt_{proportion}.pt"
+                label_proportion=proportion,
+                best_model_fname=f"dmt_{proportion}.pt",
             )
 
 
@@ -357,5 +375,6 @@ class PLabelVaryLabelProportion(BaseExperiment):
         self.create_model_folder()
         for proportion in self.ALL_LABEL_PROPORTIONS:
             self._plabel_run(
-                label_proportion=proportion, model_fname=f"plabel_{proportion}.pt"
+                label_proportion=proportion,
+                model_fname=f"plabel_{proportion}.pt",
             )

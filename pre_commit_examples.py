@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 from src.pet_3.deprocated_data import Pets
 
 
-def example_function(alpha: int, beta: str, gamma: Iterator[Any]) -> list[int]:
+def example_function(
+    alpha: int, beta: str, gamma: Iterator[Any]
+) -> list[int]:
     """
     My prefered docstring format is sphinx.
     if you are using vscode:

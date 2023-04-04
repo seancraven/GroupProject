@@ -70,9 +70,12 @@ class DMT(nn.Module):
         if use_validation:
             labeled_dataset = labeled_loader.dataset
             validation_upper_bound = int(0.05 * len(labeled_dataset))
-            validation_dataset = Subset(labeled_dataset, range(validation_upper_bound))
+            validation_dataset = Subset(
+                labeled_dataset, range(validation_upper_bound)
+            )
             training_dataset = Subset(
-                labeled_dataset, range(validation_upper_bound, len(labeled_dataset))
+                labeled_dataset,
+                range(validation_upper_bound, len(labeled_dataset)),
             )
             self.labeled_loader = DataLoader(
                 training_dataset, batch_size=labeled_loader.batch_size
@@ -128,7 +131,9 @@ class DMT(nn.Module):
         )
 
         train_loader_a, train_loader_b = map(
-            lambda subset: DataLoader(subset, batch_size=batch_size, num_workers=2),
+            lambda subset: DataLoader(
+                subset, batch_size=batch_size, num_workers=2
+            ),
             (subset_a, subset_b),
         )
 
@@ -140,7 +145,9 @@ class DMT(nn.Module):
                 tic = time.time()
                 for batch in loader:
                     images, labels = batch
-                    images, labels = images.to(self.device), labels.to(self.device)
+                    images, labels = images.to(self.device), labels.to(
+                        self.device
+                    )
 
                     opt.zero_grad()
                     # loss = self.compute_standard_loss(model(images), labels)
@@ -163,7 +170,11 @@ class DMT(nn.Module):
         if self.baseline_model:
             self.debug("Pretraining baseline model...")
             # Use the whole dataset for this one
-            _pretrain(self.baseline_model, self.baseline_optimizer, self.labeled_loader)
+            _pretrain(
+                self.baseline_model,
+                self.baseline_optimizer,
+                self.labeled_loader,
+            )
 
     def compute_pseudolabels(
         self, confidences: torch.Tensor, alpha: float
@@ -181,7 +192,9 @@ class DMT(nn.Module):
         """
         # Confidences has shape (B, W * H, C)
         quantile = torch.tensor(1 - alpha).to(self.device)
-        class_thresholds = torch.quantile(confidences.flatten(0, -2), quantile, dim=0)
+        class_thresholds = torch.quantile(
+            confidences.flatten(0, -2), quantile, dim=0
+        )
         pseudolabels = torch.argmax(confidences, dim=-1)
         max_confidences, _ = torch.max(confidences, dim=-1)
         mask = max_confidences > class_thresholds[pseudolabels]
@@ -220,8 +233,12 @@ class DMT(nn.Module):
         image = images[idx].cpu().detach().permute(1, 2, 0).numpy()
         image_shape = (image.shape[0], image.shape[1])
         # Make pseudolabel take values 0, 1, 2 instead of 0, 1
-        pseudolabel = 1 + pseudolabels[idx].cpu().detach().numpy().reshape(image_shape)
-        student_label = student_labels[idx].cpu().detach().numpy().reshape(image_shape)
+        pseudolabel = 1 + pseudolabels[idx].cpu().detach().numpy().reshape(
+            image_shape
+        )
+        student_label = (
+            student_labels[idx].cpu().detach().numpy().reshape(image_shape)
+        )
         mask = masks[idx].cpu().detach().numpy().reshape(image_shape)
         pseudolabel_with_mask = pseudolabel * mask
         weight = weights[idx].cpu().detach().numpy().reshape(image_shape)
@@ -289,8 +306,12 @@ class DMT(nn.Module):
         p_B_mask = teacher_max_confidences == teacher_per_class_confidences
         # The student probs are the probability the student assigns to the
         # teacher's labels
-        student_probs, _ = torch.max(student_per_class_confidences * p_B_mask, dim=-1)
-        student_max_confidences, _ = torch.max(student_per_class_confidences, dim=-1)
+        student_probs, _ = torch.max(
+            student_per_class_confidences * p_B_mask, dim=-1
+        )
+        student_max_confidences, _ = torch.max(
+            student_per_class_confidences, dim=-1
+        )
 
         # Compute the weights
         teacher_max_confidences = teacher_max_confidences.squeeze(-1)
@@ -299,7 +320,9 @@ class DMT(nn.Module):
         weights = (
             torch.zeros_like(pseudolabels)
             + torch.pow(student_probs, gamma_1) * agree_mask
-            + torch.pow(student_probs, gamma_2) * confidence_mask * (~agree_mask)
+            + torch.pow(student_probs, gamma_2)
+            * confidence_mask
+            * (~agree_mask)
         ) * mask
 
         return weights
@@ -318,7 +341,9 @@ class DMT(nn.Module):
         return loss
 
     @staticmethod
-    def compute_standard_loss(student_predictions: torch.Tensor, labels: torch.Tensor):
+    def compute_standard_loss(
+        student_predictions: torch.Tensor, labels: torch.Tensor
+    ):
         """
         Computes the standard cross entropy loss.
 
@@ -345,9 +370,13 @@ class DMT(nn.Module):
             images = images.to(self.device)
             labels = labels.to(self.device).flatten(1)
             predictions = net(images).argmax(dim=-1)
-            intersection = (torch.logical_and(predictions == 1, labels == 1)).sum()
+            intersection = (
+                torch.logical_and(predictions == 1, labels == 1)
+            ).sum()
             union = (torch.logical_or(predictions == 1, labels == 1)).sum()
-            IoU = intersection / union  # Got this propoortion correct on this batch
+            IoU = (
+                intersection / union
+            )  # Got this propoortion correct on this batch
             score += (
                 IoU * images.shape[0]
             )  # Needs to be a weighted sum bc the last batch might be smaller
@@ -378,11 +407,15 @@ class DMT(nn.Module):
         )
 
         if not skip_pretrain:
-            self.pretrain(num_epochs=10, batch_size=batch_size, proportion=0.7)
+            self.pretrain(
+                num_epochs=10, batch_size=batch_size, proportion=0.7
+            )
             torch.save(self.model_a.state_dict(), "DMT_model_a.pt")
             torch.save(self.model_b.state_dict(), "DMT_model_b.pt")
             if self.baseline_model:
-                torch.save(self.baseline_model.state_dict(), "DMT_baseline.pt")
+                torch.save(
+                    self.baseline_model.state_dict(), "DMT_baseline.pt"
+                )
 
         if self.validation_loader:
             if self.baseline_model:
@@ -410,7 +443,9 @@ class DMT(nn.Module):
             teacher.eval()
             student.train()
 
-            self.debug(f"Beginning dynamic mutual training on percentile {alpha}")
+            self.debug(
+                f"Beginning dynamic mutual training on percentile {alpha}"
+            )
             if self.validation_loader:
                 self.debug(
                     f"Student accuracy before training: {self.evaluate_IoU(student, self.validation_loader):.4f}"
@@ -492,7 +527,9 @@ class DMT(nn.Module):
                     epoch_standard_loss,
                 ]
 
-                student_train_accuracy = self.evaluate_IoU(student, self.labeled_loader)
+                student_train_accuracy = self.evaluate_IoU(
+                    student, self.labeled_loader
+                )
                 self.wandb_log(
                     {
                         "Epoch time": toc - tic,
@@ -550,10 +587,16 @@ class DMT(nn.Module):
             )
 
         # Finally, the best model is the one with the highest IoU on the labeled set
-        model_a_accuracy = self.evaluate_IoU(self.model_a, self.labeled_loader)
-        model_b_accuracy = self.evaluate_IoU(self.model_b, self.labeled_loader)
+        model_a_accuracy = self.evaluate_IoU(
+            self.model_a, self.labeled_loader
+        )
+        model_b_accuracy = self.evaluate_IoU(
+            self.model_b, self.labeled_loader
+        )
         best_model = (
-            self.model_a if model_a_accuracy >= model_b_accuracy else self.model_b
+            self.model_a
+            if model_a_accuracy >= model_b_accuracy
+            else self.model_b
         )
         self.best_model = best_model
 

@@ -65,7 +65,8 @@ class Pets(Dataset):
         """
 
         assert (
-            labeled_fraction in [i / 10 for i in range(9)] + [0.01, 0.02, 0.05]
+            labeled_fraction
+            in [i / 10 for i in range(9)] + [0.01, 0.02, 0.05]
             or labeled_fraction is None
         ), """
         Invalid fraction must be one of[0.01, 0.02, 0.05, 0.1, 0.2, 0.3, ... ,0.9]."""
@@ -84,8 +85,12 @@ class Pets(Dataset):
             _populate_data(self.root)
 
         if split in ("test", "all_train"):
-            self.image_folder = os.path.join(self.parent_data_folder, "images")
-            self.label_folder = os.path.join(self.parent_data_folder, "labels")
+            self.image_folder = os.path.join(
+                self.parent_data_folder, "images"
+            )
+            self.label_folder = os.path.join(
+                self.parent_data_folder, "labels"
+            )
             self.images = os.listdir(self.image_folder)
             self.images = [img for img in self.images if _valid_images(img)]
             self.images.sort()
@@ -110,17 +115,23 @@ class Pets(Dataset):
                 binary_labels=self.binary_labels,
                 shuffle=self.shuffle,
             )
-        raise ValueError("labeled_fraction must be a float for a dataset split")
+        raise ValueError(
+            "labeled_fraction must be a float for a dataset split"
+        )
 
     def __len__(self) -> int:
         return len(self.images)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         img = ToTensor()(
-            Image.open(os.path.join(self.image_folder, self.images[idx])).convert("RGB")
+            Image.open(
+                os.path.join(self.image_folder, self.images[idx])
+            ).convert("RGB")
         )
         label_name = self.images[idx].split(".")[0] + ".png"
-        label = ToTensor()(Image.open(os.path.join(self.label_folder, label_name)))
+        label = ToTensor()(
+            Image.open(os.path.join(self.label_folder, label_name))
+        )
         img = Resize((256, 256))(img)
         if self.binary_labels:
             label[label < 0.0075] = 1  # Only Edge
@@ -163,8 +174,12 @@ class Pets(Dataset):
 class PetsUnlabeled(Dataset):
     """Class to manage unlabeled data for pet dataset."""
 
-    def __init__(self, root: str, labeled_fraction: float, shuffle: bool = True):
-        move_files = os.path.join(root, f"unlabeled_train_{labeled_fraction}.txt")
+    def __init__(
+        self, root: str, labeled_fraction: float, shuffle: bool = True
+    ):
+        move_files = os.path.join(
+            root, f"unlabeled_train_{labeled_fraction}.txt"
+        )
         self.labeled_fraction = labeled_fraction
         self.train_dir = os.path.join(root, "train_data")
         self.unlabeled_dir = os.path.join(self.train_dir, "unlabeled")
@@ -183,9 +198,9 @@ class PetsUnlabeled(Dataset):
         return len(self.images)
 
     def __getitem__(self, idx: int) -> torch.Tensor:
-        img = Image.open(os.path.join(self.unlabeled_dir, self.images[idx])).convert(
-            "RGB"
-        )
+        img = Image.open(
+            os.path.join(self.unlabeled_dir, self.images[idx])
+        ).convert("RGB")
         img = Resize((256, 256))(ToTensor()(img))
         return img
 
