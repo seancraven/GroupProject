@@ -31,6 +31,8 @@ def difference_maximized_sampling(
     Returns two subsets of the dataset such that the overlap between them is minimized.
     """
     subset_1 = Subset(dataset, range(int(len(dataset) * proportion)))
-    subset_2 = Subset(dataset, range(int(1 - proportion) * len(dataset), len(dataset)))
+    subset_2 = Subset(
+        dataset, range(int(1 - proportion) * len(dataset), len(dataset))
+    )
 
     return subset_1, subset_2

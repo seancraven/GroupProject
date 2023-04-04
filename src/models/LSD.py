@@ -18,7 +18,7 @@ class LSD(nn.Module):
         preds = torch.sigmoid(x)
         preds = preds.flatten(2, -1)  # Shape (B, C, H*W)
         preds = preds.permute(0, 2, 1)  # Shape (B, H*W, C)
-        return preds 
+        return preds
 
     def predict(self, x):
         activations = self.forward(x)

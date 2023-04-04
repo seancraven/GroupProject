@@ -7,7 +7,9 @@ import torch
 MODEL_CLASSES = [UNet, LSD]
 
 
-def _model_from_file(file_path: str, model_class: Any) -> Union[nn.Module, None]:
+def _model_from_file(
+    file_path: str, model_class: Any
+) -> Union[nn.Module, None]:
     """Tries to load a model from a file. if it fails, returns None."""
     try:
         model = model_class()

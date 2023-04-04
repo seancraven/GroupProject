@@ -133,7 +133,9 @@ def multi_model_baseline():
         train_set.labeled_fraction = split_fract
         _, labeled = train_set.get_datasets()
 
-        train_loader = DataLoader(labeled, batch_size=32, shuffle=True, num_workers=8)
+        train_loader = DataLoader(
+            labeled, batch_size=32, shuffle=True, num_workers=8
+        )
 
         model = load_u_net()
 
@@ -152,7 +154,12 @@ def multi_model_baseline():
         )
 
         train_model_wanb(
-            model, mean_square_error_loss, learning_rate, num_epoch, train_loader, ()
+            model,
+            mean_square_error_loss,
+            learning_rate,
+            num_epoch,
+            train_loader,
+            (),
         )
 
         file_name = os.path.join(
@@ -181,7 +188,12 @@ def multi_model_baseline():
         )
 
         train_model_wanb(
-            model, binary_cross_entropy_loss, learning_rate, num_epoch, train_loader, ()
+            model,
+            binary_cross_entropy_loss,
+            learning_rate,
+            num_epoch,
+            train_loader,
+            (),
         )
 
         file_name = os.path.join(

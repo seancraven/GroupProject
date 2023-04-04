@@ -14,7 +14,10 @@ from functools import partial
 from torch.utils.data import DataLoader, Dataset, ConcatDataset
 from typing import Tuple, Iterable, Optional
 
-from src.utils.datasets import balanced_minibatch_sizes, difference_maximized_sampling
+from src.utils.datasets import (
+    balanced_minibatch_sizes,
+    difference_maximized_sampling,
+)
 from src.utils.evaluation import evaluate_IoU
 from src.utils.misc import ReporterMixin
 from src.utils.training import PreTrainer, FineTuner as FT
@@ -64,7 +67,9 @@ class DMT(nn.Module, ReporterMixin):
 
         # Create convenience functions to get the train IoU and validation IoU
         self.train_IoU, self.validation_IoU = map(
-            lambda loader: partial(evaluate_IoU, data=loader, device=self.device),
+            lambda loader: partial(
+                evaluate_IoU, data=loader, device=self.device
+            ),
             (self.labeled_loader, self.validation_loader),
         )
         self.best_model_a_IoU = -torch.inf
@@ -91,7 +96,9 @@ class DMT(nn.Module, ReporterMixin):
         quantile = torch.tensor(1 - alpha).to(self.device)
         # After flattening, confidences will be of shape (B*W*H, C), so
         # computing the quantile along the first dimension will give us per-class thresholds
-        class_thresholds = torch.quantile(confidences.flatten(0, -2), quantile, dim=0)
+        class_thresholds = torch.quantile(
+            confidences.flatten(0, -2), quantile, dim=0
+        )
         pseudolabels = torch.argmax(confidences, dim=-1)
         max_confidences, _ = torch.max(confidences, dim=-1)
         # Indexing into class_thresholds in this way finds the threshold for each
@@ -119,9 +126,13 @@ class DMT(nn.Module, ReporterMixin):
             teacher_class_confidences, dim=-1, keepdim=True
         )
         p_B_mask = teacher_max_confidences == teacher_class_confidences
-        student_probs, _ = torch.max(student_class_confidences * p_B_mask, dim=-1)
+        student_probs, _ = torch.max(
+            student_class_confidences * p_B_mask, dim=-1
+        )
 
-        student_max_confidences, _ = torch.max(student_class_confidences, dim=-1)
+        student_max_confidences, _ = torch.max(
+            student_class_confidences, dim=-1
+        )
 
         # Compute the weights
         teacher_max_confidences = teacher_max_confidences.squeeze(-1)
@@ -129,7 +140,9 @@ class DMT(nn.Module, ReporterMixin):
         confidence_mask = teacher_max_confidences >= student_max_confidences
         weights = (
             torch.pow(student_probs, gamma_1) * agree_mask
-            + torch.pow(student_probs, gamma_2) * confidence_mask * (~agree_mask)
+            + torch.pow(student_probs, gamma_2)
+            * confidence_mask
+            * (~agree_mask)
         ) * mask
 
         return weights
@@ -175,16 +188,24 @@ class DMT(nn.Module, ReporterMixin):
             self.labeled_loader.dataset, proportion=proportion
         )
         loader_a, loader_b = map(
-            lambda x: DataLoader(x, batch_size=self.max_batch_size, shuffle=True),
+            lambda x: DataLoader(
+                x, batch_size=self.max_batch_size, shuffle=True
+            ),
             (subset_a, subset_b),
         )
 
         # Train models A/B on subsets A/B
         for model, loader, name in zip(
-            (self.model_a, self.model_b), (loader_a, loader_b), ("Model A", "Model B")
+            (self.model_a, self.model_b),
+            (loader_a, loader_b),
+            ("Model A", "Model B"),
         ):
             trainer = PreTrainer(
-                model, loader, self.validation_loader, name=name, device=self.device
+                model,
+                loader,
+                self.validation_loader,
+                name=name,
+                device=self.device,
             )
             trainer.train(max_epochs)
 
@@ -206,10 +227,14 @@ class DMT(nn.Module, ReporterMixin):
         student.train()
 
         # Create the optimizer and scheduler as specified in the paper
-        fine_tuner = FT(student, num_epochs, self.labeled_loader, self.unlabeled_loader)
+        fine_tuner = FT(
+            student, num_epochs, self.labeled_loader, self.unlabeled_loader
+        )
         opt, scheduler = fine_tuner.optimizer, fine_tuner.scheduler
 
-        total_batches = min(len(self.labeled_loader), len(self.unlabeled_loader))
+        total_batches = min(
+            len(self.labeled_loader), len(self.unlabeled_loader)
+        )
 
         def _dynamic_gamma(gamma: float, t: int) -> float:
             return gamma
@@ -277,7 +302,9 @@ class DMT(nn.Module, ReporterMixin):
                 )
                 # Compute the standard loss
                 student_predictions = student(labeled)
-                standard_loss = self.compute_standard_loss(student_predictions, labels)
+                standard_loss = self.compute_standard_loss(
+                    student_predictions, labels
+                )
                 # Total loss and update
                 total_loss = dynamic_loss + standard_loss
                 total_loss.backward()
@@ -301,14 +328,20 @@ class DMT(nn.Module, ReporterMixin):
             if student is self.model_a:
                 if student_val_accuracy >= self.best_model_a_IoU:
                     self.best_model_a_IoU = student_val_accuracy
-                    self.best_model_a_parameters = copy.deepcopy(student.state_dict())
+                    self.best_model_a_parameters = copy.deepcopy(
+                        student.state_dict()
+                    )
             elif student is self.model_b:
                 if student_val_accuracy >= self.best_model_b_IoU:
                     self.best_model_b_IoU = student_val_accuracy
-                    self.best_model_b_parameters = copy.deepcopy(student.state_dict())
+                    self.best_model_b_parameters = copy.deepcopy(
+                        student.state_dict()
+                    )
 
             # Everything below here is just logging
-            debug_msg = "Epoch {}/{} of percentile {} completed in {:2f} secs."
+            debug_msg = (
+                "Epoch {}/{} of percentile {} completed in {:2f} secs."
+            )
             debug_msg_args = (epoch + 1, num_epochs, alpha, toc - tic)
             self.debug(debug_msg.format(*debug_msg_args))
             self.wandb_log(
@@ -336,7 +369,9 @@ class DMT(nn.Module, ReporterMixin):
                     {"Best validation IoU": self.baseline_IoU}, "Baseline"
                 )
 
-    def dynamic_train(self, percentiles: Iterable[float], num_epochs: int) -> None:
+    def dynamic_train(
+        self, percentiles: Iterable[float], num_epochs: int
+    ) -> None:
         # Potentially swap the models so that model A is the better one, since
         # model A teaches model B first
         model_a_IoU, model_b_IoU = map(
@@ -348,11 +383,17 @@ class DMT(nn.Module, ReporterMixin):
             model_a_IoU, model_b_IoU = model_b_IoU, model_a_IoU
         self.best_model_a_IoU = model_a_IoU
         self.best_model_b_IoU = model_b_IoU
-        self.best_model_a_parameters = copy.deepcopy(self.model_a.state_dict())
-        self.best_model_b_parameters = copy.deepcopy(self.model_b.state_dict())
+        self.best_model_a_parameters = copy.deepcopy(
+            self.model_a.state_dict()
+        )
+        self.best_model_b_parameters = copy.deepcopy(
+            self.model_b.state_dict()
+        )
 
         self.baseline_IoU = (
-            self.validation_IoU(self.baseline) if self.baseline is not None else None
+            self.validation_IoU(self.baseline)
+            if self.baseline is not None
+            else None
         )
 
         for alpha in percentiles:
@@ -445,8 +486,12 @@ class DMT(nn.Module, ReporterMixin):
         image = images[idx].cpu().detach().permute(1, 2, 0).numpy()
         image_shape = (image.shape[0], image.shape[1])
         # Make pseudolabel take values 0, 1, 2 instead of 0, 1
-        pseudolabel = 1 + pseudolabels[idx].cpu().detach().numpy().reshape(image_shape)
-        student_label = student_labels[idx].cpu().detach().numpy().reshape(image_shape)
+        pseudolabel = 1 + pseudolabels[idx].cpu().detach().numpy().reshape(
+            image_shape
+        )
+        student_label = (
+            student_labels[idx].cpu().detach().numpy().reshape(image_shape)
+        )
         mask = masks[idx].cpu().detach().numpy().reshape(image_shape)
         pseudolabel_with_mask = pseudolabel * mask
         weight = weights[idx].cpu().detach().numpy().reshape(image_shape)

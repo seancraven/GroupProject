@@ -61,7 +61,9 @@ def models_bar(
         This is what the models are evaluated on.
         criterion_name: The name of the criterion.
     """
-    losses, model_f_names = evaluate_models(model_f_names, criterion, test_dataset)
+    losses, model_f_names = evaluate_models(
+        model_f_names, criterion, test_dataset
+    )
 
     models_bar_from_list(losses, model_f_names)
 
@@ -190,11 +192,15 @@ def matshow_best_worst_img(
             ax[1, i].axis("off")
 
         fig.suptitle(name[1].upper() + name[2:] + " Predictions", fontsize=20)
-        fig.supylabel("Ground Truth Labels     Model Predictions", fontsize=16)
+        fig.supylabel(
+            "Ground Truth Labels     Model Predictions", fontsize=16
+        )
         fig.tight_layout()
         # This doesn't work
         fig.savefig(
-            os.path.join(save_dir, _clean_file_names([model_f_name])[0] + name + ".png")
+            os.path.join(
+                save_dir, _clean_file_names([model_f_name])[0] + name + ".png"
+            )
         )
         plt.close()
 

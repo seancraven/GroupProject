@@ -42,7 +42,8 @@ if __name__ == "__main__":
         baseline_models_list = os.listdir(baseline_dir)
         plabel_models_list = os.listdir(plabel_dir)
         baseline_models_list = [
-            os.path.join(baseline_dir, f_name) for f_name in baseline_models_list
+            os.path.join(baseline_dir, f_name)
+            for f_name in baseline_models_list
         ]
         dmt_models_list = [
             os.path.join(models_dir, f_name) for f_name in dmt_models_list
@@ -56,13 +57,17 @@ if __name__ == "__main__":
         dmt_models_list.sort()
         plabel_models_list.sort()
 
-        baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
+        baselines_loss, _ = evaluate_models(
+            baseline_models_list, evaluate_IoU, data
+        )
         np.save(baseline_file, baselines_loss)
 
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
         np.save(dmt_file, loss)
 
-        plabel_loss, _ = evaluate_models(plabel_models_list, evaluate_IoU, data)
+        plabel_loss, _ = evaluate_models(
+            plabel_models_list, evaluate_IoU, data
+        )
         np.save(plabel_file, plabel_loss)
     # Logic
     baseline_same_label = baselines_loss[15:20]  # 0.1 label fraction
@@ -124,7 +129,9 @@ if __name__ == "__main__":
     ax.set_ylabel("IoU", fontsize=20)
     ax.set_xticks(epochs, labels=[str(i) for i in epochs], fontsize=14)
     ax.spines[["right", "top"]].set_visible(False)
-    ax.set_yticks(ax.get_yticks(), [f"{i:.3f}" for i in ax.get_yticks()], fontsize=14)
+    ax.set_yticks(
+        ax.get_yticks(), [f"{i:.3f}" for i in ax.get_yticks()], fontsize=14
+    )
 
     ax.legend()
     fig.show()

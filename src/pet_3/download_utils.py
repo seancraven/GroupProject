@@ -18,7 +18,9 @@ torch.manual_seed(0)
 def _download_pet_from_url(target_dir: str) -> Tuple[str, str]:
     """Downloads the Oxford pet data from the urls."""
     images_url = "https://thor.robots.ox.ac.uk/~vgg/data/pets/images.tar.gz"
-    annotations_url = "https://thor.robots.ox.ac.uk/~vgg/data/pets/annotations.tar.gz"
+    annotations_url = (
+        "https://thor.robots.ox.ac.uk/~vgg/data/pets/annotations.tar.gz"
+    )
 
     images_download_loc = os.path.join(target_dir, "images.tar.gz")
     annotations_download_loc = os.path.join(target_dir, "annotations.tar.gz")
@@ -78,7 +80,9 @@ def _populate_data(target_dir):
         os.makedirs(test_folder)
         os.makedirs(train_folder)
 
-        print("Downloading Files from https://thor.robots.ox.ac.uk/~vgg/data/pets")
+        print(
+            "Downloading Files from https://thor.robots.ox.ac.uk/~vgg/data/pets"
+        )
         print("Takes a minute or so be patient please.")
 
         tar_img_path, tar_ano_path = _download_pet_from_url(target_dir)
@@ -95,9 +99,9 @@ def _populate_data(target_dir):
         # Download data
         _unzip_pet_data(tar_img_path, tar_ano_path, train_folder)
 
-        if os.path.isfile(os.path.join(target_dir, "train.txt")) and os.path.isfile(
-            os.path.join(target_dir, "test.txt")
-        ):
+        if os.path.isfile(
+            os.path.join(target_dir, "train.txt")
+        ) and os.path.isfile(os.path.join(target_dir, "test.txt")):
             print("Split files already exist")
         else:
             raise FileNotFoundError(
@@ -218,7 +222,9 @@ def _write_unlabeled_file(
     classed_files: Dict[str, List[str]], split_fraction: float, root: str
 ):
     labeled_file = os.path.join(root, f"labeled_train_{split_fraction}.txt")
-    unlabeled_file = os.path.join(root, f"unlabeled_train_{split_fraction}.txt")
+    unlabeled_file = os.path.join(
+        root, f"unlabeled_train_{split_fraction}.txt"
+    )
     with open(labeled_file, "w", encoding="UTF-8") as l_train, open(
         unlabeled_file, "w", encoding="UTF-8"
     ) as u_train:

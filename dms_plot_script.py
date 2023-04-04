@@ -36,7 +36,8 @@ if __name__ == "__main__":
         data = PetsDataFetcher("src/pet_3/").get_test_data()
         baseline_models_list = os.listdir(baseline_dir)
         baseline_models_list = [
-            os.path.join(baseline_dir, f_name) for f_name in baseline_models_list
+            os.path.join(baseline_dir, f_name)
+            for f_name in baseline_models_list
         ]
         baseline_models_list.sort()
 
@@ -53,8 +54,12 @@ if __name__ == "__main__":
 
         plabel_models_list.sort()
 
-        plabel_loss, _ = evaluate_models(plabel_models_list, evaluate_IoU, data)
-        baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
+        plabel_loss, _ = evaluate_models(
+            plabel_models_list, evaluate_IoU, data
+        )
+        baselines_loss, _ = evaluate_models(
+            baseline_models_list, evaluate_IoU, data
+        )
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
 
         np.save(dms_file, loss)
@@ -63,7 +68,9 @@ if __name__ == "__main__":
     ## Logic
     baseline_same_label = baselines_loss[15:20]  # 0.1 label fraction
     baseline_val = np.mean(baseline_same_label)
-    baseline_ste = 2 * np.std(baseline_same_label) / len(baseline_same_label) ** 0.5
+    baseline_ste = (
+        2 * np.std(baseline_same_label) / len(baseline_same_label) ** 0.5
+    )
     lb = baseline_val - baseline_ste
     ub = baseline_val + baseline_ste
     plabel_mean = np.mean(plabel_loss)
@@ -111,14 +118,19 @@ if __name__ == "__main__":
         linestyle="--",
     )
     ax.plot(
-        plot_range, [baseline_val for _ in plot_range], color="grey", linestyle="--"
+        plot_range,
+        [baseline_val for _ in plot_range],
+        color="grey",
+        linestyle="--",
     )
 
     ax.set_xlabel("DMS Proportion", fontsize=20)
     ax.set_ylabel("IoU", fontsize=20)
     ax.set_xticks(dms_props, labels=[str(i) for i in dms_props], fontsize=14)
     ax.spines[["right", "top"]].set_visible(False)
-    ax.set_yticks(ax.get_yticks(), [f"{i:.3f}" for i in ax.get_yticks()], fontsize=14)
+    ax.set_yticks(
+        ax.get_yticks(), [f"{i:.3f}" for i in ax.get_yticks()], fontsize=14
+    )
     ax.set_xlim(0.48, 1.02)
 
     ax.legend()

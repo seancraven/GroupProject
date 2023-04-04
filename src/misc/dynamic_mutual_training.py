@@ -32,8 +32,12 @@ class DynamicMutualTraining(nn.Module):
         )
         self.gamma1 = gamma1
         self.gamma2 = gamma2
-        self.optimizer_a = torch.optim.Adam(self.model_a.parameters(), lr=1e-3)
-        self.optimizer_b = torch.optim.Adam(self.model_b.parameters(), lr=1e-3)
+        self.optimizer_a = torch.optim.Adam(
+            self.model_a.parameters(), lr=1e-3
+        )
+        self.optimizer_b = torch.optim.Adam(
+            self.model_b.parameters(), lr=1e-3
+        )
 
     def difference_maximized_sampling(self, L):
         """
@@ -52,7 +56,9 @@ class DynamicMutualTraining(nn.Module):
         alpha = torch.rand(1).item() * 0.499999 + 0.500001
 
         subset1 = torch.utils.data.Subset(dataset, range(int(L * alpha)))
-        subset2 = torch.utils.data.Subset(dataset, range(int((1 - alpha) * L), L))
+        subset2 = torch.utils.data.Subset(
+            dataset, range(int((1 - alpha) * L), L)
+        )
 
         return subset1, subset2
 
@@ -107,7 +113,9 @@ class DynamicMutualTraining(nn.Module):
         Computes pseudolabels from predictions
         predictions are of shape (batch, no_pixels)
         """
-        threshold = torch.quantile(predictions, q=1 - alpha, dim=1, keepdim=True)
+        threshold = torch.quantile(
+            predictions, q=1 - alpha, dim=1, keepdim=True
+        )
         mask = predictions >= threshold
         return mask
 
@@ -119,11 +127,15 @@ class DynamicMutualTraining(nn.Module):
             pseudolabels1 (torch.Tensor): Pseudolabels from model_a.
         """
         weights = torch.zeros_like(confidence_a)
-        agreement_mask = torch.round(confidence_a) == torch.round(confidence_b)
+        agreement_mask = torch.round(confidence_a) == torch.round(
+            confidence_b
+        )
         more_confident_mask = confidence_a >= confidence_b
         weights += agreement_mask * torch.pow(
             confidence_b, self.gamma1
-        ) + ~agreement_mask * more_confident_mask * torch.pow(confidence_b, self.gamma2)
+        ) + ~agreement_mask * more_confident_mask * torch.pow(
+            confidence_b, self.gamma2
+        )
         return weights * pseudolabel_mask
 
     def train_step(
@@ -165,13 +177,18 @@ class DynamicMutualTraining(nn.Module):
         )
 
         loss = torch.mean(
-            cross_entropy(weight=weights, input=predictions, target=pseudo_labels)
+            cross_entropy(
+                weight=weights, input=predictions, target=pseudo_labels
+            )
         )
 
         return loss
 
     def train(
-        self, unlabelled_loader, labelled_loader, percentile=torch.linspace(0.2, 1, 5)
+        self,
+        unlabelled_loader,
+        labelled_loader,
+        percentile=torch.linspace(0.2, 1, 5),
     ):
         """
         Implement the dynamic mutual training algorithm. (still under construction)!

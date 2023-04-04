@@ -10,7 +10,9 @@ from typing import Dict, Callable
 import os
 
 
-def plot_bar(title: str, x_label: str, y_label: str, **entries: float) -> fig.Figure:
+def plot_bar(
+    title: str, x_label: str, y_label: str, **entries: float
+) -> fig.Figure:
     """
     Plots a barplot for names entries
 
@@ -100,7 +102,10 @@ def plot_img(
 
 
 def plot_img_row(
-    title: str = None, x_label: str = None, y_label: str = None, **images: torch.Tensor
+    title: str = None,
+    x_label: str = None,
+    y_label: str = None,
+    **images: torch.Tensor,
 ) -> fig.Figure:
     """
     Plots a row of images by names arguments in a row
@@ -351,5 +356,7 @@ def plot_model_figures(
     )
 
     # save figure
-    path = os.path.join(directory_path, f"{model.file_name}_img_label_pred.png")
+    path = os.path.join(
+        directory_path, f"{model.file_name}_img_label_pred.png"
+    )
     fig.savefig(path)
