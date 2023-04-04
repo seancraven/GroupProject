@@ -61,7 +61,7 @@ if __name__ == "__main__":
         np.save(baseline_file, baselines_loss)
 
     ## Logic
-    baseline_same_label = baselines_loss[14:19]  # 0.1 label fraction
+    baseline_same_label = baselines_loss[15:20]  # 0.1 label fraction
     baseline_val = np.mean(baseline_same_label)
     baseline_ste = 2 * np.std(baseline_same_label) / len(baseline_same_label) ** 0.5
     lb = baseline_val - baseline_ste
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     ax.set_ylabel("IoU", fontsize=20)
     ax.set_xticks(dms_props, labels=[str(i) for i in dms_props], fontsize=14)
     ax.spines[["right", "top"]].set_visible(False)
-    ax.set_yticks(ax.get_yticks(), [f"{i:.2}" for i in ax.get_yticks()], fontsize=14)
+    ax.set_yticks(ax.get_yticks(), [f"{i:.3f}" for i in ax.get_yticks()], fontsize=14)
     ax.set_xlim(0.48, 1.02)
 
     ax.legend()

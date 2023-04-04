@@ -71,6 +71,8 @@ if __name__ == "__main__":
     ste_baseline_loss = [
         2 * np.std(baselines_loss[i : i + 5]) / 5**0.5 for i in range(0, 35, 5)
     ]
+    print(mean_baseline_loss)
+    print(ste_baseline_loss)
     # std_baseline_loss = [2 * np.std(baselines_loss[i : i + 5]) for i in range(0, 35, 5)]
 
     ## Plotting

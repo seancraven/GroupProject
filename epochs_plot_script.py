@@ -61,9 +61,12 @@ if __name__ == "__main__":
         plabel_loss, _ = evaluate_models(plabel_models_list, evaluate_IoU, data)
         np.save(plabel_file, plabel_loss)
     # Logic
-    baseline_same_label = baselines_loss[14:19]  # 0.1 label fraction
+    baseline_same_label = baselines_loss[15:20]  # 0.1 label fraction
     baseline_val = np.mean(baseline_same_label)
+    print(baseline_val)
+
     baseline_ste = 2 * np.std(baseline_same_label) / 5**0.5
+    print(baseline_ste)
     lb = baseline_val - baseline_ste
     ub = baseline_val + baseline_ste
     plabel_val = plabel_loss[3]
@@ -96,7 +99,7 @@ if __name__ == "__main__":
     ax.set_ylabel("IoU", fontsize=20)
     ax.set_xticks(epochs, labels=[str(i) for i in epochs], fontsize=14)
     ax.spines[["right", "top"]].set_visible(False)
-    ax.set_yticks(ax.get_yticks(), [f"{i:.2}" for i in ax.get_yticks()], fontsize=14)
+    ax.set_yticks(ax.get_yticks(), [f"{i:.3f}" for i in ax.get_yticks()], fontsize=14)
 
     ax.legend()
     fig.show()
