@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
         baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
         np.save(baseline_file, baselines_loss)
-
+        print(_)
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
         np.save(dmt_file, loss)
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     ## Plotting
     plot_range = np.arange(0, 40, 5)
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(epochs, loss, color="black", marker="x", label="DMT")
     ax.fill_between(
         plot_range,

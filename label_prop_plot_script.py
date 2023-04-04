@@ -59,6 +59,7 @@ if __name__ == "__main__":
         dmt_models_list.sort()
 
         baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
+        print(_)
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
         plabel_loss, _ = evaluate_models(plabel_models_list, evaluate_IoU, data)
 
@@ -73,14 +74,23 @@ if __name__ == "__main__":
     # std_baseline_loss = [2 * np.std(baselines_loss[i : i + 5]) for i in range(0, 35, 5)]
 
     ## Plotting
-    fig, ax = plt.subplots()
-    ax.plot(label_fractions, loss, label="DMT", color="black", marker="x")
+    fig, ax = plt.subplots(figsize=(7.5, 4.5))
+    ax.plot(
+        label_fractions,
+        loss,
+        label="DMT",
+        color="black",
+        marker="x",
+        linestyle=" ",
+    )
+
     ax.plot(
         label_fractions,
         plabel_loss,
         color="navy",
         marker="x",
         label="Pseudo Label",
+        linestyle=" ",
     )
     ax.errorbar(
         label_fractions,
@@ -90,7 +100,10 @@ if __name__ == "__main__":
         label="Baseline",
         capsize=5.0,
         capthick=1,
+        linestyle=" ",
     )
+
+    ax.errorbar([0.1], [0.823], yerr=[0.005], color="black", capsize=5.0, capthick=1)
     ax.set_xlabel("Label Fraction", fontsize=20)
     ax.set_ylabel("IoU", fontsize=20)
     ax.semilogx(subs=label_fractions)

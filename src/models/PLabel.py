@@ -24,6 +24,7 @@ class PLabel(nn.Module, ReporterMixin):
         3) Added linear alpha scheduler and added this to the combined loss func
 
     """
+
     def __init__(
         self,
         model: nn.Module,
@@ -162,7 +163,7 @@ class PLabel(nn.Module, ReporterMixin):
             epoch_n = 0
 
             tic = time.time()
-            for (unlabeled, (labeled, labels)) in zip(
+            for unlabeled, (labeled, labels) in zip(
                 self.unlabeled_loader, self.labeled_loader
             ):
                 unlabeled, labeled, labels = map(
