@@ -24,7 +24,11 @@ if __name__ == "__main__":
     plabel_file = os.path.join("eval_data", "plabel_loss.npy")
     save_file = os.path.join("final_figs", "epoch_experiment.png")
 
-    if os.path.isfile(dmt_file) and os.path.isfile(baseline_file):
+    if (
+        os.path.isfile(dmt_file)
+        and os.path.isfile(baseline_file)
+        and os.path.isfile(plabel_file)
+    ):
         loss = np.load(dmt_file)
         baselines_loss = np.load(baseline_file)
         plabel_loss = np.load(plabel_file)
@@ -32,7 +36,7 @@ if __name__ == "__main__":
         # Load
         models_dir = os.path.join("models", "vary_dmt_epochs")
         baseline_dir = os.path.join("models", "baselines")
-        plabel_dir = os.path.join("models", "plabel_vary_label_proportion")
+        plabel_dir = os.path.join("models", "plabel_default")
         data = PetsDataFetcher("src/pet_3/").get_test_data()
         dmt_models_list = os.listdir(models_dir)
         baseline_models_list = os.listdir(baseline_dir)
@@ -54,7 +58,7 @@ if __name__ == "__main__":
 
         baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
         np.save(baseline_file, baselines_loss)
-        print(_)
+
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
         np.save(dmt_file, loss)
 
@@ -67,27 +71,13 @@ if __name__ == "__main__":
     baseline_ste = 2 * np.std(baseline_same_label) / 5**0.5
     lb = baseline_val - baseline_ste
     ub = baseline_val + baseline_ste
-    plabel_val = plabel_loss[3]
+    plabel_mean = np.mean(plabel_loss)
+    plabel_ste = 2 * np.std(plabel_loss) / 5**0.5
 
     ## Plotting
     plot_range = np.arange(0, 40, 5)
     fig, ax = plt.subplots()
-    ax.plot(epochs, loss, color="black", marker="x", label="DMT", linestyle=" ")
-    ax.fill_between(
-        plot_range,
-        [lb for _ in plot_range],
-        [ub for _ in plot_range],
-        color="grey",
-        alpha=0.2,
-        label="Baseline $\pm 2 SE$",
-    )
-    ax.plot(
-        plot_range,
-        [0.823 for _ in plot_range],
-        color="black",
-        linestyle="--",
-        label="Default DMT mean",
-    )
+    ax.plot(epochs, loss, color="black", marker="x", linestyle=" ")
     ax.fill_between(
         plot_range,
         [0.823 - 0.005 for _ in plot_range],
@@ -96,17 +86,38 @@ if __name__ == "__main__":
         alpha=0.2,
         label="Default DMT $\pm 2 SE$",
     )
+    ax.fill_between(
+        plot_range,
+        [lb for _ in plot_range],
+        [ub for _ in plot_range],
+        color="grey",
+        alpha=0.2,
+        label="Baseline $\pm 2 SE$",
+    )
+    ax.fill_between(
+        plot_range,
+        [plabel_mean - plabel_ste for _ in plot_range],
+        [plabel_mean + plabel_ste for _ in plot_range],
+        color="navy",
+        alpha=0.2,
+        label="Pseudo Label $\pm 2 SE$",
+    )
+    ax.plot(
+        plot_range,
+        [0.823 for _ in plot_range],
+        color="black",
+        linestyle="--",
+    )
     ax.errorbar([0.1], [0.823], yerr=[0.005], color="black", capsize=5.0, capthick=1)
     ax.plot(
         plot_range, [baseline_val for _ in plot_range], color="grey", linestyle="--"
     )
     ax.plot(
         plot_range,
-        [plabel_val for _ in plot_range],
+        [plabel_mean for _ in plot_range],
         color="navy",
         linestyle="--",
         alpha=0.2,
-        label="Pseudo Label",
     )
     ax.set_xlim(4, 31)
     ax.set_xlabel("Epochs Between \n Student Teacher Reversal", fontsize=20)

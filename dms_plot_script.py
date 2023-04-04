@@ -66,20 +66,13 @@ if __name__ == "__main__":
     baseline_ste = 2 * np.std(baseline_same_label) / len(baseline_same_label) ** 0.5
     lb = baseline_val - baseline_ste
     ub = baseline_val + baseline_ste
-    plabel_val = plabel_loss[3]
+    plabel_mean = np.mean(plabel_loss)
+    plabel_ste = 2 * np.std(plabel_loss) / 5**0.5
 
     ## Plotting
     plot_range = np.linspace(0.45, 1.02, 5)
     fig, ax = plt.subplots()
-    ax.plot(dms_props, loss, color="black", marker="x", label="DMT", linestyle=" ")
-    ax.fill_between(
-        plot_range,
-        [lb for _ in plot_range],
-        [ub for _ in plot_range],
-        color="grey",
-        alpha=0.2,
-        label="Baseline $\pm 2 SE$",
-    )
+    ax.plot(dms_props, loss, color="black", marker="x", linestyle=" ")
     ax.fill_between(
         plot_range,
         [0.823 - 0.005 for _ in plot_range],
@@ -88,23 +81,37 @@ if __name__ == "__main__":
         alpha=0.2,
         label="Defualt DMT $\pm 2 SE$",
     )
+    ax.fill_between(
+        plot_range,
+        [plabel_mean - plabel_ste for _ in plot_range],
+        [plabel_mean + plabel_ste for _ in plot_range],
+        color="navy",
+        alpha=0.2,
+        label="Pseudo Label $\pm 2 SE$",
+    )
+    ax.plot(
+        plot_range,
+        [plabel_mean for _ in plot_range],
+        color="navy",
+        linestyle="--",
+        alpha=0.2,
+    )
+    ax.fill_between(
+        plot_range,
+        [lb for _ in plot_range],
+        [ub for _ in plot_range],
+        color="grey",
+        alpha=0.2,
+        label="Baseline $\pm 2 SE$",
+    )
     ax.plot(
         plot_range,
         [0.823 for _ in plot_range],
         color="black",
         linestyle="--",
-        label="Default DMT",
     )
     ax.plot(
         plot_range, [baseline_val for _ in plot_range], color="grey", linestyle="--"
-    )
-    ax.plot(
-        plot_range,
-        [plabel_val for _ in plot_range],
-        color="navy",
-        linestyle="--",
-        alpha=0.2,
-        label="Pseudo Label",
     )
 
     ax.set_xlabel("DMS Proportion", fontsize=20)
