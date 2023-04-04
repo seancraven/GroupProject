@@ -378,3 +378,21 @@ class PLabelVaryLabelProportion(BaseExperiment):
                 label_proportion=proportion,
                 model_fname=f"plabel_{proportion}.pt",
             )
+
+
+class PlabelDefault(BaseExperiment):
+    @property
+    def model_folder(self) -> str:
+        return "models/plabel_default"
+
+    @property
+    def description(self) -> str:
+        return "Try different label proportions"
+
+    def run(self) -> None:
+        self.create_model_folder()
+        for i in range(4):
+            proportion = 0.1
+            self._plabel_run(
+                label_proportion=proportion, model_fname=f"plabel_{proportion}_{i+2}.pt"
+            )

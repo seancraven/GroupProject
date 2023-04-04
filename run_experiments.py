@@ -1,4 +1,4 @@
-from src.experiments.experiments import PLabelVaryLabelProportion
+from src.experiments.experiments import PlabelDefault
 
 if __name__ == "__main__":
-    PLabelVaryLabelProportion().run()
+    PlabelDefault().run()

@@ -78,7 +78,7 @@ if __name__ == "__main__":
     ## Plotting
     plot_range = np.linspace(0.45, 1.02, 5)
     fig, ax = plt.subplots()
-    ax.plot(dms_props, loss, color="black", marker="x", label="DMT")
+    ax.plot(dms_props, loss, color="black", marker="x", label="DMT", linestyle=" ")
     ax.fill_between(
         plot_range,
         [lb for _ in plot_range],
@@ -86,6 +86,21 @@ if __name__ == "__main__":
         color="grey",
         alpha=0.2,
         label="Baseline $\pm 2 SE$",
+    )
+    ax.fill_between(
+        plot_range,
+        [0.823 - 0.005 for _ in plot_range],
+        [0.823 + 0.005 for _ in plot_range],
+        color="black",
+        alpha=0.2,
+        label="Defualt DMT $\pm 2 SE$",
+    )
+    ax.plot(
+        plot_range,
+        [0.823 for _ in plot_range],
+        color="black",
+        linestyle="--",
+        label="Default DMT",
     )
     ax.plot(
         plot_range,
