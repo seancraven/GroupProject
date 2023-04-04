@@ -63,18 +63,16 @@ if __name__ == "__main__":
     # Logic
     baseline_same_label = baselines_loss[15:20]  # 0.1 label fraction
     baseline_val = np.mean(baseline_same_label)
-    print(baseline_val)
 
     baseline_ste = 2 * np.std(baseline_same_label) / 5**0.5
-    print(baseline_ste)
     lb = baseline_val - baseline_ste
     ub = baseline_val + baseline_ste
     plabel_val = plabel_loss[3]
 
     ## Plotting
     plot_range = np.arange(0, 40, 5)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(epochs, loss, color="black", marker="x", label="DMT")
+    fig, ax = plt.subplots()
+    ax.plot(epochs, loss, color="black", marker="x", label="DMT", linestyle=" ")
     ax.fill_between(
         plot_range,
         [lb for _ in plot_range],
@@ -83,6 +81,22 @@ if __name__ == "__main__":
         alpha=0.2,
         label="Baseline $\pm 2 SE$",
     )
+    ax.plot(
+        plot_range,
+        [0.823 for _ in plot_range],
+        color="black",
+        linestyle="--",
+        label="Default DMT mean",
+    )
+    ax.fill_between(
+        plot_range,
+        [0.823 - 0.005 for _ in plot_range],
+        [0.823 + 0.005 for _ in plot_range],
+        color="black",
+        alpha=0.2,
+        label="Default DMT $\pm 2 SE$",
+    )
+    ax.errorbar([0.1], [0.823], yerr=[0.005], color="black", capsize=5.0, capthick=1)
     ax.plot(
         plot_range, [baseline_val for _ in plot_range], color="grey", linestyle="--"
     )
