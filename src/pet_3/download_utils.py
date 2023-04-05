@@ -18,9 +18,7 @@ torch.manual_seed(0)
 def _download_pet_from_url(target_dir: str) -> Tuple[str, str]:
     """Downloads the Oxford pet data from the urls."""
     images_url = "https://thor.robots.ox.ac.uk/~vgg/data/pets/images.tar.gz"
-    annotations_url = (
-        "https://thor.robots.ox.ac.uk/~vgg/data/pets/annotations.tar.gz"
-    )
+    annotations_url = "https://thor.robots.ox.ac.uk/~vgg/data/pets/annotations.tar.gz"
 
     images_download_loc = os.path.join(target_dir, "images.tar.gz")
     annotations_download_loc = os.path.join(target_dir, "annotations.tar.gz")
@@ -70,6 +68,12 @@ def _unzip_pet_data(tar_img_path: str, tar_ano_path: str, train_path: str):
 
 
 def _populate_data(target_dir):
+    """
+    Populates the data into the train and test folders.
+    Args:
+        target_dir: Target directory. This is the parent folder of
+        the train and test set.
+    """
     test_folder = os.path.join(target_dir, "test_data")
     train_folder = os.path.join(target_dir, "train_data")
 
@@ -80,9 +84,7 @@ def _populate_data(target_dir):
         os.makedirs(test_folder)
         os.makedirs(train_folder)
 
-        print(
-            "Downloading Files from https://thor.robots.ox.ac.uk/~vgg/data/pets"
-        )
+        print("Downloading Files from https://thor.robots.ox.ac.uk/~vgg/data/pets")
         print("Takes a minute or so be patient please.")
 
         tar_img_path, tar_ano_path = _download_pet_from_url(target_dir)
@@ -99,9 +101,9 @@ def _populate_data(target_dir):
         # Download data
         _unzip_pet_data(tar_img_path, tar_ano_path, train_folder)
 
-        if os.path.isfile(
-            os.path.join(target_dir, "train.txt")
-        ) and os.path.isfile(os.path.join(target_dir, "test.txt")):
+        if os.path.isfile(os.path.join(target_dir, "train.txt")) and os.path.isfile(
+            os.path.join(target_dir, "test.txt")
+        ):
             print("Split files already exist")
         else:
             raise FileNotFoundError(
@@ -116,6 +118,7 @@ def _populate_data(target_dir):
 
 
 def _clean_img(root: str):
+    """Removes all non png files from the images folder."""
     img_dir = os.path.join(root, "train_data", "images")
     img_list = os.listdir(img_dir)
     for img in img_list:
@@ -149,6 +152,14 @@ def _class_balance_split(split_fraction: float, root: str, mode="test"):
 def _move_files_according_to_file(
     files_to_move: str, train_dir: str, destination: str, mode="test"
 ):
+    """Moves files according to a.txt file that lists the file names.
+    Args:
+        files_to_move: Path to the file that lists the files to move.
+        train_dir: Path to the train directory.
+        destination: Path to the destination directory.
+        mode: Whether to move the files to the test or unlabeled folder.
+
+    """"""
     move_files: List[str] = []
 
     with open(files_to_move, "r", encoding="UTF-8") as test:
@@ -222,9 +233,7 @@ def _write_unlabeled_file(
     classed_files: Dict[str, List[str]], split_fraction: float, root: str
 ):
     labeled_file = os.path.join(root, f"labeled_train_{split_fraction}.txt")
-    unlabeled_file = os.path.join(
-        root, f"unlabeled_train_{split_fraction}.txt"
-    )
+    unlabeled_file = os.path.join(root, f"unlabeled_train_{split_fraction}.txt")
     with open(labeled_file, "w", encoding="UTF-8") as l_train, open(
         unlabeled_file, "w", encoding="UTF-8"
     ) as u_train:

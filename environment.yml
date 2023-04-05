@@ -4,8 +4,6 @@ channels:
   - defaults
 dependencies:
   - matplotlib
-  - pre-commit
-  - pylint
   - python=3.10
   - pytorch
   - torchvision
