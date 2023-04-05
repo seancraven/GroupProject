@@ -145,9 +145,7 @@ class BaseExperiment(ABC):
             gamma_1=gamma_1,
             gamma_2=gamma_2,
         )
-        dmt.pretrain(
-            max_epochs=10_000, proportion=difference_maximized_proportion
-        )
+        dmt.pretrain(max_epochs=10_000, proportion=difference_maximized_proportion)
         dmt.dynamic_train(percentiles=percentiles, max_epochs=num_dmt_epochs)
 
         baseline_IoU = self.test(dmt.baseline)
@@ -171,8 +169,6 @@ class BaseExperiment(ABC):
     def test(model: nn.Module) -> float:
         fetcher = PetsDataFetcher(root="src/pet_3")
         test_data = fetcher.get_test_data()
-        test_loader = DataLoader(
-            test_data, batch_size=BaseExperiment.BATCH_SIZE
-        )
+        test_loader = DataLoader(test_data, batch_size=BaseExperiment.BATCH_SIZE)
         test_IoU = evaluate_IoU(model, test_loader)
         return test_IoU

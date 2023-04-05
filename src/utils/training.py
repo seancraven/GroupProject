@@ -41,9 +41,7 @@ class EarlyStopping(ReporterMixin):
         self.best_validation: Union[float, torch.Tensor] = -torch.inf
         self.best_parameters: Union[None, dict] = None
 
-    def monitor(
-        self, model: nn.Module, validation: float | torch.Tensor
-    ) -> None:
+    def monitor(self, model: nn.Module, validation: float | torch.Tensor) -> None:
         """
         Monitors the model's validation performance and updates the best validation
         metric/parameters if necessary.
@@ -59,9 +57,7 @@ class EarlyStopping(ReporterMixin):
             # current parameters
             self.best_parameters = copy.deepcopy(model.state_dict())
             self.bad_epochs = 0
-            self.debug(
-                f"Best validation {validation:.4f}, updated best params"
-            )
+            self.debug(f"Best validation {validation:.4f}, updated best params")
         else:
             self.bad_epochs += 1
 
@@ -137,9 +133,7 @@ class PreTrainer(ReporterMixin):
             epoch_loss = 0.0
             tic = time.time()
             for i, (inputs, targets) in enumerate(self.train_loader):
-                inputs, targets = inputs.to(self.device), targets.to(
-                    self.device
-                )
+                inputs, targets = inputs.to(self.device), targets.to(self.device)
 
                 self.optimizer.zero_grad()
                 outputs = self.model(inputs)  # Of shape (B, W*H, C)
@@ -157,12 +151,8 @@ class PreTrainer(ReporterMixin):
             # Evaluate metrics for monitoring
             epoch_mean_loss = epoch_loss / len(self.train_loader)
             self.model.eval()
-            validation_IoU = evaluate_IoU(
-                self.model, self.val_loader, self.device
-            )
-            train_IoU = evaluate_IoU(
-                self.model, self.train_loader, self.device
-            )
+            validation_IoU = evaluate_IoU(self.model, self.val_loader, self.device)
+            train_IoU = evaluate_IoU(self.model, self.train_loader, self.device)
 
             # Change the learning rate if needed
             epoch_mean_loss = epoch_loss / len(self.train_loader)
@@ -225,9 +215,7 @@ class FineTuner:
             lr=self.DEFAULT_LR,
             momentum=self.DEFAULT_MOMENTUM,
         )
-        no_minibatches = (
-            min(len(labeled_loader), len(unlabeled_loader)) * no_epochs
-        )
+        no_minibatches = min(len(labeled_loader), len(unlabeled_loader)) * no_epochs
         # This is the scheduler they use in the DMT code in the official repo
         self.scheduler = torch.optim.lr_scheduler.LambdaLR(
             self.optimizer, lambda x: (1 - x / no_minibatches) ** 0.9
