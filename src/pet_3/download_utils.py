@@ -70,6 +70,8 @@ def _unzip_pet_data(tar_img_path: str, tar_ano_path: str, train_path: str):
 def _populate_data(target_dir):
     """
     Populates the data into the train and test folders.
+    This shouldn't be a private method
+
     Args:
         target_dir: Target directory. This is the parent folder of
         the train and test set.
@@ -159,7 +161,7 @@ def _move_files_according_to_file(
         destination: Path to the destination directory.
         mode: Whether to move the files to the test or unlabeled folder.
 
-    """"""
+    """
     move_files: List[str] = []
 
     with open(files_to_move, "r", encoding="UTF-8") as test:
@@ -232,6 +234,17 @@ def _write_train_test_file(
 def _write_unlabeled_file(
     classed_files: Dict[str, List[str]], split_fraction: float, root: str
 ):
+    """
+    Splits each dictionary entry and writes these items to two files train.txt and test.txt.
+
+    This function should not be called more than once. It will cause information
+    leak between train and test.
+
+    :param classed_files: Dict of file names where the key is the class.
+    :type classed_files: Dict[str, List[str]]
+    :param split_fraction: fraction of the data for train.
+    :type split_fraction: float
+    """
     labeled_file = os.path.join(root, f"labeled_train_{split_fraction}.txt")
     unlabeled_file = os.path.join(root, f"unlabeled_train_{split_fraction}.txt")
     with open(labeled_file, "w", encoding="UTF-8") as l_train, open(

@@ -5,6 +5,10 @@ except ImportError:
 
 
 class ReporterMixin:
+    """
+    Mixin class for reporting to wandb and stdout.
+    """
+
     @property
     def _verbosity(self):
         return getattr(self, "verbosity", 1)
