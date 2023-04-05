@@ -1,4 +1,4 @@
-from src.experiments.experiments import PlabelDefault
+from src.experiments.experiments import Experiments
 
 if __name__ == "__main__":
-    PlabelDefault().run()
+    Experiments().run_all()
