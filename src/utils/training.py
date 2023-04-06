@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from typing import Union
 
 from src.utils.evaluation import evaluate_IoU
-from src.utils.misc import ReporterMixin
+from src.utils.mixin import ReporterMixin
 
 
 class WatchedPlateauScheduler(ReduceLROnPlateau):

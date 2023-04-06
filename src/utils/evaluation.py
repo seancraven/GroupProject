@@ -2,6 +2,7 @@
 This module contains functions for evaluating a model on a dataloader.
 
 They share an interface as much as possible.
+function(model, dataloader, device, *args, **kwargs)
 """
 import torch
 import torch.nn as nn

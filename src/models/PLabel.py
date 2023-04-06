@@ -6,7 +6,7 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 import wandb
 
-from src.utils.misc import ReporterMixin
+from src.utils.mixin import ReporterMixin
 from src.utils.datasets import balanced_minibatch_sizes
 from src.utils.evaluation import evaluate_IoU
 from src.utils.training import PreTrainer, FineTuner as FT

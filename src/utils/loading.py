@@ -1,3 +1,8 @@
+"""
+Functions to manage loading models from files.
+
+To add more model types to be automatically loaded, add them to the MODEL_CLASSES list.
+"""
 from typing import Union, Any
 from torch import nn
 from src.models.UNet import UNet
