@@ -17,15 +17,31 @@ class PLabel(nn.Module, ReporterMixin):
     """Psuedo-Label self-training model
 
     After pretraining on a labelled training set,
-     this model generates pseudolabels on the unlabelled training set
-     as the class of maximal probability for each pixel. These pseudolabels
-     are used to generate an unlabelled loss via crossentropy with the
+    this model generates pseudolabels on the unlabelled training set
+    as the class of maximal probability for each pixel. These pseudolabels
+    are used to generate an unlabelled loss via crossentropy with the
     model's predictions: optimising with respect to this unlabelled loss
     has the effect of entropy minimisation over unseen predictions.
     We then combine labelled and unlabelled loss at each step with a
     factor alpha, which increments linearly through training until
-    it reaches a maximum value.
+    it reaches a maximum value to limit the impact of the pseudo-labels
+    during early iterations.
 
+    Args:
+        model (nn.Module) : The model to train. (U-Net)
+        labeled_dataset (Dataset) : The labelled dataset.
+        unlabeled_dataset (Dataset) : The unlabelled dataset.
+        validation_dataset (Dataset) : The validation dataset.
+        max_batch_size (int) : The maximum batch size to use for training.
+        baseline (Optional[nn.Module], optional) : The baseline model to use for the DMS pre-training.
+                                                  (Defaults to None).
+        device (str, optional) : The device to train on. (Defaults to "cuda" if torch.cuda.is_available() else "cpu").
+        verbosity (int, optional) : The verbosity of the training. (Defaults to 2).
+        t1 (int, optional) : The number of iterations to train for before starting to increase alpha.
+                                (Defaults to 100).
+        t2 (int, optional) : The number of iterations to train for before alpha reaches its maximum value.
+                                (Defaults to 600).
+        max_alpha (float, optional) : The maximum value of alpha. (Defaults to 3.0).
     """
 
     def __init__(
@@ -91,7 +107,7 @@ class PLabel(nn.Module, ReporterMixin):
 
     def compute_pseudolabels(
         self, confidences: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> torch.Tensor:
         """
         Computes pseudolabels for the unlabeled data. We choose the class that
         has the maximum predictive probability
@@ -100,6 +116,10 @@ class PLabel(nn.Module, ReporterMixin):
             confidences (torch.Tensor): Tensor of shape (B, W*H, C) containing
                 the confidences of the model for each pixel in each
                 image in the batch, for each class.
+
+        Returns:
+            pseudolabels (torch.Tensor): Tensor of shape (B,W*H) containing the
+                pseudolabels for each pixel in each image in the batch.
         """
         pseudolabels = torch.argmax(confidences, dim=-1)
         return pseudolabels
@@ -109,11 +129,36 @@ class PLabel(nn.Module, ReporterMixin):
         confidences: torch.Tensor,
         labels: torch.Tensor,
     ) -> torch.Tensor:
+        """
+        Computes the cross entropy (CE) loss for the labeled / unlabeled data.
+        between the models's confidences and the labels / pseudo-labels.
+
+        Args:
+            confidences (torch.Tensor): Tensor of shape (B, W*H, C) containing the confidences
+            labels (torch.Tensor): Tensor of shape (B, W*H) containing the pseudolabels. (true or pseudo)
+           
+        Returns:
+            loss (torch.Tensor): The CE loss for the labeld / unlabeled data.
+        """
         criterion = nn.CrossEntropyLoss(reduction="mean")
+        # Cross entropy expects logits with shape (B, C, W*H)
         logits = torch.log(confidences).permute(0, 2, 1)
         return criterion(logits, labels)
 
     def pretrain_baseline(self, max_epochs: int) -> None:
+        """
+        Trains the baseline model on the labeled data.
+
+        If the baseline is not specified, it returns None.
+        Otherwise, it trains the baseline model on the labeled data
+        for max epochs or until convergence of IoU on the validation set.
+
+        Args:
+            max_epochs (int): The maximum number of epochs to train for.
+
+        Returns:
+            None
+        """
         if self.baseline is None:
             return
         trainer = PreTrainer(
@@ -127,7 +172,13 @@ class PLabel(nn.Module, ReporterMixin):
 
     def pretrain(self, max_epochs: int) -> None:
         """
-        Pretrain on the entire labeled dataset until convergence
+        Trains the initial model on the labeled data until convergence.
+
+        Args:
+            max_epochs (int): The maximum number of epochs to train for.
+
+        Returns:
+            None
         """
         # pretrain on entire labeled dataset
         subset = self.labeled_loader.dataset
@@ -147,6 +198,15 @@ class PLabel(nn.Module, ReporterMixin):
         self.pretrain_baseline(max_epochs)
 
     def train(self, num_epochs: int) -> None:
+        """
+        Trains the model following the Pseudo-Labels proceedure training procedure.
+
+        Args:
+            num_epochs (int): The number of epochs to train for.
+
+        Returns:
+            None
+        """
         self.model_IoU = self.validation_IoU(self.model)
         self.best_model_IoU = self.model_IoU
         self.best_model = self.model
@@ -242,7 +302,18 @@ class PLabel(nn.Module, ReporterMixin):
         num_epochs,
         batch_size,
         label_ratio,
-    ):
+    ) -> None:
+        """
+        Initializes wandb logging.
+
+        Args:
+            num_epochs (int): The number of epochs to train for.
+            batch_size (int): The batch size to use.
+            label_ratio (float): The ratio of labeled to unlabeled data.
+
+        Returns:
+            None
+        """
         try:
             wandb.init(
                 project="PLabel model",
@@ -256,19 +327,43 @@ class PLabel(nn.Module, ReporterMixin):
             pass
 
     def save_model(self, filename: str) -> None:
-        """Save the model to the filename specified"""
+        """
+        Save the model to the filename specified
+
+        Args:
+            filename (str): The filename to save the model to.
+
+        Returns:
+            None
+        """
         if self.best_model is None:
             raise ValueError("Model has not been trained yet")
         torch.save(self.best_model.state_dict(), filename)
 
     def save_baseline(self, filename: str) -> None:
-        """Save the baseline model to the filename specified"""
+        """
+        Save the baseline model to the filename specified
+        
+        Args:
+            filename (str): The filename to save the model to.
+
+        Returns:
+            None
+        """
         if not self.baseline:
             raise ValueError("No baseline model was specified")
         torch.save(self.baseline.state_dict(), filename)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through the model"""
+        """
+        Forward pass through the model
+
+        Args:
+            x (torch.Tensor): The input tensor.
+
+        Returns:
+            torch.Tensor: The output tensor.
+        """
         if self.model is None:
             raise ValueError("Model has not been trained yet")
         return self.model(x)
