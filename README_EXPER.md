@@ -13,18 +13,18 @@ After all experiment subclasses have been created, they are all registered in a 
 ### How the experiments are created
 First, we have the Experiment class
 
-´´´ 
+```python 
 class Experiments:
     def register:
         # keeps a experiment registry from Base Experiments
 
     def run_all():
         # runs all registered experiments
-´´´
+```
 
 Then, we have the BaseExperiment class
 
-´´´ 
+```python 
 class BaseExperiment(ABC):
     # initialize and holds all hyper-parameters used for
     # running a DMT/Baseline model
@@ -55,7 +55,7 @@ class BaseExperiment(ABC):
         # trains model on a varying proportion of 
         # labeled data with pseudo labels in training after 
         # pre-training
-´´´
+```
 Now, for the base experiment, we have three run cases. 
 These are all different with respect to what your experiment is performing, and they can all be used in combination with each other. The functionality of the seperate run functions are:
 -  **_plabel_run**: Pseudo-label run method for all experiments. This method is called for pseudo label experiments for subclasses. This method trains the PLabel model and saves the best model (See PLabel class for details). If a baseline model is provided, it is also trained and saved.
@@ -64,7 +64,7 @@ These are all different with respect to what your experiment is performing, and 
 
 
 Now, to construct an experiment, what you do is:
-´´´
+```python
 class MyExperiment(BaseExperiments):
     # create some hyperparameters
     # in here that you want to test
@@ -80,24 +80,24 @@ class MyExperiment(BaseExperiments):
         # Implement the experiment performed here
         # inside use the run function from the three cases
         # of run experiment that you want to use
-´´´
+```
 ### How to run experiments
 
 To perform DMT / Baseline experiments in the shell, first navigate:
 
-´´´ path/to/dir/src/experiments´´´ 
+``` path/to/dir/src/experiments``` 
 
 Then, if you want to want to conduct your own experiment you can first import Baseline as followed:
 
-´´´
+```
 python from /path/to/dir/src.experiments import BaseExperiments
-´´´
+```
 
 Then follow the steps above for creating an experiment, and then do:
-´´´
+```
 my_experiment = MyExperiment()
 my_experiment.run()
-´´´
+```
 
 ### Our Experiments
 
@@ -110,8 +110,8 @@ We have the following list of conducted experiments in this project:
 - **PlabelDefault**
 
 To conduct any of them follow the steps from the "**How to run experiments**". If you want to conduct all of them at once, do:
-´´´
+```
 /path/to/dir/src/experiments python run_experiments.py
-´´´
+```
 
 
