@@ -1,18 +1,18 @@
 import copy
+from typing import Tuple, Iterable, Optional
+from functools import partial
 import math
-import matplotlib.pyplot as plt
 import time
+import matplotlib.pyplot as plt
 import torch
-import torch.nn as nn
+from torch import nn
+from torch.utils.data import DataLoader, Dataset, ConcatDataset
 
 try:
     import wandb
 except ImportError:
     pass
 
-from functools import partial
-from torch.utils.data import DataLoader, Dataset, ConcatDataset
-from typing import Tuple, Iterable, Optional
 
 from src.utils.datasets import (
     balanced_minibatch_sizes,
