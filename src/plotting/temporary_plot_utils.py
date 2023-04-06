@@ -1,8 +1,9 @@
 """
+File that has plotting functions for quick and dirty plots
+during development.
 
-This file needs to:
-    - Load a U-Net model from a file
-    - Load pass it and the test data to an evaluation.
+
+Aditionally the evaluate_models is used in the plotting files.
 """
 from typing import List, Callable, Tuple, Any
 import os
@@ -61,9 +62,7 @@ def models_bar(
         This is what the models are evaluated on.
         criterion_name: The name of the criterion.
     """
-    losses, model_f_names = evaluate_models(
-        model_f_names, criterion, test_dataset
-    )
+    losses, model_f_names = evaluate_models(model_f_names, criterion, test_dataset)
 
     models_bar_from_list(losses, model_f_names)
 
@@ -74,6 +73,7 @@ def models_bar_from_list(
     criterion_name: str = "",
     file_save_path: str = "",
 ):
+    """Plots a bar chart of the models and their evaluation on a criterion."""
     clean_names = _clean_file_names(names)
     min_y, max_y = min(losses), max(losses)
 
@@ -95,6 +95,7 @@ def model_line_from_list(
     label: str = "",
     file_save_path: str = "",
 ):
+    """Plots a line plot of the models and their evaluation on a criterion."""
     fig, ax = plt.subplots()
     for line_loss in multiple_losses:
         ax.plot(names, line_loss, c="black")
@@ -113,6 +114,7 @@ def models_matshow_best_worst_img(
     num_samples: int = 10,
     files_save_path: str = "",
 ):
+    """Takes a directory of models and plots the best and worst images."""
     for model_file in model_f_names:
         if model_file is not None:
             matshow_best_worst_img(
@@ -192,15 +194,11 @@ def matshow_best_worst_img(
             ax[1, i].axis("off")
 
         fig.suptitle(name[1].upper() + name[2:] + " Predictions", fontsize=20)
-        fig.supylabel(
-            "Ground Truth Labels     Model Predictions", fontsize=16
-        )
+        fig.supylabel("Ground Truth Labels     Model Predictions", fontsize=16)
         fig.tight_layout()
         # This doesn't work
         fig.savefig(
-            os.path.join(
-                save_dir, _clean_file_names([model_f_name])[0] + name + ".png"
-            )
+            os.path.join(save_dir, _clean_file_names([model_f_name])[0] + name + ".png")
         )
         plt.close()
 
