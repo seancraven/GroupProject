@@ -267,18 +267,6 @@ class PetsDataFetcher:
         )
 
 
-def _deterministic_label_splits(root: str) -> List[float]:
-    """Finds all of the predetermined validation splits."""
-    splits: List[float] = []
-    for file in os.listdir(root):
-        if file.endswith(".txt"):
-            split_fract_string = file.split("_")[1].split(".")[0]
-            split_fract = float(split_fract_string)
-            splits.append(split_fract)
-
-    return splits
-
-
 def _class_balanced_split(
     filenames: List[str],
     label_proportion: float,
