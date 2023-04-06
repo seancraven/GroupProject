@@ -98,6 +98,7 @@ class DMT(nn.Module, ReporterMixin):
             lambda loader: partial(evaluate_IoU, data=loader, device=self.device),
             (self.labeled_loader, self.validation_loader),
         )
+        # Set up the best model parameters
         self.best_model_a_IoU = -torch.inf
         self.best_model_b_IoU = -torch.inf
         self.best_model_a_parameters = None
@@ -115,8 +116,15 @@ class DMT(nn.Module, ReporterMixin):
                 image in the batch, for each class.
             alpha (float): percentage to use for computing the class thresholds.
                 A pseudolabel is only assigned if the confidence of the predicted
-                class is in the upper (1-alpha)% of confidences for that class
-                across the batch.
+                class is in the upper alpha% (e.g. the top 20%) of confidences 
+                for that class across the batch.
+        
+        Returns:
+            pseudolabels (torch.Tensor): Tensor of shape (B,W*H) containing the
+                pseudolabels for each pixel in each image in the batch.
+            mask (torch.Tensor): Tensor of shape (B,W*H) containing a boolean
+                mask indicating for which pixels the pseudolabels are valid,
+                based on the confidence threshold.
         """
         # Torch.quantile has to be done on-device
         quantile = torch.tensor(1 - alpha).to(self.device)
@@ -191,7 +199,6 @@ class DMT(nn.Module, ReporterMixin):
         pseudolabels: torch.Tensor,
         weights: torch.Tensor,
     ) -> torch.Tensor:
-
         """
         Computes the dynamic loss for the unlabeled data. The loss is the cross entropy (CE)
         between the student's confidences and the pseudolabels, weighted by the weights
@@ -315,7 +322,8 @@ class DMT(nn.Module, ReporterMixin):
             num_epochs (int): The number of epochs to train for.
             teacher (nn.Module): The teacher model.
             student (nn.Module): The student model.
-            student_name (str): The name of the student model.
+            student_name (str): The name of the student model. Used for WandB logging and
+                debug output.
         """
         teacher.eval()
         student.train()
@@ -326,7 +334,9 @@ class DMT(nn.Module, ReporterMixin):
         # The number of batches in the unlabeled and labeled loaders
         total_batches = min(len(self.labeled_loader), len(self.unlabeled_loader))
 
-        # dynamic gamma function for powers of weights as in the paper (currently not used)
+        # dynamic gamma function for powers of weights as in the paper.
+        # This is currently not used since it is not used in the source code for
+        # the original DMT paper.
         def _dynamic_gamma(gamma: float, t: int) -> float:
             # comment the below return to apply dynamic gamma
             return gamma
@@ -571,7 +581,9 @@ class DMT(nn.Module, ReporterMixin):
             idx (int): Index of the image to plot.
             filename (str): Filename to save the plot to.
         """
-        return  # Comment me out to actually do stuff
+        # Comment the line below out to actually produce the sanity check images.
+        # Disabled since we now believe the pseudolabels are being computed correctly.
+        return
         image = images[idx].cpu().detach().permute(1, 2, 0).numpy()
         image_shape = (image.shape[0], image.shape[1])
         # Make pseudolabel take values 0, 1, 2 instead of 0, 1
