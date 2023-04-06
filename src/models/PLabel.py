@@ -1,16 +1,15 @@
-import copy
 import time
-import wandb
+from typing import Tuple, Optional
+from functools import partial
 import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader, Dataset, ConcatDataset
-from typing import Tuple, Iterable, Optional
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
+import wandb
 
 from src.utils.misc import ReporterMixin
 from src.utils.datasets import balanced_minibatch_sizes
 from src.utils.evaluation import evaluate_IoU
 from src.utils.training import PreTrainer, FineTuner as FT
-from functools import partial
 
 
 class PLabel(nn.Module, ReporterMixin):
@@ -21,9 +20,9 @@ class PLabel(nn.Module, ReporterMixin):
      this model generates pseudolabels on the unlabelled training set
      as the class of maximal probability for each pixel. These pseudolabels
      are used to generate an unlabelled loss via crossentropy with the
-    model's predictions: optimising with respect to this unlabelled loss 
-    has the effect of entropy minimisation over unseen predictions. 
-    We then combine labelled and unlabelled loss at each step with a 
+    model's predictions: optimising with respect to this unlabelled loss
+    has the effect of entropy minimisation over unseen predictions.
+    We then combine labelled and unlabelled loss at each step with a
     factor alpha, which increments linearly through training until
     it reaches a maximum value.
 
@@ -76,9 +75,7 @@ class PLabel(nn.Module, ReporterMixin):
 
         # Create convenience functions to get the train IoU and validation IoU
         self.train_IoU, self.validation_IoU = map(
-            lambda loader: partial(
-                evaluate_IoU, data=loader, device=self.device
-            ),
+            lambda loader: partial(evaluate_IoU, data=loader, device=self.device),
             (self.labeled_loader, self.validation_loader),
         )
 
@@ -90,9 +87,7 @@ class PLabel(nn.Module, ReporterMixin):
 
     def alpha_schedule_step(self):
         self.t += 1
-        self.alpha = self.calculate_alpha(
-            self.t, self.t1, self.t2, self.max_alpha
-        )
+        self.alpha = self.calculate_alpha(self.t, self.t1, self.t2, self.max_alpha)
 
     def compute_pseudolabels(
         self, confidences: torch.Tensor
@@ -137,9 +132,7 @@ class PLabel(nn.Module, ReporterMixin):
         # pretrain on entire labeled dataset
         subset = self.labeled_loader.dataset
 
-        loader = DataLoader(
-            subset, batch_size=self.max_batch_size, shuffle=True
-        )
+        loader = DataLoader(subset, batch_size=self.max_batch_size, shuffle=True)
 
         trainer = PreTrainer(
             self.model,
@@ -158,9 +151,7 @@ class PLabel(nn.Module, ReporterMixin):
         self.best_model_IoU = self.model_IoU
         self.best_model = self.model
         self.baseline_IoU = (
-            self.validation_IoU(self.baseline)
-            if self.baseline is not None
-            else None
+            self.validation_IoU(self.baseline) if self.baseline is not None else None
         )
         self.model.train()
 
@@ -197,9 +188,7 @@ class PLabel(nn.Module, ReporterMixin):
                     pseudolabels = conf_unlabeled.argmax(-1)
 
                 # use pseudo-labels from previous time step
-                unlabeled_loss = self.compute_loss(
-                    conf_unlabeled, pseudolabels
-                )
+                unlabeled_loss = self.compute_loss(conf_unlabeled, pseudolabels)
 
                 total_loss = labeled_loss + self.alpha * unlabeled_loss
                 total_loss.backward()
@@ -217,9 +206,7 @@ class PLabel(nn.Module, ReporterMixin):
             # note this part is
             epoch_mean_labeled_loss = epoch_labeled_loss / (epoch_n)
             epoch_mean_unlabeled_loss = epoch_unlabeled_loss / (epoch_n)
-            epoch_mean_loss = (
-                epoch_mean_labeled_loss + epoch_mean_unlabeled_loss
-            )
+            epoch_mean_loss = epoch_mean_labeled_loss + epoch_mean_unlabeled_loss
 
             # I0U
             train_accuracy = self.train_IoU(self.model)
