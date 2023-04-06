@@ -1,3 +1,6 @@
+"""
+General training utilities, mostly managing optimizer behaviour.
+"""
 import copy
 import time
 import torch
