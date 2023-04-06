@@ -1,6 +1,5 @@
 """
-Module to handel the logic around splitting or loading 
-datasets.
+Module to handle the logic around splitting or loading  datasets.
 """
 import math
 from typing import Tuple
