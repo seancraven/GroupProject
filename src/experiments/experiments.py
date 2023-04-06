@@ -435,7 +435,7 @@ class VaryDifferenceMaximization(BaseExperiment):
     All other parameters are set to the default values.
 
     """
-
+    # These proportions will be used for difference maximized sampling
     PROPORTIONS = (0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
     @property
@@ -465,7 +465,7 @@ class VaryDMTEpochs(BaseExperiment):
 
     All the other parameters are set to the default values.
     """
-
+    # We will try these number of epochs for DMT training.
     EPOCHS = (5, 10, 20, 30)
 
     @property
