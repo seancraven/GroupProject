@@ -53,7 +53,8 @@ src/
         |__experiment.py
             This is the main script for interaction with the code. 
             It defines a base class that implements default 
-            hyperparameters and a wrapper for models.
+            hyperparameters and a wrapper for models,
+            and how they are run and evaluated.
 
 |__models/
         The implementation of torch.nn.Modules,
@@ -69,6 +70,8 @@ src/
 
         |__download_utils.py
 |__utils/
+        Utility functions/classes. Only ref if deeper understanding is 
+        required.
         |__datasets.py
         |__evaluation.py
         |__loading.py
