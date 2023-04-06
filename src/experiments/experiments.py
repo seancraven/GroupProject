@@ -293,7 +293,6 @@ class TrainBaselines(BaseExperiment):
         return "Train baselines for all label proportions"
 
     def run(self) -> None:
-        pass
 
         NO_RUNS_PER_BASELINE = 5
         for proportion in [self.ALL_LABEL_PROPORTIONS[-1]]:
