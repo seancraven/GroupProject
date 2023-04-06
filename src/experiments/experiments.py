@@ -278,9 +278,7 @@ class BaseExperiment(ABC):
     def test(model: nn.Module) -> float:
         fetcher = PetsDataFetcher(root="src/pet_3")
         test_data = fetcher.get_test_data()
-        test_loader = DataLoader(
-            test_data, batch_size=BaseExperiment.BATCH_SIZE
-        )
+        test_loader = DataLoader(test_data, batch_size=BaseExperiment.BATCH_SIZE)
         test_IoU = evaluate_IoU(model, test_loader)
         return test_IoU
 
@@ -380,7 +378,7 @@ class PLabelVaryLabelProportion(BaseExperiment):
             )
 
 
-class PlabelDefault(BaseExperiment):
+class PLabelDefault(BaseExperiment):
     @property
     def model_folder(self) -> str:
         return "models/plabel_default"

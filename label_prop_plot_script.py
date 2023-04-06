@@ -1,5 +1,13 @@
 """
-Short plotting script.
+Short plotting script for the Label varying experiment.
+
+This should not be called before all experiments have been run.
+Experiments.run_all()
+However if eval_data is populated it can also be run. Without the experiments.
+
+Requires the VaryLabelProportion().run() class to be run first.
+Requires the TrainBaselines().run() to be evaluated first.
+Requires the PlabelVaryLabelProportion().run() to be evaluated first.
 """
 import os
 import numpy as np

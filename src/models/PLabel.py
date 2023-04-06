@@ -213,11 +213,6 @@ class PLabel(nn.Module, ReporterMixin):
             val_accuracy = self.validation_IoU(self.model)
 
             if val_accuracy > self.best_model_IoU:
-                """
-                This is wrong and needs to be changed.
-
-                This passes best model by ref needs to be by value.
-                """
                 self.best_model_IoU = val_accuracy
                 self.best_model_dict = self.model.state_dict().copy()
 
