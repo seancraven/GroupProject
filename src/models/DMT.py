@@ -24,6 +24,33 @@ from src.utils.training import PreTrainer, FineTuner as FT
 
 
 class DMT(nn.Module, ReporterMixin):
+    """
+    Dynamic Mixup Training (DMT) as described in the paper:
+    https://arxiv.org/abs/2004.08514
+
+    The DMT class is a wrapper around two models, model_a and model_b, which
+    are trained in an alternating fashion. First the models are pre-trained on
+    labeled data using the Difference Maximized Sampling (DMS). Then the models
+    are running the DMT algorithm, which alternates between training model_a
+    and model_b on a mix of labeled and unlabeled data. The models generate 
+    psuedo labels for the unlabeled data using the other model, and the
+    psuedo labels are used to train the model on the unlabeled data and labeled.
+
+    Args:
+        model_a (nn.Module): The teacher first then student model
+        model_b (nn.Module): The student first then teacher model
+        labeled_dataset (Dataset): The labeled dataset
+        unlabeled_dataset (Dataset): The unlabeled dataset
+        validation_dataset (Dataset): The validation dataset
+        max_batch_size (int): The maximum batch size to use for training
+        gamma_1 (float): The exponent for weighting the unlabeled loss when models agree
+        gamma_2 (float): The weight of the labeled loss when models disagree and teacher is more
+                         confident than the student in the pseudo label
+        baseline (Optional[nn.Module], optional): The baseline model to use for the DMS pre-training.
+                                                  (Defaults to None).
+        device (str, optional): The device to use for training. (Defaults to cuda if available).
+        verbosity (int, optional): The verbosity level for training. (Defaults to 2).
+    """
     def __init__(
         self,
         model_a: nn.Module,
@@ -116,7 +143,27 @@ class DMT(nn.Module, ReporterMixin):
         gamma_2: float,
     ) -> torch.Tensor:
         """
-        TODO docstring
+        Computes the weights for the unlabeled loss based on the pseudo labels.
+        Weights are determined by three cases:
+            1. The models agree on the pseudolabel and the teacher is more confident
+                than the student in the pseudolabel. The weight is probability of student predictiong 
+                the same class as the teacher, raised to the power gamma_1.
+            2. The models disagree on the pseudolabel and the teacher is more confident. The weight is
+                probability of student predictiong the same class as the teacher, raised to the power gamma_2.
+            3. The models disagree on the pseudolabel and the student is more confident. The weight is 0.
+        
+        Args:
+            pseudolabels (torch.Tensor): Tensor of shape (B, W*H) containing the pseudolabels.
+            mask (torch.Tensor): Tensor of shape (B, W*H) containing a mask of pixels that should be
+                                 assigned a weight. Pixels that are not assigned a pseudolabel are 
+                                 masked out. (case 3)
+            student_class_confidences (torch.Tensor): Tensor of shape (B, W*H, C) containing the confidences
+            teacher_class_confidences (torch.Tensor): Tensor of shape (B, W*H, C) containing the confidences
+            gamma_1 (float): power to raise the student probability to for case 1.
+            gamma_2 (float): power to raise the student probability to for case 2.
+        
+        Returns:
+            weights (torch.Tensor): Tensor of shape (B, W*H) containing the weights for each pixel.
         """
         # Student labels are y_B in the paper
         student_labels = torch.argmax(student_class_confidences, dim=-1)
@@ -153,6 +200,20 @@ class DMT(nn.Module, ReporterMixin):
         pseudolabels: torch.Tensor,
         weights: torch.Tensor,
     ) -> torch.Tensor:
+    
+        """ 
+        Computes the dynamic loss for the unlabeled data. The loss is the cross entropy (CE)
+        between the student's confidences and the pseudolabels, weighted by the weights
+        computed in compute_weights.
+
+        Args:
+            student_class_confidences (torch.Tensor): Tensor of shape (B, W*H, C) containing the confidences
+            pseudolabels (torch.Tensor): Tensor of shape (B, W*H) containing the pseudolabels.
+            weights (torch.Tensor): Tensor of shape (B, W*H) containing the weights for each pixel.
+        
+        Returns:
+            loss (torch.Tensor): The dynamic CE loss for the unlabeled data.
+        """
         # The weights are set to zero at the locations we should ignore
         criterion = nn.CrossEntropyLoss(reduction="none")
         # Cross entropy expects logits with shape (B, C, W*H)
@@ -165,6 +226,18 @@ class DMT(nn.Module, ReporterMixin):
     def compute_standard_loss(
         student_class_confidences: torch.Tensor, labels: torch.Tensor
     ) -> torch.Tensor:
+        
+        """
+        Computes the standard loss for the labeled data. The loss is the cross entropy
+        between the student's confidences and the labels. 
+
+        Args:
+            student_class_confidences (torch.Tensor): Tensor of shape (B, W*H, C) containing the confidences
+            labels (torch.Tensor): Tensor of shape (B, W*H) containing the labels.
+        
+        Returns:
+            loss (torch.Tensor): The standard CE loss for the labeled data.
+        """
         criterion = nn.CrossEntropyLoss(reduction="none")
         logits = torch.log(student_class_confidences).permute(0, 2, 1)
         ce = criterion(logits, labels)
@@ -172,8 +245,19 @@ class DMT(nn.Module, ReporterMixin):
         return loss
 
     def pretrain_baseline(self, max_epochs: int) -> None:
+        """
+        Trains the baseline model on the labeled data. 
+        
+        If the baseline is not specified, it returns None. 
+        Otherwise, it trains the baseline model on the labeled data 
+        for max epochs or until convergence of IoU on the validation set.
+
+        Args:
+            max_epochs (int): The maximum number of epochs to train for.
+        """
         if self.baseline is None:
             return
+        # Train baseline on labeled data (see training.py)
         trainer = PreTrainer(
             self.baseline,
             self.labeled_loader,
@@ -184,6 +268,15 @@ class DMT(nn.Module, ReporterMixin):
         trainer.train(max_epochs)
 
     def pretrain(self, max_epochs: int, proportion: float = 0.5) -> None:
+        """
+        Trains the teacher (model_a) and student (model_b) models on the labeled data.
+        The DMS aims to maximize the difference between the subsets (A and B)
+        of the labeled data for which the teacher and student are trained.
+
+        Args:
+            max_epochs (int): The maximum number of epochs to train for.
+            proportion (float): The proportion of the labeled data to use for training the teacher.
+        """
         subset_a, subset_b = difference_maximized_sampling(
             self.labeled_loader.dataset, proportion=proportion
         )
@@ -221,7 +314,19 @@ class DMT(nn.Module, ReporterMixin):
         student_name: str = "Student",
     ) -> None:
         """
-        TODO docstring
+        Trains the student model from the teacher model. The student is trained
+        on the labeled data and the unlabeled data. The student is trained on
+        the unlabeled data using the dynamic loss. The teacher generates the
+        pseudo labels for the unlabeled data. The student is trained on the
+        labeled data and the pseudo labels using the loss as combination of the 
+        standard loss and the dynamic loss.
+
+        Args:
+            alpha (float): The percentile of the pseudo labels to use for training the student.
+            num_epochs (int): The number of epochs to train for.
+            teacher (nn.Module): The teacher model.
+            student (nn.Module): The student model.
+            student_name (str): The name of the student model.
         """
         teacher.eval()
         student.train()
@@ -231,12 +336,14 @@ class DMT(nn.Module, ReporterMixin):
             student, num_epochs, self.labeled_loader, self.unlabeled_loader
         )
         opt, scheduler = fine_tuner.optimizer, fine_tuner.scheduler
-
+        # The number of batches in the unlabeled and labeled loaders
         total_batches = min(
             len(self.labeled_loader), len(self.unlabeled_loader)
         )
 
+        # dynamic gamma function for powers of weights as in the paper (currently not used)
         def _dynamic_gamma(gamma: float, t: int) -> float:
+        # comment the below return to apply dynamic gamma
             return gamma
             total_train_steps = num_epochs * total_batches
             return gamma * math.exp(5 * (1 - (t / total_train_steps)) ** 2)
@@ -254,7 +361,7 @@ class DMT(nn.Module, ReporterMixin):
                 )
 
                 opt.zero_grad()
-                # Compute the dynamic loss
+                # Attain all attributes for the dynamic loss
                 teacher_confidences = teacher(unlabeled)
                 pseudolabels, mask = self.compute_pseudolabels(
                     teacher_confidences, alpha
@@ -296,7 +403,7 @@ class DMT(nn.Module, ReporterMixin):
                     1,
                     "test2.png",
                 )
-
+                # Compute the dynamic loss
                 dynamic_loss = self.compute_dynamic_loss(
                     student_confidences, pseudolabels, weights
                 )
@@ -372,6 +479,17 @@ class DMT(nn.Module, ReporterMixin):
     def dynamic_train(
         self, percentiles: Iterable[float], num_epochs: int
     ) -> None:
+        """
+        Trains the model following the DMT training procedure. 
+        See Algorithm 2 in the paper for details (https://arxiv.org/pdf/2004.08514.pdf).
+
+        Args:
+            percentiles (Iterable[float]): The percentiles of pseudo labels for 
+                                           which to use in the training procedure.
+                                           Increases the amount of pseudo labels iteratively.
+            num_epochs (int): The number of epochs to train for.
+        """
+
         # Potentially swap the models so that model A is the better one, since
         # model A teaches model B first
         model_a_IoU, model_b_IoU = map(
@@ -395,7 +513,9 @@ class DMT(nn.Module, ReporterMixin):
             if self.baseline is not None
             else None
         )
-
+        # Train the models on increasingly more pseudo labels
+        # As models are trained, we expect less pseudo noise, so we can
+        # use more pseudo labels without hurting performance.
         for alpha in percentiles:
             self._train_from_teacher(
                 alpha=alpha,
