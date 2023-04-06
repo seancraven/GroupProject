@@ -70,7 +70,10 @@ def _unzip_pet_data(tar_img_path: str, tar_ano_path: str, train_path: str):
 def populate_data(target_dir):
     """
     Populates the data into the train and test folders.
-    This shouldn't be a private method
+    For this to work should be 'src/pet_3' or anywhere
+    with train.txt and test.txt files.
+
+    Aviod calling this directly, the PetsDataFetcher handels this.
 
     Args:
         target_dir: Target directory. This is the parent folder of
