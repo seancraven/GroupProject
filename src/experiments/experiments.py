@@ -25,9 +25,7 @@ class Experiments:
     BaseExperiment will automatically register the experiment in the registry.
 
     Then, to run all experiments, simply call Experiments.run_all()
-
     """
-
     REGISTRY: Dict[str, "BaseExperiment"] = {}
 
     @staticmethod
@@ -88,17 +86,19 @@ class BaseExperiment(ABC):
         GAMMA_2 (int): Gamma 2 for DMT
     """
 
+    # Seed to use for reproducibility, and root folder for data
     _SEED = 0
     _ROOT = "src/pet_3"
 
-    BATCH_SIZE = 32  # For poor Michael's computer
+    # Default values for experiment parameters
+    BATCH_SIZE = 32
     LABEL_PROPORTION = 0.1
     ALL_LABEL_PROPORTIONS = (0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 0.95)
     VALIDATION_PROPORTION = 0.05
     DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
     PERCENTILES = (0.2, 0.4, 0.6, 0.8, 1.0)
     NUM_DMT_EPOCHS = 10
-    MAX_PRETRAIN_EPOCHS = 10000  # Will be 10_000
+    MAX_PRETRAIN_EPOCHS = 10000
     GAMMA_1 = 3
     GAMMA_2 = 3
 
@@ -149,12 +149,13 @@ class BaseExperiment(ABC):
             f"{self.model_folder}",
         )
 
-    # this property is a description of the experiment
     @property
     def description(self) -> str:
+        """ A description of the experiment."""
         pass
 
     def create_model_folder(self):
+        """ Create the model folder, if it doesn't already exist. """
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
 
@@ -412,7 +413,6 @@ class TrainBaselines(BaseExperiment):
         return "Train baselines for all label proportions"
 
     def run(self) -> None:
-
         NO_RUNS_PER_BASELINE = 5
         for proportion in [self.ALL_LABEL_PROPORTIONS[-1]]:
             for i in range(NO_RUNS_PER_BASELINE):
