@@ -46,6 +46,7 @@ class Experiments:
                 print(f"!!! Failed to run experiment {name} !!!")
                 print(exc)
             finally:
+                # Occasionally ran into CUDA out of memory errors, so this is a workaround
                 torch.cuda.empty_cache()
                 gc.collect()
 
