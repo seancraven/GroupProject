@@ -3,9 +3,8 @@ Module to handel the logic around splitting or loading
 datasets.
 """
 import math
-
-from torch.utils.data import Dataset, Subset
 from typing import Tuple
+from torch.utils.data import Dataset, Subset
 
 
 def balanced_minibatch_sizes(
