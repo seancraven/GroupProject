@@ -67,7 +67,7 @@ def _unzip_pet_data(tar_img_path: str, tar_ano_path: str, train_path: str):
     os.remove(tar_ano_path)
 
 
-def _populate_data(target_dir):
+def populate_data(target_dir):
     """
     Populates the data into the train and test folders.
     This shouldn't be a private method
@@ -288,5 +288,4 @@ def train_test_split(
 
 
 if __name__ == "__main__":
-    # _populate_data("./")
     fractions = [i / 10 for i in range(10)]

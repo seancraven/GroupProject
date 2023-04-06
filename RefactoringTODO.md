@@ -1,3 +1,4 @@
 Docstrings:
 
-- [ ]: Plotting file docstrings.
+- [x]: Plotting file docstrings.
+- [ ]: Utils file docstrings.
