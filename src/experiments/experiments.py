@@ -19,6 +19,14 @@ from src.utils.evaluation import evaluate_IoU, watched_evaluate_IoU
 
 
 class Experiments:
+    """ 
+    Global registry of experiments.
+    To add a new experiment, simply create a new class that inherits from BaseExperiment.
+    BaseExperiment will automatically register the experiment in the registry.
+
+    Then, to run all experiments, simply call Experiments.run_all()
+
+    """
     REGISTRY: Dict[str, "BaseExperiment"] = {}
 
     @staticmethod
@@ -51,6 +59,30 @@ class Experiments:
 
 
 class BaseExperiment(ABC):
+    """ 
+    Base class for experiments.
+
+    To create a new experiment, simply create a new class that inherits from BaseExperiment.
+    The run method is an abstract method that must be implemented by the subclass.
+    The BaseExperiment contains all the common functionality for running experiments.
+    These can be provided as default values in the constructor, or overridden by the subclass.
+
+    Example:
+    class MyExperiment(BaseExperiment):
+        def run(self):
+            # Do something
+
+    Args:
+        BATCH_SIZE (int): Batch size for training
+        LABEL_PROPORTION (float): Proportion of labeled data in the training set
+        ALL_LABEL_PROPORTIONS (tuple): All label proportions to run
+        DIFFERENCE_MAXIMIZED_PROPORTION (float): Proportion of validation data
+        PERCENTILES (tuple): Percentiles to use for DMT
+        NUM_DMT_EPOCHS (int): Number of epochs to train DMT
+        MAX_PRETRAIN_EPOCHS (int): Maximum number of epochs to train baseline
+        GAMMA_1 (int): Gamma 1 for DMT
+        GAMMA_2 (int): Gamma 2 for DMT
+    """
     _SEED = 0
     _ROOT = "src/pet_3"
 
@@ -67,12 +99,14 @@ class BaseExperiment(ABC):
 
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
+        # Register the experiment in the global registry
         Experiments.register(cls)
 
     @property
     def model_folder(self) -> str:
         pass
-
+    
+    # This is an abstract method that must be implemented by the subclass
     @abstractmethod
     def run(self) -> None:
         pass
@@ -108,7 +142,7 @@ class BaseExperiment(ABC):
             4,
             f"{self.model_folder}",
         )
-
+    # this property is a description of the experiment
     @property
     def description(self) -> str:
         pass
@@ -127,6 +161,18 @@ class BaseExperiment(ABC):
         max_pretrain_epochs: int = MAX_PRETRAIN_EPOCHS,
         baseline_fname: Optional[str] = None,
     ):
+        """ 
+        Training the baseline model only. Used for comparison with DMT.
+
+        Args:
+            batch_size (int): Batch size for training
+            label_proportion (float): Proportion of labeled data
+            validation_proportion (float): Proportion of validation data
+            seed (int): Seed for random number generator
+            max_pretrain_epochs (int): Maximum number of epochs to train baseline
+            baseline_fname (Optional[str]): Baseline model filename
+        
+        """
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
             label_proportion,
@@ -168,10 +214,35 @@ class BaseExperiment(ABC):
         baseline_fname: Optional[str] = None,
         best_model_fname: Optional[str] = None,
     ) -> None:
+        """
+        Base run method for all experiments. This method is called by the
+        subclass run method. This method trains the DMT model and saves the
+        best model.
+
+        Args:
+            batch_size (int): Batch size for training
+            label_proportion (float): Proportion of labeled data
+            validation_proportion (float): Proportion of validation data
+            difference_maximized_proportion (float): Proportion of data to be
+                                                     difference maximized
+            percentiles (tuple): Percentiles to be used for assigning pseudo
+                                 labels to unlabeled data for DMT
+            num_dmt_epochs (int): Number of epochs to train DMT
+            max_pretrain_epochs (int): Maximum number of epochs to train models 
+                                       in DMT
+            gamma_1 (int): Exponent 1 for the dynamic loss
+            gamma_2 (int): Exponent 2 for the dynamic loss
+            seed (int): Seed for random number generator
+            baseline_fname (Optional[str]): Baseline model filename
+            best_model_fname (Optional[str]): Best model filename
+        """
+        # initialize models
         unet_a = UNet()
         unet_b = UNet()
+        # initialize baseline model if provided
         baseline = UNet() if baseline_fname is not None else None
 
+        # get data
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
             label_proportion,
@@ -179,6 +250,7 @@ class BaseExperiment(ABC):
             seed=seed,
             class_balance=True,
         )
+        # instantiate DMT
         dmt = DMT(
             unet_a,
             unet_b,
@@ -190,6 +262,7 @@ class BaseExperiment(ABC):
             gamma_2=gamma_2,
             baseline=baseline,
         )
+        # initialize wandb
         dmt.wandb_init(
             percentiles=percentiles,
             num_epochs=num_dmt_epochs,
@@ -199,12 +272,15 @@ class BaseExperiment(ABC):
             gamma_1=gamma_1,
             gamma_2=gamma_2,
         )
+        # pre train models for DMT
         dmt.pretrain(
             max_epochs=max_pretrain_epochs,
             proportion=difference_maximized_proportion,
         )
+        # run DMT
         dmt.dynamic_train(percentiles=percentiles, num_epochs=num_dmt_epochs)
-
+        
+        # logging and saving
         best_model_IoU = self.test(dmt.best_model)
         dmt.wandb_log({"Best model test IoU": best_model_IoU})
         if baseline is not None:
@@ -231,9 +307,26 @@ class BaseExperiment(ABC):
         baseline_fname: Optional[str] = None,
         model_fname: Optional[str] = None,
     ) -> None:
+        """
+        Pseudo-label run method for all experiments. This method is called 
+        for pseudo label experiments for subclasses. This method trains the
+        PLabel model and saves the best model (See PLabel class for details).
+        If a baseline model is provided, it is also trained and saved.
+
+        Args:
+            batch_size (int): Batch size for training
+            label_proportion (float): Proportion of labeled data
+            validation_proportion (float): Proportion of validation data
+            num_epochs (int): Number of epochs to train PLabel
+            max_pretrain_epochs (int): Maximum number of epochs to train model 
+            seed (int): Seed for random number generator
+            baseline_fname (Optional[str]): Baseline model filename
+            model_fname (Optional[str]): Best model filename
+        """
+        # initialize models
         unet_p = UNet()
         baseline = UNet() if baseline_fname is not None else None
-
+        # get data
         fetcher = PetsDataFetcher(root=self._ROOT)
         labeled, validation, unlabeled = fetcher.get_train_data(
             label_proportion,
@@ -242,7 +335,7 @@ class BaseExperiment(ABC):
             class_balance=True,
         )
 
-        # PLabel stuff
+        # PLabel instantiation
         unet_p = UNet()
         plabel = PLabel(
             unet_p,
@@ -252,16 +345,20 @@ class BaseExperiment(ABC):
             max_batch_size=batch_size,
             baseline=baseline,
         )
+        # initialize wandb
         plabel.wandb_init(
             num_epochs=num_epochs,
             batch_size=batch_size,
             label_ratio=label_proportion,
         )
+        # pre train model
         plabel.pretrain(
             max_epochs=max_pretrain_epochs,
         )
+        # train PLabel
         plabel.train(num_epochs=num_epochs)
 
+        # logging and saving
         plabel_IoU = self.test(plabel.model)
         plabel.wandb_log({"Model test IoU": plabel_IoU})
         if baseline is not None:
@@ -276,6 +373,14 @@ class BaseExperiment(ABC):
 
     @staticmethod
     def test(model: nn.Module) -> float:
+        """
+        Test method for all experiments.
+
+        Args:
+            model (nn.Module): Model to test
+        Returns:
+            float: Test IoU
+        """
         fetcher = PetsDataFetcher(root="src/pet_3")
         test_data = fetcher.get_test_data()
         test_loader = DataLoader(test_data, batch_size=BaseExperiment.BATCH_SIZE)
@@ -284,6 +389,11 @@ class BaseExperiment(ABC):
 
 
 class TrainBaselines(BaseExperiment):
+    """
+    Trains all baselines for the experiments. 
+    The number of runs per baseline is 5.
+    The proportion used is set to 0.95 which is ... of the actual data.
+    """
     @property
     def model_folder(self) -> str:
         return "models/baselines"
@@ -304,6 +414,18 @@ class TrainBaselines(BaseExperiment):
 
 
 class VaryDifferenceMaximization(BaseExperiment):
+    """ 
+    Trains DMT with different proportions of for the 
+    subsets given to model A and model B (alpha from the paper).
+    Model A gets the alpha proportion of the data
+    Model B gets the (1 - alpha) proportion of the data
+
+    The proportions for pretraining are set to:
+    0.5, 0.6, 0.7, 0.8, 0.9, 1.0 (as a percentage)
+
+    All other parameters are set to the default values.
+
+    """
     PROPORTIONS = (0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
     @property
@@ -323,6 +445,16 @@ class VaryDifferenceMaximization(BaseExperiment):
 
 
 class VaryDMTEpochs(BaseExperiment):
+    """
+    Varying the number of epochs for DMT.
+    The epochs determine how long we train 
+    the student model on the teacher model's predictions
+    for each swap.
+
+    The epochs in the experiment are: 5, 10, 20, 30.
+
+    All the other parameters are set to the default values.
+    """
     EPOCHS = (5, 10, 20, 30)
 
     @property
@@ -342,6 +474,15 @@ class VaryDMTEpochs(BaseExperiment):
 
 
 class VaryLabelProportion(BaseExperiment):
+    """
+    Varying the label proportion for the experiments.
+    The label proportion is the proportion of the data that is labeled.
+    
+    The proportions in the experiment are: 
+    0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 0.95 (as a percentage of ... the actual data)
+
+    All the other parameters are set to the default values.
+    """
     @property
     def model_folder(self) -> str:
         return "models/vary_label_proportion"
@@ -376,8 +517,15 @@ class PLabelVaryLabelProportion(BaseExperiment):
                 model_fname=f"plabel_{proportion}.pt",
             )
 
-
-class PLabelDefault(BaseExperiment):
+class PlabelDefault(BaseExperiment):
+    """
+    The default pseudo label experiment. 
+    The label proportion is 0.1 and the number of runs is 4.
+    It trains the U-Net model until convergence, and then
+    trains the model on the unlabeled data using the pseudo labels.
+    
+    See PLabel class in src/models/PLabel.py for more details.
+    """
     @property
     def model_folder(self) -> str:
         return "models/plabel_default"
