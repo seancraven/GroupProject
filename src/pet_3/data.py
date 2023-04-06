@@ -25,7 +25,7 @@ class _BasePets(Dataset):
     It is a class to handel loading files from
     the pet_3/train_data and pet_3/label_data folders.
 
-    Additionally is the interface for the dataset.
+    Additionally provides methods for dataset interaction.
     """
 
     INVALID_IMAGES = (
