@@ -1,3 +1,7 @@
+"""
+Model used in all experiments. 
+Model forward is slightly altered to flatten output.
+"""
 import torch
 
 

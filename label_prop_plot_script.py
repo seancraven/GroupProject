@@ -1,5 +1,13 @@
 """
-Short plotting script.
+Short plotting script for the Label varying experiment.
+
+This should not be called before all experiments have been run.
+Experiments.run_all()
+However if eval_data is populated it can also be run. Without the experiments.
+
+Requires the VaryLabelProportion().run() class to be run first.
+Requires the TrainBaselines().run() to be evaluated first.
+Requires the PlabelVaryLabelProportion().run() to be evaluated first.
 """
 import os
 import numpy as np
@@ -41,8 +49,7 @@ if __name__ == "__main__":
 
         baseline_models_list = os.listdir(baseline_dir)
         baseline_models_list = [
-            os.path.join(baseline_dir, f_name)
-            for f_name in baseline_models_list
+            os.path.join(baseline_dir, f_name) for f_name in baseline_models_list
         ]
 
         dmt_models_list = os.listdir(models_dir)
@@ -59,31 +66,24 @@ if __name__ == "__main__":
         baseline_models_list.sort()
         dmt_models_list.sort()
 
-        baselines_loss, _ = evaluate_models(
-            baseline_models_list, evaluate_IoU, data
-        )
+        baselines_loss, _ = evaluate_models(baseline_models_list, evaluate_IoU, data)
         loss, _ = evaluate_models(dmt_models_list, evaluate_IoU, data)
-        plabel_loss, _ = evaluate_models(
-            plabel_models_list, evaluate_IoU, data
-        )
+        plabel_loss, _ = evaluate_models(plabel_models_list, evaluate_IoU, data)
 
         np.save(baseline_file, baselines_loss)
         np.save(dmt_file, loss)
         np.save(plabel_file, plabel_loss)
 
-    mean_baseline_loss = [
-        sum(baselines_loss[i : i + 5]) / 5 for i in range(0, 35, 5)
-    ]
+    mean_baseline_loss = [sum(baselines_loss[i : i + 5]) / 5 for i in range(0, 35, 5)]
     ste_baseline_loss = [
-        2 * np.std(baselines_loss[i : i + 5]) / 5**0.5
-        for i in range(0, 35, 5)
+        2 * np.std(baselines_loss[i : i + 5]) / 5**0.5 for i in range(0, 35, 5)
     ]
     # std_baseline_loss = [2 * np.std(baselines_loss[i : i + 5]) for i in range(0, 35, 5)]
 
     sub_label_frac = [0.01, 0.02, 0.05, 0.5, 0.8, 1.0]
     print(loss)
     ## Plotting
-    fig, ax = plt.subplots(figsize=(7.5, 4.5))
+    fig, ax = plt.subplots(figsize=(10, 4.5))
     ax.plot(
         sub_label_frac,
         loss[[0, 1, 2, 4, 5, 6]],
@@ -112,14 +112,8 @@ if __name__ == "__main__":
         linestyle=" ",
     )
 
-<<<<<<< HEAD
     ax.errorbar([0.1], [0.823], yerr=[0.005], color="black", capsize=5.0, capthick=1)
     ax.errorbar([0.1], [0.814], yerr=[0.004], color="navy", capsize=5.0, capthick=1)
-=======
-    ax.errorbar(
-        [0.1], [0.823], yerr=[0.005], color="black", capsize=5.0, capthick=1
-    )
->>>>>>> refs/remotes/origin/main
     ax.set_xlabel("Label Fraction", fontsize=20)
     ax.set_ylabel("IoU", fontsize=20)
     ax.semilogx(subs=label_fractions)
@@ -127,13 +121,7 @@ if __name__ == "__main__":
         label_fractions, labels=[str(i) for i in label_fractions], fontsize=14
     )
     ax.spines[["right", "top"]].set_visible(False)
-<<<<<<< HEAD
     ax.set_yticks(ax.get_yticks(), [f"{i:.2f}" for i in ax.get_yticks()], fontsize=14)
-=======
-    ax.set_yticks(
-        ax.get_yticks(), [f"{i:.2}" for i in ax.get_yticks()], fontsize=14
-    )
->>>>>>> refs/remotes/origin/main
 
     ax.legend()
     fig.show()
