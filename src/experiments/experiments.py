@@ -25,17 +25,17 @@ class Experiments:
     BaseExperiment will automatically register the experiment in the registry.
 
     Then, to run all experiments, simply call Experiments.run_all()
-
     """
-
     REGISTRY: Dict[str, "BaseExperiment"] = {}
 
     @staticmethod
     def register(experiment: Type["BaseExperiment"]) -> None:
+        """ Registers an experiment so it is known to the Experiments class."""
         Experiments.REGISTRY[experiment.__name__] = experiment
 
     @staticmethod
     def run_all() -> None:
+        """ Try to run all experiments; if one fails, print the error and continue."""
         for name, Experiment in Experiments.REGISTRY.items():
             try:
                 experiment = Experiment()
@@ -46,11 +46,13 @@ class Experiments:
                 print(f"!!! Failed to run experiment {name} !!!")
                 print(exc)
             finally:
+                # Occasionally ran into CUDA out of memory errors, so this is a workaround
                 torch.cuda.empty_cache()
                 gc.collect()
 
     @staticmethod
     def plot_all() -> None:
+        """ Try to plot all experiments; if one fails, print the error and continue."""
         for name, experiment in Experiments.REGISTRY.items():
             try:
                 experiment().plot()
@@ -85,32 +87,39 @@ class BaseExperiment(ABC):
         GAMMA_2 (int): Gamma 2 for DMT
     """
 
+    # Seed to use for reproducibility, and root folder for data
     _SEED = 0
     _ROOT = "src/pet_3"
 
-    BATCH_SIZE = 32  # For poor Michael's computer
+    # Default values for experiment parameters
+    BATCH_SIZE = 32
     LABEL_PROPORTION = 0.1
     ALL_LABEL_PROPORTIONS = (0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 0.95)
     VALIDATION_PROPORTION = 0.05
     DIFFERENCE_MAXIMIZED_PROPORTION = 0.7
     PERCENTILES = (0.2, 0.4, 0.6, 0.8, 1.0)
     NUM_DMT_EPOCHS = 10
-    MAX_PRETRAIN_EPOCHS = 10000  # Will be 10_000
+    MAX_PRETRAIN_EPOCHS = 10000
     GAMMA_1 = 3
     GAMMA_2 = 3
 
     def __init_subclass__(cls, **kwargs) -> None:
+        """
+        This method is called whenever a subclass is defined.
+        We use it to register the subclass in the global registry of experiments.
+        """
         super().__init_subclass__(**kwargs)
         # Register the experiment in the global registry
         Experiments.register(cls)
 
     @property
     def model_folder(self) -> str:
+        """ The model folder is the folder where the models are saved. """
         pass
 
-    # This is an abstract method that must be implemented by the subclass
     @abstractmethod
     def run(self) -> None:
+        """ Runs the experiment. Must be implemented by subclass. """
         pass
 
     def plot(self) -> None:
@@ -145,12 +154,13 @@ class BaseExperiment(ABC):
             f"{self.model_folder}",
         )
 
-    # this property is a description of the experiment
     @property
     def description(self) -> str:
+        """ A description of the experiment."""
         pass
 
     def create_model_folder(self):
+        """ Create the model folder, if it doesn't already exist. """
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
 
@@ -408,7 +418,6 @@ class TrainBaselines(BaseExperiment):
         return "Train baselines for all label proportions"
 
     def run(self) -> None:
-
         NO_RUNS_PER_BASELINE = 5
         for proportion in [self.ALL_LABEL_PROPORTIONS[-1]]:
             for i in range(NO_RUNS_PER_BASELINE):
@@ -431,7 +440,7 @@ class VaryDifferenceMaximization(BaseExperiment):
     All other parameters are set to the default values.
 
     """
-
+    # These proportions will be used for difference maximized sampling
     PROPORTIONS = (0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
     @property
@@ -461,7 +470,7 @@ class VaryDMTEpochs(BaseExperiment):
 
     All the other parameters are set to the default values.
     """
-
+    # We will try these number of epochs for DMT training.
     EPOCHS = (5, 10, 20, 30)
 
     @property

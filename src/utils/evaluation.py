@@ -53,7 +53,15 @@ def evaluate_acc(
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ) -> float:
     """Accuracy criterion for evaluating a model on a dataset.
-    not used.
+    This is not used anywhere.
+
+    Args:
+        model: The model to evaluate.
+        data: The data to evaluate the model on, in a DataLoader.
+        device: The device to run the model on.
+    
+    Returns:
+        Mean accuracy across the dataset.
     """
     model = model.to(device)
     acc = 0.0
