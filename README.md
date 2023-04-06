@@ -1,5 +1,5 @@
 # Table Of Contents
-- [Replicating Results](# Replicating the Results of this Project) 
+[Replicating Results](# Replicating the Results of this Project) 
 - [Wandb](# Logging into Weights and Biases)
 - [How to run DMT Experiments](# Guide on how to run experiments for DMT)
 - [Experiment Architecture](### Architecture for Experiment)
