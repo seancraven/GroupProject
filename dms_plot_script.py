@@ -24,7 +24,6 @@ mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "Computer Modern"
 # mpl.rcParams["text.usetex"] = True
 
-
 if __name__ == "__main__":
     dms_props = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     baseline_file = os.path.join("eval_data", "baseline_loss.npy")
@@ -80,7 +79,7 @@ if __name__ == "__main__":
     ## Plotting
     plot_range = np.linspace(0.45, 1.02, 5)
     fig, ax = plt.subplots()
-    ax.plot(dms_props, loss, color="black", marker="x", linestyle=" ")
+    ax.plot(dms_props, loss, color="black", marker="x")
     ax.fill_between(
         plot_range,
         [0.823 - 0.005 for _ in plot_range],

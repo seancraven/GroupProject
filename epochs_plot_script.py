@@ -23,6 +23,7 @@ mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "Computer Modern"
 # mpl.rcParams["text.usetex"] = True
 
+mpl.rcParams.update(mpl.rcParamsDefault)
 
 if __name__ == "__main__":
     epochs = [5, 10, 20, 30]

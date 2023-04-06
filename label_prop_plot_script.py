@@ -23,6 +23,7 @@ mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "Computer Modern"
 # mpl.rcParams["text.usetex"] = True
 
+mpl.rcParams.update(mpl.rcParamsDefault)
 
 if __name__ == "__main__":
     label_fractions = [0.01, 0.02, 0.05, 0.1, 0.5, 0.8, 1.0]
