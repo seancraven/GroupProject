@@ -1,4 +1,7 @@
- 
+"""
+All Mixin classes contained. 
+
+"""
 try:
     import wandb
 except ImportError:
@@ -8,6 +11,8 @@ except ImportError:
 class ReporterMixin:
     """
     Mixin class for reporting to wandb and stdout.
+
+    Deals with openeing and closing wandb experiments.
     """
 
     @property
