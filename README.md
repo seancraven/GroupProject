@@ -1,12 +1,12 @@
 # Table Of Contents
-[Replicating Results](# Replicating the Results of this Project) 
-- [Wandb](# Logging into Weights and Biases)
-- [How to run DMT Experiments](# Guide on how to run experiments for DMT)
-- [Experiment Architecture](### Architecture for Experiment)
-- [Experiment Creation](### How the experiments are created)
-- [How to run Experiments](### How to run the experiments)
-- [Running our Experiments](### Our Experiments)
-- [Code Structure and Short Outline](## Project Structure)
+[Replicating Results](#Replicating the Results of this Project) 
+- [Wandb](#Logging into Weights and Biases)
+- [How to run DMT Experiments](#Guide on how to run experiments for DMT)
+- [Experiment Architecture](###Architecture for Experiment)
+- [Experiment Creation](###How the experiments are created)
+- [How to run Experiments](###How to run the experiments)
+- [Running our Experiments](###Our Experiments)
+- [Code Structure and Short Outline](##Project Structure)
 # Replicating the Results of this Project
 First, we would recommend, using the environmen.yml.
 ```note
