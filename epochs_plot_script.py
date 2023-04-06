@@ -21,7 +21,7 @@ from src.plotting.temporary_plot_utils import (
 mpl.style.use("default")
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "Computer Modern"
-mpl.rcParams["text.usetex"] = True
+# mpl.rcParams["text.usetex"] = True
 
 
 if __name__ == "__main__":

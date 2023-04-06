@@ -15,7 +15,7 @@ from src.pet_3.data import PetsDataFetcher
 mpl.style.use("default")
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "Computer Modern"
-mpl.rcParams["text.usetex"] = True
+# mpl.rcParams["text.usetex"] = True
 
 
 TOTAL_BATCH_SIZE = 32
@@ -151,7 +151,10 @@ unet_50_conf = unet_50(image).squeeze().detach().numpy()[:, 1].reshape(256, 256)
 unet_80_conf = unet_80(image).squeeze().detach().numpy()[:, 1].reshape(256, 256)
 unet_100_conf = unet_100(image).squeeze().detach().numpy()[:, 1].reshape(256, 256)
 
-fig, axs, = plt.subplots(
+(
+    fig,
+    axs,
+) = plt.subplots(
     3, 8, figsize=(20, 7), sharex=True
 )  # create a row of 5 subplots
 
