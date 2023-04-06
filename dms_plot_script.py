@@ -22,7 +22,9 @@ from src.plotting.temporary_plot_utils import (
 mpl.style.use("default")
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "Computer Modern"
-# mpl.rcParams["text.usetex"] = True
+mpl.rcParams["text.usetex"] = True
+
+mpl.rcParams.update(mpl.rcParamsDefault)
 
 if __name__ == "__main__":
     dms_props = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]

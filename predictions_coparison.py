@@ -15,8 +15,9 @@ from src.pet_3.data import PetsDataFetcher
 mpl.style.use("default")
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "Computer Modern"
-# mpl.rcParams["text.usetex"] = True
+mpl.rcParams["text.usetex"] = True
 
+mpl.rcParams.update(mpl.rcParamsDefault)
 
 TOTAL_BATCH_SIZE = 32
 LABEL_PROPORTION = 0.01
