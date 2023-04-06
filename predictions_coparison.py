@@ -28,82 +28,91 @@ fetcher = PetsDataFetcher(root="src/pet_3")
 )
 device = "cuda" if torch.cuda.is_available() else "cpu"
 # DMT
-dmt_01 = UNet.from_state_dict(
-    torch.load("models/vary_label_proportion/dmt_0.01.pt", map_location=device)
-)
-dmt_02 = UNet.from_state_dict(
-    torch.load("models/vary_label_proportion/dmt_0.02.pt", map_location=device)
-)
-dmt_05 = UNet.from_state_dict(
-    torch.load("models/vary_label_proportion/dmt_0.05.pt", map_location=device)
-)
-dmt_10 = UNet.from_state_dict(
-    torch.load("models/vary_label_proportion/dmt_0.1.pt", map_location=device)
-)
-dmt_50 = UNet.from_state_dict(
-    torch.load("models/vary_label_proportion/dmt_0.5.pt", map_location=device)
-)
-dmt_80 = UNet.from_state_dict(
-    torch.load("models/vary_label_proportion/dmt_0.8.pt", map_location=device)
-)
-dmt_100 = UNet.from_state_dict(
-    torch.load("models/vary_label_proportion/dmt_0.95.pt", map_location=device)
-)
+try:
+    dmt_01 = UNet.from_state_dict(
+        torch.load("models/vary_label_proportion/dmt_0.01.pt", map_location=device)
+    )
+    dmt_02 = UNet.from_state_dict(
+        torch.load("models/vary_label_proportion/dmt_0.02.pt", map_location=device)
+    )
+    dmt_05 = UNet.from_state_dict(
+        torch.load("models/vary_label_proportion/dmt_0.05.pt", map_location=device)
+    )
+    dmt_10 = UNet.from_state_dict(
+        torch.load("models/vary_label_proportion/dmt_0.1.pt", map_location=device)
+    )
+    dmt_50 = UNet.from_state_dict(
+        torch.load("models/vary_label_proportion/dmt_0.5.pt", map_location=device)
+    )
+    dmt_80 = UNet.from_state_dict(
+        torch.load("models/vary_label_proportion/dmt_0.8.pt", map_location=device)
+    )
+    dmt_100 = UNet.from_state_dict(
+        torch.load("models/vary_label_proportion/dmt_0.95.pt", map_location=device)
+    )
 
-# Plabel
-plabel_01 = UNet.from_state_dict(
-    torch.load(
-        "models/plabel_vary_label_proportion/plabel_0.01.pt", map_location=device
+    # Plabel
+    plabel_01 = UNet.from_state_dict(
+        torch.load(
+            "models/plabel_vary_label_proportion/plabel_0.01.pt", map_location=device
+        )
     )
-)
-plabel_02 = UNet.from_state_dict(
-    torch.load(
-        "models/plabel_vary_label_proportion/plabel_0.02.pt", map_location=device
+    plabel_02 = UNet.from_state_dict(
+        torch.load(
+            "models/plabel_vary_label_proportion/plabel_0.02.pt", map_location=device
+        )
     )
-)
-plabel_05 = UNet.from_state_dict(
-    torch.load(
-        "models/plabel_vary_label_proportion/plabel_0.05.pt", map_location=device
+    plabel_05 = UNet.from_state_dict(
+        torch.load(
+            "models/plabel_vary_label_proportion/plabel_0.05.pt", map_location=device
+        )
     )
-)
-plabel_10 = UNet.from_state_dict(
-    torch.load("models/plabel_vary_label_proportion/plabel_0.1.pt", map_location=device)
-)
-plabel_50 = UNet.from_state_dict(
-    torch.load("models/plabel_vary_label_proportion/plabel_0.5.pt", map_location=device)
-)
-plabel_80 = UNet.from_state_dict(
-    torch.load("models/plabel_vary_label_proportion/plabel_0.8.pt", map_location=device)
-)
-plabel_100 = UNet.from_state_dict(
-    torch.load(
-        "models/plabel_vary_label_proportion/plabel_0.95.pt", map_location=device
+    plabel_10 = UNet.from_state_dict(
+        torch.load(
+            "models/plabel_vary_label_proportion/plabel_0.1.pt", map_location=device
+        )
     )
-)
+    plabel_50 = UNet.from_state_dict(
+        torch.load(
+            "models/plabel_vary_label_proportion/plabel_0.5.pt", map_location=device
+        )
+    )
+    plabel_80 = UNet.from_state_dict(
+        torch.load(
+            "models/plabel_vary_label_proportion/plabel_0.8.pt", map_location=device
+        )
+    )
+    plabel_100 = UNet.from_state_dict(
+        torch.load(
+            "models/plabel_vary_label_proportion/plabel_0.95.pt", map_location=device
+        )
+    )
 
-# Unet
-unet_01 = UNet.from_state_dict(
-    torch.load("models/baselines/baseline_0.01_1.pt", map_location=device)
-)
-unet_02 = UNet.from_state_dict(
-    torch.load("models/baselines/baseline_0.02_1.pt", map_location=device)
-)
-unet_05 = UNet.from_state_dict(
-    torch.load("models/baselines/baseline_0.05_1.pt", map_location=device)
-)
-unet_10 = UNet.from_state_dict(
-    torch.load("models/baselines/baseline_0.1_1.pt", map_location=device)
-)
-unet_50 = UNet.from_state_dict(
-    torch.load("models/baselines/baseline_0.5_1.pt", map_location=device)
-)
-unet_80 = UNet.from_state_dict(
-    torch.load("models/baselines/baseline_0.8_1.pt", map_location=device)
-)
-unet_100 = UNet.from_state_dict(
-    torch.load("models/baselines/baseline_0.95_1.pt", map_location=device)
-)
-
+    # Unet
+    unet_01 = UNet.from_state_dict(
+        torch.load("models/baselines/baseline_0.01_1.pt", map_location=device)
+    )
+    unet_02 = UNet.from_state_dict(
+        torch.load("models/baselines/baseline_0.02_1.pt", map_location=device)
+    )
+    unet_05 = UNet.from_state_dict(
+        torch.load("models/baselines/baseline_0.05_1.pt", map_location=device)
+    )
+    unet_10 = UNet.from_state_dict(
+        torch.load("models/baselines/baseline_0.1_1.pt", map_location=device)
+    )
+    unet_50 = UNet.from_state_dict(
+        torch.load("models/baselines/baseline_0.5_1.pt", map_location=device)
+    )
+    unet_80 = UNet.from_state_dict(
+        torch.load("models/baselines/baseline_0.8_1.pt", map_location=device)
+    )
+    unet_100 = UNet.from_state_dict(
+        torch.load("models/baselines/baseline_0.95_1.pt", map_location=device)
+    )
+except FileNotFoundError as e:
+    print("\nYou must train all the models first run run_experiments.py!!!\n")
+    raise e
 i = 0
 
 image = labeled[i][0].unsqueeze(0)
