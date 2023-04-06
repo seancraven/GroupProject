@@ -104,6 +104,10 @@ class BaseExperiment(ABC):
     GAMMA_2 = 3
 
     def __init_subclass__(cls, **kwargs) -> None:
+        """
+        This method is called whenever a subclass is defined.
+        We use it to register the subclass in the global registry of experiments.
+        """
         super().__init_subclass__(**kwargs)
         # Register the experiment in the global registry
         Experiments.register(cls)
