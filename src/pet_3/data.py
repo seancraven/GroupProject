@@ -1,3 +1,6 @@
+"""
+Classes to manage the interface with the pets data.
+"""
 import os
 import random
 from typing import List, Optional, Tuple, Union, Dict
@@ -16,6 +19,15 @@ Named = Tuple[Union[TrainPseudoSplit, TrainValidatePseudoSplit], str]
 
 
 class _BasePets(Dataset):
+    """
+    Private class that should not be called directly.
+
+    It is a class to handel loading files from
+    the pet_3/train_data and pet_3/label_data folders.
+
+    Additionally is the interface for the dataset.
+    """
+
     INVALID_IMAGES = (
         "Egyptian_Mau_162.jpg",
         "Egyptian_Mau_20.jpg",
@@ -77,17 +89,49 @@ class _BasePets(Dataset):
 
 
 class PetsLabeled(_BasePets):
+    """Subclass of _BasePets that is used for labeled data.
+    Can be passed to a DataLoader. As torch.utils.data.Dataset is an ancestor and has len
+    and getitem implemented.
+    """
+
     def __init__(self, test: bool, filenames, image_folder, label_folder):
         super().__init__(filenames, image_folder, label_folder)
         self.test = test
 
 
 class PetsUnlabeled(_BasePets):
+    """Subclass of _BasePets that is used for unlabeled data.
+    Can be passed to a DataLoader. As torch.utils.data.Dataset is an ancestor and has len
+    and getitem implemented."""
+
     def __init__(self, filenames, image_folder):
         super().__init__(filenames, image_folder, None)
 
 
 class PetsDataFetcher:
+    """Interface for the pets data. get_*_data methods return subclass of
+    torch.utils.data.Dataset.
+
+    Examples:
+        Train with 10% labeled data and 10% validation data.
+            >>> from src.pet_3.data import PetsDataFetcher
+            >>> data_fetcher = PetsDataFetcher("src/pet_3")
+            >>> labeled, unlabeled, validation = data_fetcher.get_train_data(label_proportion=0.1,
+            ...                                     validation_proportion=0.1,
+            ...                                     seed=42,
+            )
+            Return types:
+                labeled: PetsLabeled
+                unlabeled: PetsUnlabeled
+                validation: PetsLabeled
+        Test data:
+            >>> from src.pet_3.data import PetsDataFetcher
+            >>> data_fetcher = PetsDataFetcher("src/pet_3")
+            >>> test_data = data_fetcher.get_test_data()
+            Return type:
+                test_data: PetsLabeled
+    """
+
     def __init__(self, root: str) -> None:
         self.root = root
         self.test_path = os.path.join(self.root, "test_data")
@@ -123,10 +167,21 @@ class PetsDataFetcher:
         """Returns the train data, generated randomly from the given seed.
         The class balance split option will not give the same random splits
         as with class_balance=False.
+
+        A consistent random seed should be employed across instantiations,
+        this ensures that validation set and splits are the same.
+
+        Further, if a consistent random seed is used across instantiations,
+        if two different labele proportion splits are used, they share
+        the larger labelled set will always be a superset of the smalled
+        labelled set.
+
         Args:
             label_proportion: The proportion of the train data that is labeled.
             validation_proportion: The proportion of the train data that is used for validation.
             seed: The seed used to generate the random split.
+            class_balance: Whether to maintain class balance in random splits.
+
         Returns:
             A tuple of the train and validation data, and unlabeled data.
         """
@@ -199,6 +254,8 @@ class PetsDataFetcher:
             label_proportion: The proportion of the train data that is labeled.
             validation_proportion: The proportion of the train labeled data that is used for validation.
             seed: The seed used to generate the random split.
+            class_balance: Whether to maintain class balance in random splits.
+
         Returns:
             A tuple of the train and validation data, and unlabeled data.
         """
@@ -229,10 +286,12 @@ def _class_balanced_split(
 ) -> Tuple[List[str], List[str], List[str]]:
     """Splits the data into labeled, unlabeled, and validation data,
     while maintaining class balance.
+
     Args:
         filenames: The filenames of the data.
         label_proportion: The proportion of the data that is labeled.
         validation_proportion: The proportion of the data that is used for validation.
+
     Returns:
         A tuple of the validation, train, and unlabeled data.
     """
