@@ -32,10 +32,12 @@ class Experiments:
 
     @staticmethod
     def register(experiment: Type["BaseExperiment"]) -> None:
+        """ Registers an experiment so it is known to the Experiments class."""
         Experiments.REGISTRY[experiment.__name__] = experiment
 
     @staticmethod
     def run_all() -> None:
+        """ Try to run all experiments; if one fails, print the error and continue."""
         for name, Experiment in Experiments.REGISTRY.items():
             try:
                 experiment = Experiment()
@@ -51,6 +53,7 @@ class Experiments:
 
     @staticmethod
     def plot_all() -> None:
+        """ Try to plot all experiments; if one fails, print the error and continue."""
         for name, experiment in Experiments.REGISTRY.items():
             try:
                 experiment().plot()
@@ -106,11 +109,12 @@ class BaseExperiment(ABC):
 
     @property
     def model_folder(self) -> str:
+        """ The model folder is the folder where the models are saved. """
         pass
 
-    # This is an abstract method that must be implemented by the subclass
     @abstractmethod
     def run(self) -> None:
+        """ Runs the experiment. Must be implemented by subclass. """
         pass
 
     def plot(self) -> None:
