@@ -16,8 +16,8 @@ from src.utils.mixin import ReporterMixin
 
 class WatchedPlateauScheduler(ReduceLROnPlateau):
     """Wrapper around a scheduler that tracks whether the scheduler stepped"""
-
     def step(self, metric: float | torch.Tensor) -> bool:
+        """ Step the scheduler and return whether it stepped. """
         prev_lr = [gp["lr"] for gp in self.optimizer.param_groups]
         super().step(metric)
         new_lr = [gp["lr"] for gp in self.optimizer.param_groups]
@@ -25,18 +25,18 @@ class WatchedPlateauScheduler(ReduceLROnPlateau):
         return did_step
 
     def reset(self) -> None:
+        """ Reset the scheduler's plateau tracker """
         self._reset()
 
 
 class EarlyStopping(ReporterMixin):
     """Quick and dirty implementation of early stopping using validation metric."""
-
     def __init__(self, patience: int, min_delta: float = 0.0) -> None:
         """
         Args:
-            patience: Number of epochs to wait without seeing any improvement
+            patience (int): Number of epochs to wait without seeing any improvement
                 before stopping.
-            min_delta: Minimum change to qualify as an improvement.
+            min_delta (float): Minimum change to qualify as an improvement.
         """
         self.patience = patience
         self.min_delta = min_delta
@@ -94,6 +94,15 @@ class PreTrainer(ReporterMixin):
         device="cuda" if torch.cuda.is_available() else "cpu",
         verbosity: int = 2,
     ) -> None:
+        """
+        Args:
+            model: The model to train.
+            train_loader: The training data loader.
+            val_loader: The validation data loader.
+            name: The name of the model, used for logging.
+            device: The device to train on.
+            verbosity: The verbosity of the logger.
+        """
         super().__init__()
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -198,9 +207,12 @@ class PreTrainer(ReporterMixin):
 class FineTuner:
     """
     Helper class to create the optimizer and learning rate scheduler for the
-    'fine-tuning' stage of DMT
-    """
+    'fine-tuning' stage of DMT.
 
+    Has attributes "optimizer" and "scheduler", which are the correct optimizer
+    and scheduler for the given model with the specified number of epochs and
+    the specified labeled and unlabeled data loaders.
+    """
     # The values below are from the DMT paper
     DEFAULT_LR = 4e-3
     DEFAULT_MOMENTUM = 0.9
@@ -212,6 +224,13 @@ class FineTuner:
         labeled_loader: DataLoader,
         unlabeled_loader: DataLoader,
     ) -> None:
+        """
+        Args:
+            model: The model to train.
+            no_epochs: The number of epochs to train for.
+            labeled_loader: The labeled data loader.
+            unlabeled_loader: The unlabeled data loader.
+        """
         # In the paper they just use SGD with learning rate 4e-3 and momentum 0.9
         self.optimizer = torch.optim.SGD(
             model.parameters(),

@@ -6,6 +6,10 @@ import torch
 
 
 class UNet(torch.nn.Module):
+    """
+    A UNet model taken from a brain segmentation paper. The forward pass is
+    modified to produce an output of the shape DMT expects, i.e. (B, H*W, C).
+    """
     def __init__(self):
         super().__init__()
         self.model = torch.hub.load(
@@ -25,6 +29,7 @@ class UNet(torch.nn.Module):
 
     @classmethod
     def from_state_dict(cls, state_dict) -> "UNet":
+        """ Produces a UNet model from a state dict."""
         unet = cls()
         unet.load_state_dict(state_dict)
         return unet
