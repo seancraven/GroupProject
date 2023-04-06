@@ -15,9 +15,9 @@ from src.utils.mixin import ReporterMixin
 
 
 class WatchedPlateauScheduler(ReduceLROnPlateau):
-    """Wrapper around a scheduler that tracks whether the scheduler stepped"""
+    """Wrapper around a scheduler that tracks whether the learning rate changed."""
     def step(self, metric: float | torch.Tensor) -> bool:
-        """ Step the scheduler and return whether it stepped. """
+        """ Step the scheduler and return whether it changed the learning rate """
         prev_lr = [gp["lr"] for gp in self.optimizer.param_groups]
         super().step(metric)
         new_lr = [gp["lr"] for gp in self.optimizer.param_groups]
