@@ -1,5 +1,6 @@
 # Table Of Contents
-[Replicating Results](#replicating-the-results-of-this-project) 
+- [Additional packages](#additional-packages)
+- [Replicating Results](#replicating-the-results-of-this-project) 
 - [Wandb](#logging-into-weights-and-biases)
 - [How to run DMT Experiments](#guide-on-how-to-run-experiments-for-dmt)
 - [Experiment Architecture](#architecture-for-experiments)
@@ -7,11 +8,13 @@
 - [How to run Experiments](#how-to-run-experiments)
 - [Running our Experiments](#our-experiments)
 - [Code Structure and Short Outline](#project-structure)
+# Additional packages
+In addition to those in the comp0090-cw1-pt environment, we use the `wandb` and `matplotlib` packages. These can be installed using the environment.yml file as detailed below.
+
 # Replicating the Results of this Project
-First, we would recommend, using the environmen.yml.
+First, we would recommend using the environment.yml.
 ```note
-If you have a cuda enabled gpu there is a huge advantage to installing torch with cuda.
-this is massively preferred as the experiment suite takes ~50 hours on RTX 3090, with cuda.
+If you have a CUDA enabled GPU, we strongly recommend installing PyTorch with CUDA. The experiment suite takes ~50 hours on an RTX 3090 with 24GB of VRAM using CUDA; no attempt has been made to run this on a CPU-only system.
 ```
 To create the environment open the terminal on a Unix-like system;
 ```bash
@@ -22,30 +25,36 @@ Then run,
 ```bash
 python run_experiments.py
 ```
+This file has been set up to run all the experiments we created.
 
 # Logging into Weights and Biases
-To run the scripts, you will need to make a Weights and Biases account. On 
-wandb.ai.
+To run the scripts, you will need to make a Weights and Biases account on wandb.ai. This is a platform used to track training of deep learning models.
 
-After creating the environment and account, you can log into Weights and Biases with,
+After creating the environment and account, you can log in to Weights and Biases with
 ```bash
 wandb login
 ```
+After this, training progress will be logged to weights and biases.
 
 # Guide on how to run experiments for DMT
-
-
 ### Architecture for Experiments
+Experiments are based on classes. A parent class BaseExperiment defines various default parameters and default ways to run training, as well as providing a uniform interface for running experiments.
 
-The architecture of the experiments is dependent on classes. Any experiment performed in this project are subclasses of a parent class BaseExperiments.  
-  
-The BaseExperiment class contain all the hyper-parameters needed for models within Dynamic Mutual Training (DMT) and for the Baseline models.
-These are set to some default values that needs to be overridden for experiments to reflect changes in the experiment conducted. 
+The BaseExperiment class contain all the hyper-parameters needed for models within Dynamic Mutual Training (DMT) and for the Baseline models. These are set to some default values that needs to be overridden for experiments to reflect changes in the experiment conducted. 
 
-After all experiment subclasses have been created, they are all registered in a global class Experiments that keeps a registry on all the experiments that will be conducted (i.e., all the subclasses). If the user then wants to run all the experiments, the Experiment class have a functionality for this that will be explained below. However, without proper GPU and memory this will be tedious. Even in the case for running a single experiment for a subclass, the user will rely on having signficant computing power (robust GPU).
+All subclasses of BaseExperiment are registered to a class called Experiments which maintains a registry of all experiments that will be conducted. To run all experiments, all that needs to be done is
+```python
+from path/to/dir/src.experiments import Experiments
+
+Experiments.run_all()
+```
+or using the run_experiments.py file detailed above.
+
+We do not suggest running all the experiments since it takes a long time; even running a single experiment for a subclass will require significant computing power.
+
 
 ### How the experiments are created
-First, we have the Experiment class
+First, we have the Experiments class
 
 ```python 
 class Experiments:
@@ -95,9 +104,9 @@ These are all different with respect to what your experiment is performing, and 
 -  **_plabel_run**: Pseudo-label run method for all experiments. This method is called for pseudo label experiments for subclasses. This method trains the PLabel model and saves the best model (See PLabel class for details). If a baseline model is provided, it is also trained and saved.
 - **_base_run**: Base run method for all experiments. This method is called by the subclass run method. This method trains the DMT model and saves the best model.
 - **_train_baseline_only**: Training the baseline model only. Used for comparison with DMT.
+All default parameters are provided, so to modify a parameter, you should call e.g. `self._base_run(label_proportion=0.4)`.
 
-
-Now, to construct an experiment, what you do is:
+Should you wish to define your own experiment, you should do the following:
 ```python
 class MyExperiment(BaseExperiments):
     # create some hyperparameters
@@ -110,21 +119,29 @@ class MyExperiment(BaseExperiments):
     @property 
     def description():
         # set a return description of the experiment
+        
     def run():
         # Implement the experiment performed here
         # inside use the run function from the three cases
         # of run experiment that you want to use
 ```
-### How to run experiments
+### How to run an individual experiment
+
+Write a Python file which imports a single experiment, e.g.
+```python
+from path/to/dir/src/experiments import VaryLabelProportion
+
+experiment = VaryLabelProportion()
+experiment.run()
+```
 
 To perform DMT / Baseline experiments in the shell, first navigate:
-
 ``` path/to/dir/src/experiments``` 
 
-Then, if you want to want to conduct your own experiment you can first import Baseline as followed:
+Then, if you want to want to conduct your own experiment you can first import BaseExperiment as followed:
 
 ```bash
-python from /path/to/dir/src.experiments import BaseExperiments
+python from /path/to/dir/src.experiments import BaseExperiment
 ```
 
 Then follow the steps above for creating an experiment, and then do:
