@@ -12,10 +12,8 @@
 In addition to those in the comp0090-cw1-pt environment, we use the `wandb` and `matplotlib` packages. These can be installed using the environment.yml file as detailed below.
 
 # Replicating the Results of this Project
-First, we would recommend using the environment.yml.
-```note
-If you have a CUDA enabled GPU, we strongly recommend installing PyTorch with CUDA. The experiment suite takes ~50 hours on an RTX 3090 with 24GB of VRAM using CUDA; no attempt has been made to run this on a CPU-only system.
-```
+First, we would recommend using the environment.yml. If you have a CUDA enabled GPU, we strongly recommend installing PyTorch with CUDA. The experiment suite takes ~50 hours on an RTX 3090 with 24GB of VRAM using CUDA; no attempt has been made to run this on a CPU-only system.
+
 To create the environment open the terminal on a Unix-like system;
 ```bash
 conda env create -f environment.yml
