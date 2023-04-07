@@ -11,7 +11,7 @@
 First, we would recommend, using the environmen.yml.
 ```note
 If you have a cuda enabled gpu there is a huge advantage to installing torch with cuda.
-this is massively preffered as the experiment suite takes ~50 hours on RTX 3090, with cuda.
+this is massively preferred as the experiment suite takes ~50 hours on RTX 3090, with cuda.
 ```
 To create the environment open the terminal on a Unix-like system;
 ```bash
